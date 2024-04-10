@@ -1,0 +1,719 @@
+openapi: 3.0.1
+info:
+  description: Apache Flink job lifecycle management component for Confluent Platform.
+  title: Confluent Manager for Apache Flink / CMF
+  version: "1.0"
+servers:
+- url: http://localhost:8080/cmf/api/v1
+paths:
+  /environments:
+    get:
+      operationId: getEnvironments
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Multiple
+          sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentsPage'
+          description: Environments found and returned.
+        "304":
+          description: Not modified.
+          headers:
+            ETag:
+              description: An ID for this version of the response.
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Lists Environments
+      x-spring-paginated: true
+    post:
+      operationId: createOrUpdateEnvironment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostEnvironment'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEnvironment'
+          description: The Environments was successfully added.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Create or update an Environment
+  /environments/{name}:
+    delete:
+      operationId: deleteEnvironment
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Environment found and deleted.
+        "304":
+          description: Not modified.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+  /environments/{name}/applications:
+    get:
+      operationId: getApplications
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Multiple
+          sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Subscribe to any updates
+        explode: true
+        in: query
+        name: watch
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Select fields to return
+        explode: true
+        in: query
+        name: fieldSelector
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationsPage'
+          description: Application found and returned.
+        "304":
+          description: Not modified.
+          headers:
+            ETag:
+              description: An ID for this version of the response.
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Lists Applications
+      x-spring-paginated: true
+    post:
+      operationId: createOrUpdateApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Application'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: The Application was successfully created or updated.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Creates a new Flink Application or updates an existing one.
+  /environments/{name}/applications/{appName}:
+    delete:
+      operationId: deleteApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Application found and deleted.
+        "304":
+          description: Not modified.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes an Application
+    get:
+      operationId: getApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Select fields to return
+        explode: true
+        in: query
+        name: fieldSelector
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: Application found and returned.
+        "304":
+          description: Not modified.
+          headers:
+            ETag:
+              description: An ID for this version of the response.
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Get a Application
+  /environments/{name}/applications/{appName}/start:
+    post:
+      operationId: startApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          application/json:
+            schema:
+              properties:
+                discardState:
+                  type: boolean
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: Application started
+        "304":
+          description: Not modified.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Starts an earlier submitted Flink Application
+  /environments/{name}/applications/{appName}/stop:
+    post:
+      operationId: stopApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+          description: Application stopped
+        "304":
+          description: Not modified.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Stops an earlier started Flink Application
+components:
+  parameters:
+    pageParam:
+      description: Zero-based page index (0..N)
+      explode: true
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+      style: form
+    sizeParam:
+      description: The size of the page to be returned
+      explode: true
+      in: query
+      name: size
+      required: false
+      schema:
+        type: integer
+      style: form
+    sortParam:
+      description: 'Sorting criteria in the format: property,(asc|desc). Multiple
+        sort criteria are supported.'
+      explode: true
+      in: query
+      name: sort
+      required: false
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+  requestBodies:
+    inline_object:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
+  schemas:
+    RestError:
+      description: The schema for all error responses.
+      properties:
+        status:
+          description: The HTTP status code.
+          example: 400
+          format: int32
+          readOnly: true
+          title: Status
+          type: integer
+        error:
+          description: The short error message.
+          example: Bad Request
+          readOnly: true
+          title: Error
+          type: string
+        path:
+          description: The path of the URL for this request.
+          example: /api/owners
+          format: uri
+          readOnly: true
+          title: Path
+          type: string
+        timestamp:
+          description: The time the error occured.
+          format: date-time
+          readOnly: true
+          title: Timestamp
+          type: string
+        message:
+          description: The long error message.
+          example: Request failed schema validation
+          readOnly: true
+          title: Message
+          type: string
+        schemaValidationErrors:
+          description: Validation errors against the OpenAPI schema.
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+          title: Schema validation errors
+          type: array
+        trace:
+          description: The stacktrace for this error.
+          example: 'com.atlassian.oai.validator.springmvc.InvalidRequestException:
+            ...'
+          readOnly: true
+          title: Trace
+          type: string
+      required:
+      - error
+      - message
+      - path
+      - schemaValidationErrors
+      - status
+      - timestamp
+      title: REST Error
+      type: object
+    ValidationMessage:
+      additionalProperties: true
+      description: Messages describing a validation error.
+      properties:
+        message:
+          description: The valiation message.
+          example: '[Path ''/lastName''] Instance type (null) does not match any allowed
+            primitive type (allowed: ["string"])'
+          readOnly: true
+          title: Message
+          type: string
+      required:
+      - message
+      title: Validation message
+      type: object
+    PaginationResponse:
+      properties:
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+      type: object
+    Sort:
+      format: sort
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean
+      type: object
+    Pageable:
+      format: pageable
+      properties:
+        page:
+          minimum: 0
+          type: integer
+        size:
+          minimum: 1
+          type: integer
+        sort:
+          items:
+            type: string
+          type: array
+      type: object
+    PostResourceBase:
+      properties:
+        name:
+          description: A unique name for the resource.
+          maxLength: 253
+          minLength: 4
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+          title: Name
+          type: string
+      type: object
+    GetResourceBase:
+      properties:
+        created_time:
+          format: date-time
+          title: Time when the resource has been created
+          type: string
+        updated_time:
+          format: date-time
+          title: Time when the resource has been last updated
+          type: string
+      type: object
+    ResourceWithDefaults:
+      properties:
+        default_strategy:
+          enum:
+          - jsonpatch
+          - template-merge-position
+          - template-merge-name
+          title: Default Strategy
+          type: string
+        defaults:
+          format: yamlorjson
+          title: the defaults as YAML or JSON
+          type: object
+      type: object
+    PostEnvironment:
+      allOf:
+      - $ref: '#/components/schemas/PostResourceBase'
+      - $ref: '#/components/schemas/ResourceWithDefaults'
+      description: Environment
+      example:
+        kubernetesClusterName: kubernetesClusterName
+        namespaces:
+        - namespaces
+        - namespaces
+      properties:
+        kubernetesClusterName:
+          title: Name from the CMF configuration for the Kubernetes cluster name
+          type: string
+        namespaces:
+          items:
+            type: string
+          title: One or more namespaces to use. Use '*' for any.
+          type: array
+      required:
+      - kubernetesClusterName
+      - name
+      - namespaces
+      title: Environment
+      type: object
+    GetEnvironment:
+      allOf:
+      - $ref: '#/components/schemas/PostResourceBase'
+      - $ref: '#/components/schemas/GetResourceBase'
+      - $ref: '#/components/schemas/ResourceWithDefaults'
+      description: Environment
+      example:
+        kubernetesClusterName: kubernetesClusterName
+        namespaces:
+        - namespaces
+        - namespaces
+      properties:
+        kubernetesClusterName:
+          title: Name from the CMF configuration for the Kubernetes cluster name
+          type: string
+        namespaces:
+          items:
+            type: string
+          title: One or more namespaces to use. Use '*' for any.
+          type: array
+      required:
+      - kubernetesClusterName
+      - name
+      - namespaces
+      title: Environment
+      type: object
+    EnvironmentsPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/EnvironmentsPage_allOf'
+      type: object
+    Application:
+      description: Represents a Flink Application submitted by the user
+      example:
+        metadata: '{}'
+        apiVersion: apiVersion
+        kind: kind
+        spec: '{}'
+        status: '{}'
+      properties:
+        apiVersion:
+          title: API version for Application spec
+          type: string
+        kind:
+          title: Kind of resource - set to FlinkApplication
+          type: string
+        metadata:
+          format: yamlorjson
+          title: Metadata about the application
+          type: object
+        spec:
+          format: yamlorjson
+          title: Spec for Flink Application
+          type: object
+        status:
+          format: yamlorjson
+          title: Status for Flink Application
+          type: object
+      required:
+      - apiVersion
+      - kind
+      - metadata
+      - spec
+      title: Application
+      type: object
+    ApplicationsPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/ApplicationsPage_allOf'
+      type: object
+    inline_object:
+      properties:
+        discardState:
+          type: boolean
+      type: object
+    EnvironmentsPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: EnvironmentsPageMetadata
+      type: object
+    EnvironmentsPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/EnvironmentsPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/GetEnvironment'
+          title: Env
+          type: array
+      type: object
+    ApplicationPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: ApplicationPageMetadata
+      type: object
+    ApplicationsPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ApplicationPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/Application'
+          type: array
+      type: object
