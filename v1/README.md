@@ -32,15 +32,16 @@ All URIs are relative to *http://localhost:8080/cmf/api/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**CreateOrUpdateApplication**](docs/DefaultApi.md#createorupdateapplication) | **Post** /environments/{name}/applications | Creates a new Flink Application or updates an existing one.
+*DefaultApi* | [**CreateOrUpdateApplication**](docs/DefaultApi.md#createorupdateapplication) | **Post** /environments/{envName}/applications | Creates a new Flink Application or updates an existing one in the given Environment.
 *DefaultApi* | [**CreateOrUpdateEnvironment**](docs/DefaultApi.md#createorupdateenvironment) | **Post** /environments | Create or update an Environment
-*DefaultApi* | [**DeleteApplication**](docs/DefaultApi.md#deleteapplication) | **Delete** /environments/{name}/applications/{appName} | Deletes an Application
-*DefaultApi* | [**DeleteEnvironment**](docs/DefaultApi.md#deleteenvironment) | **Delete** /environments/{name} | 
-*DefaultApi* | [**GetApplication**](docs/DefaultApi.md#getapplication) | **Get** /environments/{name}/applications/{appName} | Get a Application
-*DefaultApi* | [**GetApplications**](docs/DefaultApi.md#getapplications) | **Get** /environments/{name}/applications | Lists Applications
-*DefaultApi* | [**GetEnvironments**](docs/DefaultApi.md#getenvironments) | **Get** /environments | Lists Environments
-*DefaultApi* | [**StartApplication**](docs/DefaultApi.md#startapplication) | **Post** /environments/{name}/applications/{appName}/start | Starts an earlier submitted Flink Application
-*DefaultApi* | [**StopApplication**](docs/DefaultApi.md#stopapplication) | **Post** /environments/{name}/applications/{appName}/stop | Stops an earlier started Flink Application
+*DefaultApi* | [**DeleteApplication**](docs/DefaultApi.md#deleteapplication) | **Delete** /environments/{envName}/applications/{appName} | Deletes an Application of the given name in the given Environment.
+*DefaultApi* | [**DeleteEnvironment**](docs/DefaultApi.md#deleteenvironment) | **Delete** /environments/{envName} | 
+*DefaultApi* | [**GetApplication**](docs/DefaultApi.md#getapplication) | **Get** /environments/{envName}/applications/{appName} | Retrieve an Application of the given name in the given Environment.
+*DefaultApi* | [**GetApplications**](docs/DefaultApi.md#getapplications) | **Get** /environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
+*DefaultApi* | [**GetEnvironment**](docs/DefaultApi.md#getenvironment) | **Get** /environments/{envName} | Get/Describe an environment with the given name.
+*DefaultApi* | [**GetEnvironments**](docs/DefaultApi.md#getenvironments) | **Get** /environments | Retrieve a paginated list of all environments.
+*DefaultApi* | [**StartApplication**](docs/DefaultApi.md#startapplication) | **Post** /environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
+*DefaultApi* | [**SuspendApplication**](docs/DefaultApi.md#suspendapplication) | **Post** /environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
 
 
 ## Documentation For Models
@@ -49,12 +50,11 @@ Class | Method | HTTP request | Description
  - [ApplicationPageMetadata](docs/ApplicationPageMetadata.md)
  - [ApplicationsPage](docs/ApplicationsPage.md)
  - [ApplicationsPageAllOf](docs/ApplicationsPageAllOf.md)
+ - [Environment](docs/Environment.md)
  - [EnvironmentsPage](docs/EnvironmentsPage.md)
  - [EnvironmentsPageAllOf](docs/EnvironmentsPageAllOf.md)
  - [EnvironmentsPageMetadata](docs/EnvironmentsPageMetadata.md)
- - [GetEnvironment](docs/GetEnvironment.md)
  - [GetResourceBase](docs/GetResourceBase.md)
- - [InlineObject](docs/InlineObject.md)
  - [Pageable](docs/Pageable.md)
  - [PaginationResponse](docs/PaginationResponse.md)
  - [PostEnvironment](docs/PostEnvironment.md)

@@ -10,15 +10,14 @@
 package v1
 
 import (
-	_bytes "bytes"
 	_context "context"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
-	"reflect"
+	_bytes "bytes"
 	"strings"
-
 	"github.com/antihax/optional"
+	"reflect"
 )
 
 // Linger please
@@ -29,58 +28,58 @@ var (
 type DefaultApi interface {
 
     /*
-     * CreateOrUpdateApplication Creates a new Flink Application or updates an existing one.
+     * CreateOrUpdateApplication Creates a new Flink Application or updates an existing one in the given Environment.
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param application
      * @return Application
      */
-    CreateOrUpdateApplication(ctx _context.Context, name string, application Application) (Application, *_nethttp.Response, error)
+    CreateOrUpdateApplication(ctx _context.Context, envName string, application Application) (Application, *_nethttp.Response, error)
 
     /*
      * CreateOrUpdateEnvironment Create or update an Environment
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
      * @param postEnvironment
-     * @return GetEnvironment
+     * @return Environment
      */
-    CreateOrUpdateEnvironment(ctx _context.Context, postEnvironment PostEnvironment) (GetEnvironment, *_nethttp.Response, error)
+    CreateOrUpdateEnvironment(ctx _context.Context, postEnvironment PostEnvironment) (Environment, *_nethttp.Response, error)
 
     /*
-     * DeleteApplication Deletes an Application
+     * DeleteApplication Deletes an Application of the given name in the given Environment.
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param appName Name of the Application
      */
-    DeleteApplication(ctx _context.Context, name string, appName string) (*_nethttp.Response, error)
+    DeleteApplication(ctx _context.Context, envName string, appName string) (*_nethttp.Response, error)
 
     /*
      * DeleteEnvironment Method for DeleteEnvironment
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment to be deleted.
      */
-    DeleteEnvironment(ctx _context.Context, name string) (*_nethttp.Response, error)
+    DeleteEnvironment(ctx _context.Context, envName string) (*_nethttp.Response, error)
 
     /*
-     * GetApplication Get a Application
+     * GetApplication Retrieve an Application of the given name in the given Environment.
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param appName Name of the Application
      * @param optional nil or *GetApplicationOpts - Optional Parameters:
      * @param "FieldSelector" (optional.String) -  Select fields to return
      * @return Application
      */
-    GetApplication(ctx _context.Context, name string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error)
+    GetApplication(ctx _context.Context, envName string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error)
 
     /*
-     * GetApplications Lists Applications
+     * GetApplications Retrieve a paginated list of all applications in the given Environment.
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param optional nil or *GetApplicationsOpts - Optional Parameters:
      * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
      * @param "Size" (optional.Int32) -  The size of the page to be returned
@@ -89,10 +88,19 @@ type DefaultApi interface {
      * @param "FieldSelector" (optional.String) -  Select fields to return
      * @return ApplicationsPage
      */
-    GetApplications(ctx _context.Context, name string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error)
+    GetApplications(ctx _context.Context, envName string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error)
 
     /*
-     * GetEnvironments Lists Environments
+     * GetEnvironment Get/Describe an environment with the given name.
+     *
+     * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+     * @param envName Name of the Environment to be retrieved.
+     * @return Environment
+     */
+    GetEnvironment(ctx _context.Context, envName string) (Environment, *_nethttp.Response, error)
+
+    /*
+     * GetEnvironments Retrieve a paginated list of all environments.
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
      * @param optional nil or *GetEnvironmentsOpts - Optional Parameters:
@@ -107,36 +115,35 @@ type DefaultApi interface {
      * StartApplication Starts an earlier submitted Flink Application
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param appName Name of the Application
-     * @param inlineObject
      * @return Application
      */
-    StartApplication(ctx _context.Context, name string, appName string, inlineObject InlineObject) (Application, *_nethttp.Response, error)
+    StartApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error)
 
     /*
-     * StopApplication Stops an earlier started Flink Application
+     * SuspendApplication Suspends an earlier started Flink Application
      *
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-     * @param name Name of the Environment
+     * @param envName Name of the Environment
      * @param appName Name of the Application
      * @return Application
      */
-    StopApplication(ctx _context.Context, name string, appName string) (Application, *_nethttp.Response, error)
+    SuspendApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error)
 }
 
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
 /*
- * CreateOrUpdateApplication Creates a new Flink Application or updates an existing one.
+ * CreateOrUpdateApplication Creates a new Flink Application or updates an existing one in the given Environment.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param application
  * @return Application
  */
-func (a *DefaultApiService) CreateOrUpdateApplication(ctx _context.Context, name string, application Application) (Application, *_nethttp.Response, error) {
+func (a *DefaultApiService) CreateOrUpdateApplication(ctx _context.Context, envName string, application Application) (Application, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -147,8 +154,8 @@ func (a *DefaultApiService) CreateOrUpdateApplication(ctx _context.Context, name
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -244,16 +251,16 @@ func (a *DefaultApiService) CreateOrUpdateApplication(ctx _context.Context, name
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param postEnvironment
- * @return GetEnvironment
+ * @return Environment
  */
-func (a *DefaultApiService) CreateOrUpdateEnvironment(ctx _context.Context, postEnvironment PostEnvironment) (GetEnvironment, *_nethttp.Response, error) {
+func (a *DefaultApiService) CreateOrUpdateEnvironment(ctx _context.Context, postEnvironment PostEnvironment) (Environment, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  GetEnvironment
+		localVarReturnValue  Environment
 	)
 
 	// create path and map variables
@@ -338,13 +345,13 @@ func (a *DefaultApiService) CreateOrUpdateEnvironment(ctx _context.Context, post
 }
 
 /*
- * DeleteApplication Deletes an Application
+ * DeleteApplication Deletes an Application of the given name in the given Environment.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param appName Name of the Application
  */
-func (a *DefaultApiService) DeleteApplication(ctx _context.Context, name string, appName string) (*_nethttp.Response, error) {
+func (a *DefaultApiService) DeleteApplication(ctx _context.Context, envName string, appName string) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
@@ -354,8 +361,8 @@ func (a *DefaultApiService) DeleteApplication(ctx _context.Context, name string,
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications/{appName}"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications/{appName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(appName, "")) , -1)
 
@@ -421,9 +428,9 @@ func (a *DefaultApiService) DeleteApplication(ctx _context.Context, name string,
  * DeleteEnvironment Method for DeleteEnvironment
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment to be deleted.
  */
-func (a *DefaultApiService) DeleteEnvironment(ctx _context.Context, name string) (*_nethttp.Response, error) {
+func (a *DefaultApiService) DeleteEnvironment(ctx _context.Context, envName string) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
@@ -433,8 +440,8 @@ func (a *DefaultApiService) DeleteEnvironment(ctx _context.Context, name string)
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -487,6 +494,16 @@ func (a *DefaultApiService) DeleteEnvironment(ctx _context.Context, name string)
 				return localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -500,16 +517,16 @@ type GetApplicationOpts struct {
 }
 
 /*
- * GetApplication Get a Application
+ * GetApplication Retrieve an Application of the given name in the given Environment.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param appName Name of the Application
  * @param optional nil or *GetApplicationOpts - Optional Parameters:
  * @param "FieldSelector" (optional.String) -  Select fields to return
  * @return Application
  */
-func (a *DefaultApiService) GetApplication(ctx _context.Context, name string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error) {
+func (a *DefaultApiService) GetApplication(ctx _context.Context, envName string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -520,8 +537,8 @@ func (a *DefaultApiService) GetApplication(ctx _context.Context, name string, ap
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications/{appName}"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications/{appName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(appName, "")) , -1)
 
@@ -579,6 +596,16 @@ func (a *DefaultApiService) GetApplication(ctx _context.Context, name string, ap
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -605,10 +632,10 @@ type GetApplicationsOpts struct {
 }
 
 /*
- * GetApplications Lists Applications
+ * GetApplications Retrieve a paginated list of all applications in the given Environment.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param optional nil or *GetApplicationsOpts - Optional Parameters:
  * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
  * @param "Size" (optional.Int32) -  The size of the page to be returned
@@ -617,7 +644,7 @@ type GetApplicationsOpts struct {
  * @param "FieldSelector" (optional.String) -  Select fields to return
  * @return ApplicationsPage
  */
-func (a *DefaultApiService) GetApplications(ctx _context.Context, name string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error) {
+func (a *DefaultApiService) GetApplications(ctx _context.Context, envName string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -628,8 +655,8 @@ func (a *DefaultApiService) GetApplications(ctx _context.Context, name string, l
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -721,6 +748,104 @@ func (a *DefaultApiService) GetApplications(ctx _context.Context, name string, l
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+/*
+ * GetEnvironment Get/Describe an environment with the given name.
+ *
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param envName Name of the Environment to be retrieved.
+ * @return Environment
+ */
+func (a *DefaultApiService) GetEnvironment(ctx _context.Context, envName string) (Environment, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Environment
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 // GetEnvironmentsOpts Optional parameters for the method 'GetEnvironments'
 type GetEnvironmentsOpts struct {
     Page optional.Int32
@@ -729,7 +854,7 @@ type GetEnvironmentsOpts struct {
 }
 
 /*
- * GetEnvironments Lists Environments
+ * GetEnvironments Retrieve a paginated list of all environments.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetEnvironmentsOpts - Optional Parameters:
@@ -838,12 +963,11 @@ func (a *DefaultApiService) GetEnvironments(ctx _context.Context, localVarOption
  * StartApplication Starts an earlier submitted Flink Application
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param appName Name of the Application
- * @param inlineObject
  * @return Application
  */
-func (a *DefaultApiService) StartApplication(ctx _context.Context, name string, appName string, inlineObject InlineObject) (Application, *_nethttp.Response, error) {
+func (a *DefaultApiService) StartApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -854,8 +978,8 @@ func (a *DefaultApiService) StartApplication(ctx _context.Context, name string, 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications/{appName}/start"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications/{appName}/start"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(appName, "")) , -1)
 
@@ -864,7 +988,7 @@ func (a *DefaultApiService) StartApplication(ctx _context.Context, name string, 
 	localVarFormParams := _neturl.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -880,8 +1004,6 @@ func (a *DefaultApiService) StartApplication(ctx _context.Context, name string, 
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = &inlineObject
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -929,14 +1051,14 @@ func (a *DefaultApiService) StartApplication(ctx _context.Context, name string, 
 }
 
 /*
- * StopApplication Stops an earlier started Flink Application
+ * SuspendApplication Suspends an earlier started Flink Application
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param name Name of the Environment
+ * @param envName Name of the Environment
  * @param appName Name of the Application
  * @return Application
  */
-func (a *DefaultApiService) StopApplication(ctx _context.Context, name string, appName string) (Application, *_nethttp.Response, error) {
+func (a *DefaultApiService) SuspendApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -947,8 +1069,8 @@ func (a *DefaultApiService) StopApplication(ctx _context.Context, name string, a
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/environments/{name}/applications/{appName}/stop"
-	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(name, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/environments/{envName}/applications/{appName}/suspend"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(envName, "")) , -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(appName, "")) , -1)
 

@@ -12,5 +12,5 @@ package v1
 type EnvironmentsPage struct {
 	Pageable Pageable `json:"pageable,omitempty"`
 	Metadata EnvironmentsPageMetadata `json:"metadata,omitempty"`
-	Items []GetEnvironment `json:"items,omitempty"`
+	Items []Environment `json:"items,omitempty"`
 }

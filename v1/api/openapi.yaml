@@ -43,7 +43,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnvironmentsPage'
-          description: Environments found and returned.
+          description: List of environments found. If no environments are found, an
+            empty list is returned.
         "304":
           description: Not modified.
           headers:
@@ -59,7 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Lists Environments
+      summary: Retrieve a paginated list of all environments.
       x-spring-paginated: true
     post:
       operationId: createOrUpdateEnvironment
@@ -74,8 +75,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetEnvironment'
-          description: The Environments was successfully added.
+                $ref: '#/components/schemas/Environment'
+          description: The Environment was successfully created or updated.
         "400":
           content:
             application/json:
@@ -89,14 +90,14 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Create or update an Environment
-  /environments/{name}:
+  /environments/{envName}:
     delete:
       operationId: deleteEnvironment
       parameters:
-      - description: Name of the Environment
+      - description: Name of the Environment to be deleted.
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -112,7 +113,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-  /environments/{name}/applications:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment not found.
+    get:
+      operationId: getEnvironment
+      parameters:
+      - description: Name of the Environment to be retrieved.
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+          description: Environment found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Get/Describe an environment with the given name.
+  /environments/{envName}/applications:
     get:
       operationId: getApplications
       parameters:
@@ -146,7 +184,7 @@ paths:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -189,7 +227,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Lists Applications
+      summary: Retrieve a paginated list of all applications in the given Environment.
       x-spring-paginated: true
     post:
       operationId: createOrUpdateApplication
@@ -197,7 +235,7 @@ paths:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -239,15 +277,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Creates a new Flink Application or updates an existing one.
-  /environments/{name}/applications/{appName}:
+      summary: Creates a new Flink Application or updates an existing one in the given
+        Environment.
+  /environments/{envName}/applications/{appName}:
     delete:
       operationId: deleteApplication
       parameters:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -271,14 +310,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Deletes an Application
+      summary: Deletes an Application of the given name in the given Environment.
     get:
       operationId: getApplication
       parameters:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -321,15 +360,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Get a Application
-  /environments/{name}/applications/{appName}/start:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Application not found.
+      summary: Retrieve an Application of the given name in the given Environment.
+  /environments/{envName}/applications/{appName}/start:
     post:
       operationId: startApplication
       parameters:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -342,16 +387,6 @@ paths:
         schema:
           type: string
         style: simple
-      requestBody:
-        $ref: '#/components/requestBodies/inline_object'
-        content:
-          application/json:
-            schema:
-              properties:
-                discardState:
-                  type: boolean
-              type: object
-        required: true
       responses:
         "200":
           content:
@@ -368,14 +403,14 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Starts an earlier submitted Flink Application
-  /environments/{name}/applications/{appName}/stop:
+  /environments/{envName}/applications/{appName}/suspend:
     post:
-      operationId: stopApplication
+      operationId: suspendApplication
       parameters:
       - description: Name of the Environment
         explode: false
         in: path
-        name: name
+        name: envName
         required: true
         schema:
           type: string
@@ -394,7 +429,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Application'
-          description: Application stopped
+          description: Application suspended
         "304":
           description: Not modified.
         "500":
@@ -403,7 +438,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Stops an earlier started Flink Application
+      summary: Suspends an earlier started Flink Application
 components:
   parameters:
     pageParam:
@@ -436,13 +471,6 @@ components:
           type: string
         type: array
       style: form
-  requestBodies:
-    inline_object:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_object'
-      required: true
   schemas:
     RestError:
       description: The schema for all error responses.
@@ -468,7 +496,7 @@ components:
           title: Path
           type: string
         timestamp:
-          description: The time the error occured.
+          description: The time the error occurred.
           format: date-time
           readOnly: true
           title: Timestamp
@@ -586,49 +614,33 @@ components:
       - $ref: '#/components/schemas/ResourceWithDefaults'
       description: Environment
       example:
-        kubernetesClusterName: kubernetesClusterName
-        namespaces:
-        - namespaces
-        - namespaces
+        namespace: namespace
       properties:
-        kubernetesClusterName:
-          title: Name from the CMF configuration for the Kubernetes cluster name
+        namespace:
+          title: K8s namespace name where resources referencing this environment are
+            created in.
           type: string
-        namespaces:
-          items:
-            type: string
-          title: One or more namespaces to use. Use '*' for any.
-          type: array
       required:
-      - kubernetesClusterName
       - name
-      - namespaces
+      - namespace
       title: Environment
       type: object
-    GetEnvironment:
+    Environment:
       allOf:
       - $ref: '#/components/schemas/PostResourceBase'
       - $ref: '#/components/schemas/GetResourceBase'
       - $ref: '#/components/schemas/ResourceWithDefaults'
       description: Environment
       example:
-        kubernetesClusterName: kubernetesClusterName
-        namespaces:
-        - namespaces
-        - namespaces
+        namespace: namespace
       properties:
-        kubernetesClusterName:
-          title: Name from the CMF configuration for the Kubernetes cluster name
+        namespace:
+          title: K8s namespace name where resources referencing this environment are
+            created in.
           type: string
-        namespaces:
-          items:
-            type: string
-          title: One or more namespaces to use. Use '*' for any.
-          type: array
       required:
-      - kubernetesClusterName
       - name
-      - namespaces
+      - namespace
       title: Environment
       type: object
     EnvironmentsPage:
@@ -675,11 +687,6 @@ components:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/ApplicationsPage_allOf'
       type: object
-    inline_object:
-      properties:
-        discardState:
-          type: boolean
-      type: object
     EnvironmentsPageMetadata:
       properties:
         size:
@@ -695,7 +702,7 @@ components:
         items:
           default: []
           items:
-            $ref: '#/components/schemas/GetEnvironment'
+            $ref: '#/components/schemas/Environment'
           title: Env
           type: array
       type: object

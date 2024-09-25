@@ -11,12 +11,11 @@ docs/ApplicationPageMetadata.md
 docs/ApplicationsPage.md
 docs/ApplicationsPageAllOf.md
 docs/DefaultApi.md
+docs/Environment.md
 docs/EnvironmentsPage.md
 docs/EnvironmentsPageAllOf.md
 docs/EnvironmentsPageMetadata.md
-docs/GetEnvironment.md
 docs/GetResourceBase.md
-docs/InlineObject.md
 docs/Pageable.md
 docs/PaginationResponse.md
 docs/PostEnvironment.md
@@ -32,12 +31,11 @@ model_application.go
 model_application_page_metadata.go
 model_applications_page.go
 model_applications_page_all_of.go
+model_environment.go
 model_environments_page.go
 model_environments_page_all_of.go
 model_environments_page_metadata.go
-model_get_environment.go
 model_get_resource_base.go
-model_inline_object.go
 model_pageable.go
 model_pagination_response.go
 model_post_environment.go

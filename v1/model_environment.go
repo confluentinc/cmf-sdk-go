@@ -11,8 +11,8 @@ package v1
 import (
 	"time"
 )
-// GetEnvironment Environment
-type GetEnvironment struct {
+// Environment Environment
+type Environment struct {
 	// A unique name for the resource.
 	Name string `json:"name"`
 	CreatedTime time.Time `json:"created_time,omitempty"`

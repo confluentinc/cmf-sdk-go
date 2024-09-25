@@ -1,4 +1,4 @@
-# GetEnvironment
+# Environment
 
 ## Properties
 

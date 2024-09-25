@@ -11,5 +11,5 @@ package v1
 // EnvironmentsPageAllOf struct for EnvironmentsPageAllOf
 type EnvironmentsPageAllOf struct {
 	Metadata EnvironmentsPageMetadata `json:"metadata,omitempty"`
-	Items []GetEnvironment `json:"items,omitempty"`
+	Items []Environment `json:"items,omitempty"`
 }

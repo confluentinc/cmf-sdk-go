@@ -4,23 +4,24 @@ All URIs are relative to *http://localhost:8080/cmf/api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateOrUpdateApplication**](DefaultApi.md#CreateOrUpdateApplication) | **Post** /environments/{name}/applications | Creates a new Flink Application or updates an existing one.
+[**CreateOrUpdateApplication**](DefaultApi.md#CreateOrUpdateApplication) | **Post** /environments/{envName}/applications | Creates a new Flink Application or updates an existing one in the given Environment.
 [**CreateOrUpdateEnvironment**](DefaultApi.md#CreateOrUpdateEnvironment) | **Post** /environments | Create or update an Environment
-[**DeleteApplication**](DefaultApi.md#DeleteApplication) | **Delete** /environments/{name}/applications/{appName} | Deletes an Application
-[**DeleteEnvironment**](DefaultApi.md#DeleteEnvironment) | **Delete** /environments/{name} | 
-[**GetApplication**](DefaultApi.md#GetApplication) | **Get** /environments/{name}/applications/{appName} | Get a Application
-[**GetApplications**](DefaultApi.md#GetApplications) | **Get** /environments/{name}/applications | Lists Applications
-[**GetEnvironments**](DefaultApi.md#GetEnvironments) | **Get** /environments | Lists Environments
-[**StartApplication**](DefaultApi.md#StartApplication) | **Post** /environments/{name}/applications/{appName}/start | Starts an earlier submitted Flink Application
-[**StopApplication**](DefaultApi.md#StopApplication) | **Post** /environments/{name}/applications/{appName}/stop | Stops an earlier started Flink Application
+[**DeleteApplication**](DefaultApi.md#DeleteApplication) | **Delete** /environments/{envName}/applications/{appName} | Deletes an Application of the given name in the given Environment.
+[**DeleteEnvironment**](DefaultApi.md#DeleteEnvironment) | **Delete** /environments/{envName} | 
+[**GetApplication**](DefaultApi.md#GetApplication) | **Get** /environments/{envName}/applications/{appName} | Retrieve an Application of the given name in the given Environment.
+[**GetApplications**](DefaultApi.md#GetApplications) | **Get** /environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
+[**GetEnvironment**](DefaultApi.md#GetEnvironment) | **Get** /environments/{envName} | Get/Describe an environment with the given name.
+[**GetEnvironments**](DefaultApi.md#GetEnvironments) | **Get** /environments | Retrieve a paginated list of all environments.
+[**StartApplication**](DefaultApi.md#StartApplication) | **Post** /environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
+[**SuspendApplication**](DefaultApi.md#SuspendApplication) | **Post** /environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
 
 
 
 ## CreateOrUpdateApplication
 
-> Application CreateOrUpdateApplication(ctx, name, application)
+> Application CreateOrUpdateApplication(ctx, envName, application)
 
-Creates a new Flink Application or updates an existing one.
+Creates a new Flink Application or updates an existing one in the given Environment.
 
 ### Required Parameters
 
@@ -28,7 +29,7 @@ Creates a new Flink Application or updates an existing one.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
 **application** | [**Application**](Application.md)|  | 
 
 ### Return type
@@ -51,7 +52,7 @@ No authorization required
 
 ## CreateOrUpdateEnvironment
 
-> GetEnvironment CreateOrUpdateEnvironment(ctx, postEnvironment)
+> Environment CreateOrUpdateEnvironment(ctx, postEnvironment)
 
 Create or update an Environment
 
@@ -65,7 +66,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**GetEnvironment**](GetEnvironment.md)
+[**Environment**](Environment.md)
 
 ### Authorization
 
@@ -83,9 +84,9 @@ No authorization required
 
 ## DeleteApplication
 
-> DeleteApplication(ctx, name, appName)
+> DeleteApplication(ctx, envName, appName)
 
-Deletes an Application
+Deletes an Application of the given name in the given Environment.
 
 ### Required Parameters
 
@@ -93,7 +94,7 @@ Deletes an Application
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
 **appName** | **string**| Name of the Application | 
 
 ### Return type
@@ -116,7 +117,7 @@ No authorization required
 
 ## DeleteEnvironment
 
-> DeleteEnvironment(ctx, name)
+> DeleteEnvironment(ctx, envName)
 
 
 
@@ -126,7 +127,7 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment to be deleted. | 
 
 ### Return type
 
@@ -148,9 +149,9 @@ No authorization required
 
 ## GetApplication
 
-> Application GetApplication(ctx, name, appName, optional)
+> Application GetApplication(ctx, envName, appName, optional)
 
-Get a Application
+Retrieve an Application of the given name in the given Environment.
 
 ### Required Parameters
 
@@ -158,7 +159,7 @@ Get a Application
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
 **appName** | **string**| Name of the Application | 
  **optional** | ***GetApplicationOpts** | optional parameters | nil if no parameters
 
@@ -193,9 +194,9 @@ No authorization required
 
 ## GetApplications
 
-> ApplicationsPage GetApplications(ctx, name, optional)
+> ApplicationsPage GetApplications(ctx, envName, optional)
 
-Lists Applications
+Retrieve a paginated list of all applications in the given Environment.
 
 ### Required Parameters
 
@@ -203,7 +204,7 @@ Lists Applications
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
  **optional** | ***GetApplicationsOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -238,11 +239,43 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## GetEnvironment
+
+> Environment GetEnvironment(ctx, envName)
+
+Get/Describe an environment with the given name.
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**envName** | **string**| Name of the Environment to be retrieved. | 
+
+### Return type
+
+[**Environment**](Environment.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## GetEnvironments
 
 > EnvironmentsPage GetEnvironments(ctx, optional)
 
-Lists Environments
+Retrieve a paginated list of all environments.
 
 ### Required Parameters
 
@@ -283,7 +316,7 @@ No authorization required
 
 ## StartApplication
 
-> Application StartApplication(ctx, name, appName, inlineObject)
+> Application StartApplication(ctx, envName, appName)
 
 Starts an earlier submitted Flink Application
 
@@ -293,9 +326,8 @@ Starts an earlier submitted Flink Application
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
 **appName** | **string**| Name of the Application | 
-**inlineObject** | [**InlineObject**](InlineObject.md)|  | 
 
 ### Return type
 
@@ -307,7 +339,7 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
@@ -315,11 +347,11 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## StopApplication
+## SuspendApplication
 
-> Application StopApplication(ctx, name, appName)
+> Application SuspendApplication(ctx, envName, appName)
 
-Stops an earlier started Flink Application
+Suspends an earlier started Flink Application
 
 ### Required Parameters
 
@@ -327,7 +359,7 @@ Stops an earlier started Flink Application
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**name** | **string**| Name of the Environment | 
+**envName** | **string**| Name of the Environment | 
 **appName** | **string**| Name of the Application | 
 
 ### Return type
