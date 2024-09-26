@@ -83,7 +83,7 @@ type DefaultApi interface {
      * @param optional nil or *GetApplicationsOpts - Optional Parameters:
      * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
      * @param "Size" (optional.Int32) -  The size of the page to be returned
-     * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported.
+     * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @param "Watch" (optional.Bool) -  Subscribe to any updates
      * @param "FieldSelector" (optional.String) -  Select fields to return
      * @return ApplicationsPage
@@ -106,7 +106,7 @@ type DefaultApi interface {
      * @param optional nil or *GetEnvironmentsOpts - Optional Parameters:
      * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
      * @param "Size" (optional.Int32) -  The size of the page to be returned
-     * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported.
+     * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @return EnvironmentsPage
      */
     GetEnvironments(ctx _context.Context, localVarOptionals *GetEnvironmentsOpts) (EnvironmentsPage, *_nethttp.Response, error)
@@ -639,7 +639,7 @@ type GetApplicationsOpts struct {
  * @param optional nil or *GetApplicationsOpts - Optional Parameters:
  * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
  * @param "Size" (optional.Int32) -  The size of the page to be returned
- * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported.
+ * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
  * @param "Watch" (optional.Bool) -  Subscribe to any updates
  * @param "FieldSelector" (optional.String) -  Select fields to return
  * @return ApplicationsPage
@@ -860,7 +860,7 @@ type GetEnvironmentsOpts struct {
  * @param optional nil or *GetEnvironmentsOpts - Optional Parameters:
  * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
  * @param "Size" (optional.Int32) -  The size of the page to be returned
- * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported.
+ * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
  * @return EnvironmentsPage
  */
 func (a *DefaultApiService) GetEnvironments(ctx _context.Context, localVarOptionals *GetEnvironmentsOpts) (EnvironmentsPage, *_nethttp.Response, error) {

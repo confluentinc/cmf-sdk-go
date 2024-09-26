@@ -10,7 +10,9 @@
 package v1
 // Sort struct for Sort
 type Sort struct {
+	// Whether the results are sorted.
 	Sorted bool `json:"sorted,omitempty"`
+	// Whether the results are unsorted.
 	Unsorted bool `json:"unsorted,omitempty"`
 	Empty bool `json:"empty,omitempty"`
 }
