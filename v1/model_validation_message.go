@@ -10,6 +10,6 @@
 package v1
 // ValidationMessage Messages describing a validation error.
 type ValidationMessage struct {
-	// The valiation message.
+	// The validation message.
 	Message string `json:"message"`
 }
