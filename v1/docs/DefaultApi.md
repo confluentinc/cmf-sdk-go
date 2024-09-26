@@ -217,7 +217,7 @@ Name | Type | Description  | Notes
 
  **page** | **optional.Int32**| Zero-based page index (0..N) | 
  **size** | **optional.Int32**| The size of the page to be returned | 
- **sort** | [**optional.Interface of []string**](string.md)| Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported. | 
+ **sort** | [**optional.Interface of []string**](string.md)| Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
  **watch** | **optional.Bool**| Subscribe to any updates | 
  **fieldSelector** | **optional.String**| Select fields to return | 
 
@@ -294,7 +294,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **optional.Int32**| Zero-based page index (0..N) | 
  **size** | **optional.Int32**| The size of the page to be returned | 
- **sort** | [**optional.Interface of []string**](string.md)| Sorting criteria in the format: property,(asc|desc). Multiple sort criteria are supported. | 
+ **sort** | [**optional.Interface of []string**](string.md)| Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
 
 ### Return type
 
