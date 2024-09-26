@@ -19,7 +19,7 @@ type RestError struct {
 	Error string `json:"error"`
 	// The path of the URL for this request.
 	Path string `json:"path"`
-	// The time the error occured.
+	// The time the error occurred.
 	Timestamp time.Time `json:"timestamp"`
 	// The long error message.
 	Message string `json:"message"`
