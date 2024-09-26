@@ -26,8 +26,8 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Multiple
-          sort criteria are supported.'
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
         explode: true
         in: query
         name: sort
@@ -170,8 +170,8 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Multiple
-          sort criteria are supported.'
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
         explode: true
         in: query
         name: sort
@@ -460,8 +460,8 @@ components:
         type: integer
       style: form
     sortParam:
-      description: 'Sorting criteria in the format: property,(asc|desc). Multiple
-        sort criteria are supported.'
+      description: 'Sorting criteria in the format: property,(asc|desc). Default sort
+        order is ascending. Multiple sort criteria are supported.'
       explode: true
       in: query
       name: sort
@@ -534,7 +534,7 @@ components:
       description: Messages describing a validation error.
       properties:
         message:
-          description: The valiation message.
+          description: The validation message.
           example: '[Path ''/lastName''] Instance type (null) does not match any allowed
             primitive type (allowed: ["string"])'
           readOnly: true
@@ -553,8 +553,12 @@ components:
       format: sort
       properties:
         sorted:
+          description: Whether the results are sorted.
+          example: true
           type: boolean
         unsorted:
+          description: Whether the results are unsorted.
+          example: false
           type: boolean
         empty:
           type: boolean
@@ -566,12 +570,11 @@ components:
           minimum: 0
           type: integer
         size:
+          description: The number of items in a page.
           minimum: 1
           type: integer
         sort:
-          items:
-            type: string
-          type: array
+          $ref: '#/components/schemas/Sort'
       type: object
     PostResourceBase:
       properties:

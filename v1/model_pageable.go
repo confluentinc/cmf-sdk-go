@@ -11,6 +11,7 @@ package v1
 // Pageable struct for Pageable
 type Pageable struct {
 	Page int32 `json:"page,omitempty"`
+	// The number of items in a page.
 	Size int32 `json:"size,omitempty"`
-	Sort []string `json:"sort,omitempty"`
+	Sort Sort `json:"sort,omitempty"`
 }
