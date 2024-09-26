@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -euo pipefail
 function print() {
   echo -e $1
   printf %${#1}s | tr ' ' '='
