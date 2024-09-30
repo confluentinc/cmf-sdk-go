@@ -1,6 +1,6 @@
 # CMF-SDK-GO 
 
-This repository contains auto-generated golang SDK for interacting with Confluent Manager for Apache FLink on confluent on-premise.
+This repository contains auto-generated golang SDK for interacting with Confluent Manager for Apache Flink on Confluent Platform on-premise.
 
 ## Compatibility
 
@@ -14,7 +14,7 @@ There are *NO compatibility guarantees* for this repository.
 
 ## License
 
-Copyright 2021 Confluent Inc.
+Copyright 2024 Confluent Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
