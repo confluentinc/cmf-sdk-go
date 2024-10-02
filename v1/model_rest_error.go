@@ -8,23 +8,8 @@
  */
 
 package v1
-import (
-	"time"
-)
 // RestError The schema for all error responses.
 type RestError struct {
-	// The HTTP status code.
-	Status int32 `json:"status"`
-	// The short error message.
-	Error string `json:"error"`
-	// The path of the URL for this request.
-	Path string `json:"path"`
-	// The time the error occurred.
-	Timestamp time.Time `json:"timestamp"`
-	// The long error message.
-	Message string `json:"message"`
-	// Validation errors against the OpenAPI schema.
-	SchemaValidationErrors []ValidationMessage `json:"schemaValidationErrors"`
-	// The stacktrace for this error.
-	Trace string `json:"trace,omitempty"`
+	// List of all errors
+	Errors []ModelError `json:"errors,omitempty"`
 }

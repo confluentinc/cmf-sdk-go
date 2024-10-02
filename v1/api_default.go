@@ -69,11 +69,9 @@ type DefaultApi interface {
      * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
      * @param envName Name of the Environment
      * @param appName Name of the Application
-     * @param optional nil or *GetApplicationOpts - Optional Parameters:
-     * @param "FieldSelector" (optional.String) -  Select fields to return
      * @return Application
      */
-    GetApplication(ctx _context.Context, envName string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error)
+    GetApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error)
 
     /*
      * GetApplications Retrieve a paginated list of all applications in the given Environment.
@@ -84,8 +82,6 @@ type DefaultApi interface {
      * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
      * @param "Size" (optional.Int32) -  The size of the page to be returned
      * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @param "Watch" (optional.Bool) -  Subscribe to any updates
-     * @param "FieldSelector" (optional.String) -  Select fields to return
      * @return ApplicationsPage
      */
     GetApplications(ctx _context.Context, envName string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error)
@@ -511,22 +507,15 @@ func (a *DefaultApiService) DeleteEnvironment(ctx _context.Context, envName stri
 	return localVarHTTPResponse, nil
 }
 
-// GetApplicationOpts Optional parameters for the method 'GetApplication'
-type GetApplicationOpts struct {
-    FieldSelector optional.String
-}
-
 /*
  * GetApplication Retrieve an Application of the given name in the given Environment.
  *
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param envName Name of the Environment
  * @param appName Name of the Application
- * @param optional nil or *GetApplicationOpts - Optional Parameters:
- * @param "FieldSelector" (optional.String) -  Select fields to return
  * @return Application
  */
-func (a *DefaultApiService) GetApplication(ctx _context.Context, envName string, appName string, localVarOptionals *GetApplicationOpts) (Application, *_nethttp.Response, error) {
+func (a *DefaultApiService) GetApplication(ctx _context.Context, envName string, appName string) (Application, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -546,9 +535,6 @@ func (a *DefaultApiService) GetApplication(ctx _context.Context, envName string,
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
-	if localVarOptionals != nil && localVarOptionals.FieldSelector.IsSet() {
-		localVarQueryParams.Add("fieldSelector", parameterToString(localVarOptionals.FieldSelector.Value(), ""))
-	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -627,8 +613,6 @@ type GetApplicationsOpts struct {
     Page optional.Int32
     Size optional.Int32
     Sort optional.Interface
-    Watch optional.Bool
-    FieldSelector optional.String
 }
 
 /*
@@ -640,8 +624,6 @@ type GetApplicationsOpts struct {
  * @param "Page" (optional.Int32) -  Zero-based page index (0..N)
  * @param "Size" (optional.Int32) -  The size of the page to be returned
  * @param "Sort" (optional.Interface of []string) -  Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
- * @param "Watch" (optional.Bool) -  Subscribe to any updates
- * @param "FieldSelector" (optional.String) -  Select fields to return
  * @return ApplicationsPage
  */
 func (a *DefaultApiService) GetApplications(ctx _context.Context, envName string, localVarOptionals *GetApplicationsOpts) (ApplicationsPage, *_nethttp.Response, error) {
@@ -678,12 +660,6 @@ func (a *DefaultApiService) GetApplications(ctx _context.Context, envName string
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
-	}
-	if localVarOptionals != nil && localVarOptionals.Watch.IsSet() {
-		localVarQueryParams.Add("watch", parameterToString(localVarOptionals.Watch.Value(), ""))
-	}
-	if localVarOptionals != nil && localVarOptionals.FieldSelector.IsSet() {
-		localVarQueryParams.Add("fieldSelector", parameterToString(localVarOptionals.FieldSelector.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

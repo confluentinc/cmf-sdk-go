@@ -1,10 +1,10 @@
-# ValidationMessage
+# ResourceWithFlinkApplicationDefaults
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Message** | **string** | The validation message. | [readonly] 
+**FlinkApplicationDefaults** | **map[string]interface{}** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

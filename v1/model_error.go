@@ -8,8 +8,8 @@
  */
 
 package v1
-// ValidationMessage Messages describing a validation error.
-type ValidationMessage struct {
-	// The validation message.
-	Message string `json:"message"`
+// ModelError An error
+type ModelError struct {
+	// An error message
+	Message string `json:"message,omitempty"`
 }

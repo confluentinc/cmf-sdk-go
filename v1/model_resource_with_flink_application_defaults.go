@@ -8,8 +8,7 @@
  */
 
 package v1
-// ResourceWithDefaults struct for ResourceWithDefaults
-type ResourceWithDefaults struct {
-	DefaultStrategy string `json:"default_strategy,omitempty"`
-	Defaults map[string]interface{} `json:"defaults,omitempty"`
+// ResourceWithFlinkApplicationDefaults struct for ResourceWithFlinkApplicationDefaults
+type ResourceWithFlinkApplicationDefaults struct {
+	FlinkApplicationDefaults map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 }
