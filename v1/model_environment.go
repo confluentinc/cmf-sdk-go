@@ -17,6 +17,5 @@ type Environment struct {
 	Name string `json:"name"`
 	CreatedTime time.Time `json:"created_time,omitempty"`
 	UpdatedTime time.Time `json:"updated_time,omitempty"`
-	DefaultStrategy string `json:"default_strategy,omitempty"`
-	Defaults map[string]interface{} `json:"defaults,omitempty"`
+	FlinkApplicationDefaults map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 }

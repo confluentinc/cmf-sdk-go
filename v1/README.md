@@ -55,14 +55,14 @@ Class | Method | HTTP request | Description
  - [EnvironmentsPageAllOf](docs/EnvironmentsPageAllOf.md)
  - [EnvironmentsPageMetadata](docs/EnvironmentsPageMetadata.md)
  - [GetResourceBase](docs/GetResourceBase.md)
+ - [ModelError](docs/ModelError.md)
  - [Pageable](docs/Pageable.md)
  - [PaginationResponse](docs/PaginationResponse.md)
  - [PostEnvironment](docs/PostEnvironment.md)
  - [PostResourceBase](docs/PostResourceBase.md)
- - [ResourceWithDefaults](docs/ResourceWithDefaults.md)
+ - [ResourceWithFlinkApplicationDefaults](docs/ResourceWithFlinkApplicationDefaults.md)
  - [RestError](docs/RestError.md)
  - [Sort](docs/Sort.md)
- - [ValidationMessage](docs/ValidationMessage.md)
 
 
 ## Documentation For Authorization

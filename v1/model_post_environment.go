@@ -12,6 +12,5 @@ package v1
 type PostEnvironment struct {
 	// A unique name for the resource.
 	Name string `json:"name"`
-	DefaultStrategy string `json:"default_strategy,omitempty"`
-	Defaults map[string]interface{} `json:"defaults,omitempty"`
+	FlinkApplicationDefaults map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 }

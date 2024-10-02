@@ -149,7 +149,7 @@ No authorization required
 
 ## GetApplication
 
-> Application GetApplication(ctx, envName, appName, optional)
+> Application GetApplication(ctx, envName, appName)
 
 Retrieve an Application of the given name in the given Environment.
 
@@ -161,18 +161,6 @@ Name | Type | Description  | Notes
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **envName** | **string**| Name of the Environment | 
 **appName** | **string**| Name of the Application | 
- **optional** | ***GetApplicationOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a GetApplicationOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
- **fieldSelector** | **optional.String**| Select fields to return | 
 
 ### Return type
 
@@ -218,8 +206,6 @@ Name | Type | Description  | Notes
  **page** | **optional.Int32**| Zero-based page index (0..N) | 
  **size** | **optional.Int32**| The size of the page to be returned | 
  **sort** | [**optional.Interface of []string**](string.md)| Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
- **watch** | **optional.Bool**| Subscribe to any updates | 
- **fieldSelector** | **optional.String**| Select fields to return | 
 
 ### Return type
 
