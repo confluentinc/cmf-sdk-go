@@ -189,22 +189,6 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Subscribe to any updates
-        explode: true
-        in: query
-        name: watch
-        required: false
-        schema:
-          type: boolean
-        style: form
-      - description: Select fields to return
-        explode: true
-        in: query
-        name: fieldSelector
-        required: false
-        schema:
-          type: string
-        style: form
       responses:
         "200":
           content:
@@ -330,14 +314,6 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Select fields to return
-        explode: true
-        in: query
-        name: fieldSelector
-        required: false
-        schema:
-          type: string
-        style: form
       responses:
         "200":
           content:
@@ -475,74 +451,13 @@ components:
     RestError:
       description: The schema for all error responses.
       properties:
-        status:
-          description: The HTTP status code.
-          example: 400
-          format: int32
-          readOnly: true
-          title: Status
-          type: integer
-        error:
-          description: The short error message.
-          example: Bad Request
-          readOnly: true
-          title: Error
-          type: string
-        path:
-          description: The path of the URL for this request.
-          example: /api/owners
-          format: uri
-          readOnly: true
-          title: Path
-          type: string
-        timestamp:
-          description: The time the error occurred.
-          format: date-time
-          readOnly: true
-          title: Timestamp
-          type: string
-        message:
-          description: The long error message.
-          example: Request failed schema validation
-          readOnly: true
-          title: Message
-          type: string
-        schemaValidationErrors:
-          description: Validation errors against the OpenAPI schema.
+        errors:
+          description: List of all errors
           items:
-            $ref: '#/components/schemas/ValidationMessage'
-          title: Schema validation errors
+            $ref: '#/components/schemas/error'
+          title: errors
           type: array
-        trace:
-          description: The stacktrace for this error.
-          example: 'com.atlassian.oai.validator.springmvc.InvalidRequestException:
-            ...'
-          readOnly: true
-          title: Trace
-          type: string
-      required:
-      - error
-      - message
-      - path
-      - schemaValidationErrors
-      - status
-      - timestamp
       title: REST Error
-      type: object
-    ValidationMessage:
-      additionalProperties: true
-      description: Messages describing a validation error.
-      properties:
-        message:
-          description: The validation message.
-          example: '[Path ''/lastName''] Instance type (null) does not match any allowed
-            primitive type (allowed: ["string"])'
-          readOnly: true
-          title: Message
-          type: string
-      required:
-      - message
-      title: Validation message
       type: object
     PaginationResponse:
       properties:
@@ -597,53 +512,46 @@ components:
           title: Time when the resource has been last updated
           type: string
       type: object
-    ResourceWithDefaults:
+    ResourceWithFlinkApplicationDefaults:
       properties:
-        default_strategy:
-          enum:
-          - jsonpatch
-          - template-merge-position
-          - template-merge-name
-          title: Default Strategy
-          type: string
-        defaults:
+        flinkApplicationDefaults:
           format: yamlorjson
-          title: the defaults as YAML or JSON
+          title: the defaults as YAML or JSON for FlinkApplications
           type: object
       type: object
     PostEnvironment:
       allOf:
       - $ref: '#/components/schemas/PostResourceBase'
-      - $ref: '#/components/schemas/ResourceWithDefaults'
+      - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
       description: Environment
       example:
-        namespace: namespace
+        kubernetesNamespace: kubernetesNamespace
       properties:
-        namespace:
-          title: K8s namespace name where resources referencing this environment are
-            created in.
+        kubernetesNamespace:
+          title: Kubernetes namespace name where resources referencing this environment
+            are created in.
           type: string
       required:
+      - kubernetesNamespace
       - name
-      - namespace
       title: Environment
       type: object
     Environment:
       allOf:
       - $ref: '#/components/schemas/PostResourceBase'
       - $ref: '#/components/schemas/GetResourceBase'
-      - $ref: '#/components/schemas/ResourceWithDefaults'
+      - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
       description: Environment
       example:
-        namespace: namespace
+        kubernetesNamespace: kubernetesNamespace
       properties:
-        namespace:
-          title: K8s namespace name where resources referencing this environment are
-            created in.
+        kubernetesNamespace:
+          title: Kubernetes namespace name where resources referencing this environment
+            are created in.
           type: string
       required:
+      - kubernetesNamespace
       - name
-      - namespace
       title: Environment
       type: object
     EnvironmentsPage:
@@ -689,6 +597,14 @@ components:
       allOf:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/ApplicationsPage_allOf'
+      type: object
+    error:
+      description: An error
+      properties:
+        message:
+          description: An error message
+          type: string
+      title: error
       type: object
     EnvironmentsPageMetadata:
       properties:
