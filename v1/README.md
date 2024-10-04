@@ -55,6 +55,7 @@ Class | Method | HTTP request | Description
  - [EnvironmentsPageAllOf](docs/EnvironmentsPageAllOf.md)
  - [EnvironmentsPageMetadata](docs/EnvironmentsPageMetadata.md)
  - [GetResourceBase](docs/GetResourceBase.md)
+ - [KubernetesNamespace](docs/KubernetesNamespace.md)
  - [ModelError](docs/ModelError.md)
  - [Pageable](docs/Pageable.md)
  - [PaginationResponse](docs/PaginationResponse.md)

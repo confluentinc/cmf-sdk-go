@@ -16,6 +16,7 @@ docs/EnvironmentsPage.md
 docs/EnvironmentsPageAllOf.md
 docs/EnvironmentsPageMetadata.md
 docs/GetResourceBase.md
+docs/KubernetesNamespace.md
 docs/ModelError.md
 docs/Pageable.md
 docs/PaginationResponse.md
@@ -37,6 +38,7 @@ model_environments_page_all_of.go
 model_environments_page_metadata.go
 model_error.go
 model_get_resource_base.go
+model_kubernetes_namespace.go
 model_pageable.go
 model_pagination_response.go
 model_post_environment.go

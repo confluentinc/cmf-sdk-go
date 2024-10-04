@@ -512,6 +512,13 @@ components:
           title: Time when the resource has been last updated
           type: string
       type: object
+    KubernetesNamespace:
+      properties:
+        kubernetesNamespace:
+          minLength: 1
+          title: kubernetes namespace
+          type: string
+      type: object
     ResourceWithFlinkApplicationDefaults:
       properties:
         flinkApplicationDefaults:
@@ -523,14 +530,8 @@ components:
       allOf:
       - $ref: '#/components/schemas/PostResourceBase'
       - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
+      - $ref: '#/components/schemas/KubernetesNamespace'
       description: Environment
-      example:
-        kubernetesNamespace: kubernetesNamespace
-      properties:
-        kubernetesNamespace:
-          title: Kubernetes namespace name where resources referencing this environment
-            are created in.
-          type: string
       required:
       - kubernetesNamespace
       - name
@@ -541,14 +542,8 @@ components:
       - $ref: '#/components/schemas/PostResourceBase'
       - $ref: '#/components/schemas/GetResourceBase'
       - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
+      - $ref: '#/components/schemas/KubernetesNamespace'
       description: Environment
-      example:
-        kubernetesNamespace: kubernetesNamespace
-      properties:
-        kubernetesNamespace:
-          title: Kubernetes namespace name where resources referencing this environment
-            are created in.
-          type: string
       required:
       - kubernetesNamespace
       - name
