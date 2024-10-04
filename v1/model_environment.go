@@ -18,4 +18,5 @@ type Environment struct {
 	CreatedTime time.Time `json:"created_time,omitempty"`
 	UpdatedTime time.Time `json:"updated_time,omitempty"`
 	FlinkApplicationDefaults map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
+	KubernetesNamespace string `json:"kubernetesNamespace"`
 }
