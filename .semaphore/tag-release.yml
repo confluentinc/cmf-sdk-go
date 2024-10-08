@@ -1,0 +1,31 @@
+version: v1.0
+name: tag-release
+agent:
+  machine:
+    type: s1-prod-ubuntu20-04-amd64-1
+
+execution_time_limit:
+  hours: 1
+
+blocks:
+  - name: "Tag and push tag"
+    dependencies: [ ]
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu20-04-amd64-1
+      jobs:
+        - name: "Tag and push tag"
+          commands:
+            - echo repo name = cmf-sdk-go, tag-name = $TAG_NAME and git-ref = $GIT_REF, dry-run = $DRY_RUN
+            - git clone "git@github.com:confluentinc/cmf-sdk-go.git"
+            - cd cmf-sdk-go
+            - git remote -v
+            - git fetch --all
+            - git checkout $GIT_REF
+            - git tag $TAG_NAME
+            - git push origin $TAG_NAME --dry-run
+            - |
+              if [[ $DRY_RUN == "False" ]]; then
+                git push origin $TAG_NAME
+              fi
