@@ -516,8 +516,11 @@ components:
       properties:
         kubernetesNamespace:
           minLength: 1
-          title: kubernetes namespace
+          title: Kubernetes namespace name where resources referencing this environment
+            are created in.
           type: string
+      required:
+      - kubernetesNamespace
       type: object
     ResourceWithFlinkApplicationDefaults:
       properties:
