@@ -1,6 +1,6 @@
 module github.com/confluentinc/cmf-sdk-go
 
-go 1.23.1
+go 1.22.7
 
 require (
 	github.com/antihax/optional v1.0.0
