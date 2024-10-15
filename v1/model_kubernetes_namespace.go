@@ -10,5 +10,5 @@
 package v1
 // KubernetesNamespace struct for KubernetesNamespace
 type KubernetesNamespace struct {
-	KubernetesNamespace string `json:"kubernetesNamespace"`
+	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
 }
