@@ -19,5 +19,7 @@ blocks:
       jobs:
         - name: Go build
           commands:
+            - echo "Building Golang SDK for CMF"
             - sem-version go 1.22.7
+            - checkout
             - go build ./...
