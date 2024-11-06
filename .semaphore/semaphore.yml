@@ -12,4 +12,12 @@ auto_cancel:
 execution_time_limit:
   hours: 1
 
-blocks: []
+blocks:
+  - name: Build
+    dependencies: []
+    task:
+      jobs:
+        - name: Go build
+          commands:
+            - sem-version go 1.22.7
+            - go build ./...
