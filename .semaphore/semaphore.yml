@@ -12,5 +12,4 @@ auto_cancel:
 execution_time_limit:
   hours: 1
 
-blocks:
-  # Empty block 
+blocks: []
