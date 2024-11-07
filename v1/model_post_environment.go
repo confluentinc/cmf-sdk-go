@@ -13,5 +13,5 @@ type PostEnvironment struct {
 	// A unique name for the resource.
 	Name string `json:"name"`
 	FlinkApplicationDefaults map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
-	KubernetesNamespace string `json:"kubernetesNamespace"`
+	KubernetesNamespace string `json:"kubernetesNamespace,omitempty"`
 }

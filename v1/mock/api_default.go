@@ -12,8 +12,8 @@ import (
 	github_com_confluentinc_cmf_sdk_go_v1 "github.com/confluentinc/cmf-sdk-go/v1"
 )
 
-// DefaultApi is a mock of DefaultApi interface
-type DefaultApi struct {
+// MockDefaultApi is a mock of DefaultApi interface
+type MockDefaultApi struct {
 	lockCreateOrUpdateApplication sync.Mutex
 	CreateOrUpdateApplicationFunc func(ctx context.Context, envName string, application github_com_confluentinc_cmf_sdk_go_v1.Application) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error)
 
@@ -95,12 +95,12 @@ type DefaultApi struct {
 }
 
 // CreateOrUpdateApplication mocks base method by wrapping the associated func.
-func (m *DefaultApi) CreateOrUpdateApplication(ctx context.Context, envName string, application github_com_confluentinc_cmf_sdk_go_v1.Application) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
+func (m *MockDefaultApi) CreateOrUpdateApplication(ctx context.Context, envName string, application github_com_confluentinc_cmf_sdk_go_v1.Application) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
 	m.lockCreateOrUpdateApplication.Lock()
 	defer m.lockCreateOrUpdateApplication.Unlock()
 
 	if m.CreateOrUpdateApplicationFunc == nil {
-		panic("mocker: DefaultApi.CreateOrUpdateApplicationFunc is nil but DefaultApi.CreateOrUpdateApplication was called.")
+		panic("mocker: MockDefaultApi.CreateOrUpdateApplicationFunc is nil but MockDefaultApi.CreateOrUpdateApplication was called.")
 	}
 
 	call := struct {
@@ -119,7 +119,7 @@ func (m *DefaultApi) CreateOrUpdateApplication(ctx context.Context, envName stri
 }
 
 // CreateOrUpdateApplicationCalled returns true if CreateOrUpdateApplication was called at least once.
-func (m *DefaultApi) CreateOrUpdateApplicationCalled() bool {
+func (m *MockDefaultApi) CreateOrUpdateApplicationCalled() bool {
 	m.lockCreateOrUpdateApplication.Lock()
 	defer m.lockCreateOrUpdateApplication.Unlock()
 
@@ -127,7 +127,7 @@ func (m *DefaultApi) CreateOrUpdateApplicationCalled() bool {
 }
 
 // CreateOrUpdateApplicationCalls returns the calls made to CreateOrUpdateApplication.
-func (m *DefaultApi) CreateOrUpdateApplicationCalls() []struct {
+func (m *MockDefaultApi) CreateOrUpdateApplicationCalls() []struct {
 	Ctx         context.Context
 	EnvName     string
 	Application github_com_confluentinc_cmf_sdk_go_v1.Application
@@ -139,12 +139,12 @@ func (m *DefaultApi) CreateOrUpdateApplicationCalls() []struct {
 }
 
 // CreateOrUpdateEnvironment mocks base method by wrapping the associated func.
-func (m *DefaultApi) CreateOrUpdateEnvironment(ctx context.Context, postEnvironment github_com_confluentinc_cmf_sdk_go_v1.PostEnvironment) (github_com_confluentinc_cmf_sdk_go_v1.Environment, *net_http.Response, error) {
+func (m *MockDefaultApi) CreateOrUpdateEnvironment(ctx context.Context, postEnvironment github_com_confluentinc_cmf_sdk_go_v1.PostEnvironment) (github_com_confluentinc_cmf_sdk_go_v1.Environment, *net_http.Response, error) {
 	m.lockCreateOrUpdateEnvironment.Lock()
 	defer m.lockCreateOrUpdateEnvironment.Unlock()
 
 	if m.CreateOrUpdateEnvironmentFunc == nil {
-		panic("mocker: DefaultApi.CreateOrUpdateEnvironmentFunc is nil but DefaultApi.CreateOrUpdateEnvironment was called.")
+		panic("mocker: MockDefaultApi.CreateOrUpdateEnvironmentFunc is nil but MockDefaultApi.CreateOrUpdateEnvironment was called.")
 	}
 
 	call := struct {
@@ -161,7 +161,7 @@ func (m *DefaultApi) CreateOrUpdateEnvironment(ctx context.Context, postEnvironm
 }
 
 // CreateOrUpdateEnvironmentCalled returns true if CreateOrUpdateEnvironment was called at least once.
-func (m *DefaultApi) CreateOrUpdateEnvironmentCalled() bool {
+func (m *MockDefaultApi) CreateOrUpdateEnvironmentCalled() bool {
 	m.lockCreateOrUpdateEnvironment.Lock()
 	defer m.lockCreateOrUpdateEnvironment.Unlock()
 
@@ -169,7 +169,7 @@ func (m *DefaultApi) CreateOrUpdateEnvironmentCalled() bool {
 }
 
 // CreateOrUpdateEnvironmentCalls returns the calls made to CreateOrUpdateEnvironment.
-func (m *DefaultApi) CreateOrUpdateEnvironmentCalls() []struct {
+func (m *MockDefaultApi) CreateOrUpdateEnvironmentCalls() []struct {
 	Ctx             context.Context
 	PostEnvironment github_com_confluentinc_cmf_sdk_go_v1.PostEnvironment
 } {
@@ -180,12 +180,12 @@ func (m *DefaultApi) CreateOrUpdateEnvironmentCalls() []struct {
 }
 
 // DeleteApplication mocks base method by wrapping the associated func.
-func (m *DefaultApi) DeleteApplication(ctx context.Context, envName, appName string) (*net_http.Response, error) {
+func (m *MockDefaultApi) DeleteApplication(ctx context.Context, envName, appName string) (*net_http.Response, error) {
 	m.lockDeleteApplication.Lock()
 	defer m.lockDeleteApplication.Unlock()
 
 	if m.DeleteApplicationFunc == nil {
-		panic("mocker: DefaultApi.DeleteApplicationFunc is nil but DefaultApi.DeleteApplication was called.")
+		panic("mocker: MockDefaultApi.DeleteApplicationFunc is nil but MockDefaultApi.DeleteApplication was called.")
 	}
 
 	call := struct {
@@ -204,7 +204,7 @@ func (m *DefaultApi) DeleteApplication(ctx context.Context, envName, appName str
 }
 
 // DeleteApplicationCalled returns true if DeleteApplication was called at least once.
-func (m *DefaultApi) DeleteApplicationCalled() bool {
+func (m *MockDefaultApi) DeleteApplicationCalled() bool {
 	m.lockDeleteApplication.Lock()
 	defer m.lockDeleteApplication.Unlock()
 
@@ -212,7 +212,7 @@ func (m *DefaultApi) DeleteApplicationCalled() bool {
 }
 
 // DeleteApplicationCalls returns the calls made to DeleteApplication.
-func (m *DefaultApi) DeleteApplicationCalls() []struct {
+func (m *MockDefaultApi) DeleteApplicationCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 	AppName string
@@ -224,12 +224,12 @@ func (m *DefaultApi) DeleteApplicationCalls() []struct {
 }
 
 // DeleteEnvironment mocks base method by wrapping the associated func.
-func (m *DefaultApi) DeleteEnvironment(ctx context.Context, envName string) (*net_http.Response, error) {
+func (m *MockDefaultApi) DeleteEnvironment(ctx context.Context, envName string) (*net_http.Response, error) {
 	m.lockDeleteEnvironment.Lock()
 	defer m.lockDeleteEnvironment.Unlock()
 
 	if m.DeleteEnvironmentFunc == nil {
-		panic("mocker: DefaultApi.DeleteEnvironmentFunc is nil but DefaultApi.DeleteEnvironment was called.")
+		panic("mocker: MockDefaultApi.DeleteEnvironmentFunc is nil but MockDefaultApi.DeleteEnvironment was called.")
 	}
 
 	call := struct {
@@ -246,7 +246,7 @@ func (m *DefaultApi) DeleteEnvironment(ctx context.Context, envName string) (*ne
 }
 
 // DeleteEnvironmentCalled returns true if DeleteEnvironment was called at least once.
-func (m *DefaultApi) DeleteEnvironmentCalled() bool {
+func (m *MockDefaultApi) DeleteEnvironmentCalled() bool {
 	m.lockDeleteEnvironment.Lock()
 	defer m.lockDeleteEnvironment.Unlock()
 
@@ -254,7 +254,7 @@ func (m *DefaultApi) DeleteEnvironmentCalled() bool {
 }
 
 // DeleteEnvironmentCalls returns the calls made to DeleteEnvironment.
-func (m *DefaultApi) DeleteEnvironmentCalls() []struct {
+func (m *MockDefaultApi) DeleteEnvironmentCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 } {
@@ -265,12 +265,12 @@ func (m *DefaultApi) DeleteEnvironmentCalls() []struct {
 }
 
 // GetApplication mocks base method by wrapping the associated func.
-func (m *DefaultApi) GetApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
+func (m *MockDefaultApi) GetApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
 	m.lockGetApplication.Lock()
 	defer m.lockGetApplication.Unlock()
 
 	if m.GetApplicationFunc == nil {
-		panic("mocker: DefaultApi.GetApplicationFunc is nil but DefaultApi.GetApplication was called.")
+		panic("mocker: MockDefaultApi.GetApplicationFunc is nil but MockDefaultApi.GetApplication was called.")
 	}
 
 	call := struct {
@@ -289,7 +289,7 @@ func (m *DefaultApi) GetApplication(ctx context.Context, envName, appName string
 }
 
 // GetApplicationCalled returns true if GetApplication was called at least once.
-func (m *DefaultApi) GetApplicationCalled() bool {
+func (m *MockDefaultApi) GetApplicationCalled() bool {
 	m.lockGetApplication.Lock()
 	defer m.lockGetApplication.Unlock()
 
@@ -297,7 +297,7 @@ func (m *DefaultApi) GetApplicationCalled() bool {
 }
 
 // GetApplicationCalls returns the calls made to GetApplication.
-func (m *DefaultApi) GetApplicationCalls() []struct {
+func (m *MockDefaultApi) GetApplicationCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 	AppName string
@@ -309,12 +309,12 @@ func (m *DefaultApi) GetApplicationCalls() []struct {
 }
 
 // GetApplications mocks base method by wrapping the associated func.
-func (m *DefaultApi) GetApplications(ctx context.Context, envName string, localVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetApplicationsOpts) (github_com_confluentinc_cmf_sdk_go_v1.ApplicationsPage, *net_http.Response, error) {
+func (m *MockDefaultApi) GetApplications(ctx context.Context, envName string, localVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetApplicationsOpts) (github_com_confluentinc_cmf_sdk_go_v1.ApplicationsPage, *net_http.Response, error) {
 	m.lockGetApplications.Lock()
 	defer m.lockGetApplications.Unlock()
 
 	if m.GetApplicationsFunc == nil {
-		panic("mocker: DefaultApi.GetApplicationsFunc is nil but DefaultApi.GetApplications was called.")
+		panic("mocker: MockDefaultApi.GetApplicationsFunc is nil but MockDefaultApi.GetApplications was called.")
 	}
 
 	call := struct {
@@ -333,7 +333,7 @@ func (m *DefaultApi) GetApplications(ctx context.Context, envName string, localV
 }
 
 // GetApplicationsCalled returns true if GetApplications was called at least once.
-func (m *DefaultApi) GetApplicationsCalled() bool {
+func (m *MockDefaultApi) GetApplicationsCalled() bool {
 	m.lockGetApplications.Lock()
 	defer m.lockGetApplications.Unlock()
 
@@ -341,7 +341,7 @@ func (m *DefaultApi) GetApplicationsCalled() bool {
 }
 
 // GetApplicationsCalls returns the calls made to GetApplications.
-func (m *DefaultApi) GetApplicationsCalls() []struct {
+func (m *MockDefaultApi) GetApplicationsCalls() []struct {
 	Ctx               context.Context
 	EnvName           string
 	LocalVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetApplicationsOpts
@@ -353,12 +353,12 @@ func (m *DefaultApi) GetApplicationsCalls() []struct {
 }
 
 // GetEnvironment mocks base method by wrapping the associated func.
-func (m *DefaultApi) GetEnvironment(ctx context.Context, envName string) (github_com_confluentinc_cmf_sdk_go_v1.Environment, *net_http.Response, error) {
+func (m *MockDefaultApi) GetEnvironment(ctx context.Context, envName string) (github_com_confluentinc_cmf_sdk_go_v1.Environment, *net_http.Response, error) {
 	m.lockGetEnvironment.Lock()
 	defer m.lockGetEnvironment.Unlock()
 
 	if m.GetEnvironmentFunc == nil {
-		panic("mocker: DefaultApi.GetEnvironmentFunc is nil but DefaultApi.GetEnvironment was called.")
+		panic("mocker: MockDefaultApi.GetEnvironmentFunc is nil but MockDefaultApi.GetEnvironment was called.")
 	}
 
 	call := struct {
@@ -375,7 +375,7 @@ func (m *DefaultApi) GetEnvironment(ctx context.Context, envName string) (github
 }
 
 // GetEnvironmentCalled returns true if GetEnvironment was called at least once.
-func (m *DefaultApi) GetEnvironmentCalled() bool {
+func (m *MockDefaultApi) GetEnvironmentCalled() bool {
 	m.lockGetEnvironment.Lock()
 	defer m.lockGetEnvironment.Unlock()
 
@@ -383,7 +383,7 @@ func (m *DefaultApi) GetEnvironmentCalled() bool {
 }
 
 // GetEnvironmentCalls returns the calls made to GetEnvironment.
-func (m *DefaultApi) GetEnvironmentCalls() []struct {
+func (m *MockDefaultApi) GetEnvironmentCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 } {
@@ -394,12 +394,12 @@ func (m *DefaultApi) GetEnvironmentCalls() []struct {
 }
 
 // GetEnvironments mocks base method by wrapping the associated func.
-func (m *DefaultApi) GetEnvironments(ctx context.Context, localVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetEnvironmentsOpts) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentsPage, *net_http.Response, error) {
+func (m *MockDefaultApi) GetEnvironments(ctx context.Context, localVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetEnvironmentsOpts) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentsPage, *net_http.Response, error) {
 	m.lockGetEnvironments.Lock()
 	defer m.lockGetEnvironments.Unlock()
 
 	if m.GetEnvironmentsFunc == nil {
-		panic("mocker: DefaultApi.GetEnvironmentsFunc is nil but DefaultApi.GetEnvironments was called.")
+		panic("mocker: MockDefaultApi.GetEnvironmentsFunc is nil but MockDefaultApi.GetEnvironments was called.")
 	}
 
 	call := struct {
@@ -416,7 +416,7 @@ func (m *DefaultApi) GetEnvironments(ctx context.Context, localVarOptionals *git
 }
 
 // GetEnvironmentsCalled returns true if GetEnvironments was called at least once.
-func (m *DefaultApi) GetEnvironmentsCalled() bool {
+func (m *MockDefaultApi) GetEnvironmentsCalled() bool {
 	m.lockGetEnvironments.Lock()
 	defer m.lockGetEnvironments.Unlock()
 
@@ -424,7 +424,7 @@ func (m *DefaultApi) GetEnvironmentsCalled() bool {
 }
 
 // GetEnvironmentsCalls returns the calls made to GetEnvironments.
-func (m *DefaultApi) GetEnvironmentsCalls() []struct {
+func (m *MockDefaultApi) GetEnvironmentsCalls() []struct {
 	Ctx               context.Context
 	LocalVarOptionals *github_com_confluentinc_cmf_sdk_go_v1.GetEnvironmentsOpts
 } {
@@ -435,12 +435,12 @@ func (m *DefaultApi) GetEnvironmentsCalls() []struct {
 }
 
 // StartApplication mocks base method by wrapping the associated func.
-func (m *DefaultApi) StartApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
+func (m *MockDefaultApi) StartApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
 	m.lockStartApplication.Lock()
 	defer m.lockStartApplication.Unlock()
 
 	if m.StartApplicationFunc == nil {
-		panic("mocker: DefaultApi.StartApplicationFunc is nil but DefaultApi.StartApplication was called.")
+		panic("mocker: MockDefaultApi.StartApplicationFunc is nil but MockDefaultApi.StartApplication was called.")
 	}
 
 	call := struct {
@@ -459,7 +459,7 @@ func (m *DefaultApi) StartApplication(ctx context.Context, envName, appName stri
 }
 
 // StartApplicationCalled returns true if StartApplication was called at least once.
-func (m *DefaultApi) StartApplicationCalled() bool {
+func (m *MockDefaultApi) StartApplicationCalled() bool {
 	m.lockStartApplication.Lock()
 	defer m.lockStartApplication.Unlock()
 
@@ -467,7 +467,7 @@ func (m *DefaultApi) StartApplicationCalled() bool {
 }
 
 // StartApplicationCalls returns the calls made to StartApplication.
-func (m *DefaultApi) StartApplicationCalls() []struct {
+func (m *MockDefaultApi) StartApplicationCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 	AppName string
@@ -479,12 +479,12 @@ func (m *DefaultApi) StartApplicationCalls() []struct {
 }
 
 // SuspendApplication mocks base method by wrapping the associated func.
-func (m *DefaultApi) SuspendApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
+func (m *MockDefaultApi) SuspendApplication(ctx context.Context, envName, appName string) (github_com_confluentinc_cmf_sdk_go_v1.Application, *net_http.Response, error) {
 	m.lockSuspendApplication.Lock()
 	defer m.lockSuspendApplication.Unlock()
 
 	if m.SuspendApplicationFunc == nil {
-		panic("mocker: DefaultApi.SuspendApplicationFunc is nil but DefaultApi.SuspendApplication was called.")
+		panic("mocker: MockDefaultApi.SuspendApplicationFunc is nil but MockDefaultApi.SuspendApplication was called.")
 	}
 
 	call := struct {
@@ -503,7 +503,7 @@ func (m *DefaultApi) SuspendApplication(ctx context.Context, envName, appName st
 }
 
 // SuspendApplicationCalled returns true if SuspendApplication was called at least once.
-func (m *DefaultApi) SuspendApplicationCalled() bool {
+func (m *MockDefaultApi) SuspendApplicationCalled() bool {
 	m.lockSuspendApplication.Lock()
 	defer m.lockSuspendApplication.Unlock()
 
@@ -511,7 +511,7 @@ func (m *DefaultApi) SuspendApplicationCalled() bool {
 }
 
 // SuspendApplicationCalls returns the calls made to SuspendApplication.
-func (m *DefaultApi) SuspendApplicationCalls() []struct {
+func (m *MockDefaultApi) SuspendApplicationCalls() []struct {
 	Ctx     context.Context
 	EnvName string
 	AppName string
@@ -523,7 +523,7 @@ func (m *DefaultApi) SuspendApplicationCalls() []struct {
 }
 
 // Reset resets the calls made to the mocked methods.
-func (m *DefaultApi) Reset() {
+func (m *MockDefaultApi) Reset() {
 	m.lockCreateOrUpdateApplication.Lock()
 	m.calls.CreateOrUpdateApplication = nil
 	m.lockCreateOrUpdateApplication.Unlock()
