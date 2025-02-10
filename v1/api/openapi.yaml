@@ -43,6 +43,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnvironmentsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentsPage'
           description: List of environments found. If no environments are found, an
             empty list is returned.
         "304":
@@ -59,6 +62,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of all environments.
       x-spring-paginated: true
@@ -69,11 +75,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostEnvironment'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/PostEnvironment'
         required: true
       responses:
         "201":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/Environment'
           description: The Environment was successfully created or updated.
@@ -82,10 +94,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Bad request.
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -112,10 +130,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Server error.
         "404":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Environment not found.
@@ -136,16 +160,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Environment'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Environment'
           description: Environment found and returned.
         "404":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Environment not found.
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -195,6 +228,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ApplicationsPage'
           description: Application found and returned.
         "304":
           description: Not modified.
@@ -208,6 +244,9 @@ paths:
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -248,16 +287,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Bad request.
         "422":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Request valid but invalid content.
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -293,6 +341,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Deletes an Application of the given name in the given Environment.
     get:
@@ -320,6 +371,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Application'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Application'
           description: Application found and returned.
         "304":
           description: Not modified.
@@ -335,10 +389,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
           description: Server error.
         "404":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Application not found.
@@ -369,12 +429,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Application'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Application'
           description: Application started
         "304":
           description: Not modified.
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -405,12 +471,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Application'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Application'
           description: Application suspended
         "304":
           description: Not modified.
         "500":
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
@@ -515,6 +587,9 @@ components:
     KubernetesNamespace:
       properties:
         kubernetesNamespace:
+          maxLength: 253
+          minLength: 1
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
           title: Kubernetes namespace name where resources referencing this environment
             are created in.
           type: string
