@@ -5,13 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **SrInstance** | [**KafkaCatalogSpecSrInstance**](KafkaCatalogSpecSrInstance.md) |  | 
-**KafkaClusters** | [**[]KafkaCatalogSpecKafkaClusters**](KafkaCatalogSpecKafkaClusters.md) |  | 
+**KafkaClusters** | Pointer to [**[]KafkaCatalogSpecKafkaClusters**](KafkaCatalogSpecKafkaClusters.md) |  | [optional] 
 
 ## Methods
 
 ### NewKafkaCatalogSpec
 
-`func NewKafkaCatalogSpec(srInstance KafkaCatalogSpecSrInstance, kafkaClusters []KafkaCatalogSpecKafkaClusters, ) *KafkaCatalogSpec`
+`func NewKafkaCatalogSpec(srInstance KafkaCatalogSpecSrInstance, ) *KafkaCatalogSpec`
 
 NewKafkaCatalogSpec instantiates a new KafkaCatalogSpec object
 This constructor will assign default values to properties that have it defined,
@@ -65,6 +65,11 @@ and a boolean to check if the value has been set.
 
 SetKafkaClusters sets KafkaClusters field to given value.
 
+### HasKafkaClusters
+
+`func (o *KafkaCatalogSpec) HasKafkaClusters() bool`
+
+HasKafkaClusters returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

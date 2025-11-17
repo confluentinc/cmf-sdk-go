@@ -5,6 +5,12 @@ info:
   version: "1.0"
 servers:
 - url: http://localhost:8080
+tags:
+- name: Environments
+- name: FlinkApplications
+- name: Secrets
+- name: SQL
+- name: Savepoints
 paths:
   /cmf/api/v1/environments:
     get:
@@ -69,6 +75,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of all environments.
+      tags:
+      - Environments
       x-spring-paginated: true
     post:
       operationId: createOrUpdateEnvironment
@@ -110,6 +118,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Create or update an Environment
+      tags:
+      - Environments
   /cmf/api/v1/environments/{envName}:
     delete:
       operationId: deleteEnvironment
@@ -145,6 +155,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Environment not found.
+      tags:
+      - Environments
     get:
       operationId: getEnvironment
       parameters:
@@ -185,6 +197,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Get/Describe an environment with the given name.
+      tags:
+      - Environments
   /cmf/api/v1/environments/{envName}/applications:
     get:
       operationId: getApplications
@@ -262,6 +276,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of all applications in the given Environment.
+      tags:
+      - FlinkApplications
       x-spring-paginated: true
     post:
       operationId: createOrUpdateApplication
@@ -322,6 +338,8 @@ paths:
           description: Server error.
       summary: Creates a new Flink Application or updates an existing one in the given
         Environment.
+      tags:
+      - FlinkApplications
   /cmf/api/v1/environments/{envName}/applications/{appName}:
     delete:
       operationId: deleteApplication
@@ -357,6 +375,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Deletes an Application of the given name in the given Environment.
+      tags:
+      - FlinkApplications
     get:
       operationId: getApplication
       parameters:
@@ -414,6 +434,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Application not found.
       summary: Retrieve an Application of the given name in the given Environment.
+      tags:
+      - FlinkApplications
   /cmf/api/v1alpha1/environments/{envName}/applications/{appName}/events:
     get:
       operationId: getApplicationEvents
@@ -490,6 +512,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Get a paginated list of events of the given Application
+      tags:
+      - FlinkApplications
       x-spring-paginated: true
   /cmf/api/v1/environments/{envName}/applications/{appName}/start:
     post:
@@ -511,6 +535,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: UID of the Savepoint from which the application should be started.
+          This savepoint could belong to the application or can be a deatched savepoint.
+        explode: true
+        in: query
+        name: startFromSavepointUid
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
@@ -523,6 +556,15 @@ paths:
           description: Application started
         "304":
           description: Not modified.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Application or Savepoint not found.
         "500":
           content:
             application/json:
@@ -533,6 +575,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Starts an earlier submitted Flink Application
+      tags:
+      - FlinkApplications
   /cmf/api/v1/environments/{envName}/applications/{appName}/suspend:
     post:
       operationId: suspendApplication
@@ -575,6 +619,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Suspends an earlier started Flink Application
+      tags:
+      - FlinkApplications
   /cmf/api/v1/environments/{envName}/applications/{appName}/instances:
     get:
       operationId: getApplicationInstances
@@ -651,6 +697,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Get a paginated list of instances of the given Application
+      tags:
+      - FlinkApplications
       x-spring-paginated: true
   /cmf/api/v1/environments/{envName}/applications/{appName}/instances/{instName}:
     get:
@@ -710,6 +758,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve an Instance of an Application
+      tags:
+      - FlinkApplications
   /cmf/api/v1/environments/{envName}/secret-mappings/{name}:
     delete:
       operationId: deleteEnvironmentSecretMapping
@@ -754,6 +804,8 @@ paths:
           description: Server error.
       summary: Deletes the Environment Secret Mapping for the given Environment and
         Secret.
+      tags:
+      - Environments
     get:
       operationId: getEnvironmentSecretMapping
       parameters:
@@ -803,6 +855,8 @@ paths:
           description: Server error.
       summary: Retrieve the Environment Secret Mapping for the given name in the given
         environment.
+      tags:
+      - Environments
     put:
       operationId: updateEnvironmentSecretMapping
       parameters:
@@ -869,6 +923,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Updates the Environment Secret Mapping for the given Environment.
+      tags:
+      - Environments
   /cmf/api/v1/environments/{envName}/secret-mappings:
     get:
       operationId: getEnvironmentSecretMappings
@@ -937,6 +993,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of all Environment Secret Mappings.
+      tags:
+      - Environments
       x-spring-paginated: true
     post:
       operationId: createEnvironmentSecretMapping
@@ -1005,6 +1063,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Creates the Environment Secret Mapping for the given Environment.
+      tags:
+      - Environments
   /cmf/api/v1/environments/{envName}/statements:
     get:
       operationId: getStatements
@@ -1097,6 +1157,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of Statements in the given Environment.
+      tags:
+      - SQL
       x-spring-paginated: true
     post:
       operationId: createStatement
@@ -1174,6 +1236,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Creates a new Flink SQL Statement in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/environments/{envName}/statements/{stmtName}:
     delete:
       operationId: deleteStatement
@@ -1218,6 +1282,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Deletes the Statement of the given name in the given Environment.
+      tags:
+      - SQL
     get:
       operationId: getStatement
       parameters:
@@ -1266,6 +1332,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve the Statement of the given name in the given Environment.
+      tags:
+      - SQL
     put:
       operationId: updateStatement
       parameters:
@@ -1334,6 +1402,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Updates a Statement of the given name in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/environments/{envName}/statements/{stmtName}/results:
     get:
       operationId: getStatementResult
@@ -1410,6 +1480,8 @@ paths:
           description: Server error.
       summary: Retrieve the result of the interactive Statement with the given name
         in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions:
     get:
       operationId: getStatementExceptions
@@ -1460,6 +1532,8 @@ paths:
           description: Server error.
       summary: Retrieves the last 10 exceptions of the Statement with the given name
         in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/environments/{envName}/compute-pools:
     get:
       operationId: getComputePools
@@ -1528,6 +1602,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of Compute Pools in the given Environment.
+      tags:
+      - SQL
       x-spring-paginated: true
     post:
       operationId: createComputePool
@@ -1596,6 +1672,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Creates a new Flink Compute Pool in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}:
     delete:
       operationId: deleteComputePool
@@ -1647,6 +1725,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Compute Pool is in use and cannot be deleted.
       summary: Deletes the ComputePool of the given name in the given Environment.
+      tags:
+      - SQL
     get:
       operationId: getComputePool
       parameters:
@@ -1695,6 +1775,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve the Compute Pool of the given name in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/secrets:
     get:
       operationId: getSecrets
@@ -1757,6 +1839,8 @@ paths:
           description: Server error.
       summary: Retrieve a paginated list of all secrets. Note that the actual secret
         data is masked for security reasons.
+      tags:
+      - Secrets
       x-spring-paginated: true
     post:
       description: Create a Secret. This secrets can be then used to specify sensitive
@@ -1811,6 +1895,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Create a Secret.
+      tags:
+      - Secrets
   /cmf/api/v1/secrets/{secretName}:
     delete:
       operationId: deleteSecret
@@ -1845,6 +1931,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Delete the secret with the given name.
+      tags:
+      - Secrets
     get:
       operationId: getSecret
       parameters:
@@ -1886,6 +1974,8 @@ paths:
           description: Server error.
       summary: Retrieve the Secret of the given name. Note that the secret data is
         not returned for security reasons.
+      tags:
+      - Secrets
     put:
       operationId: updateSecret
       parameters:
@@ -1953,6 +2043,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Update the secret.
+      tags:
+      - Secrets
   /cmf/api/v1/catalogs/kafka:
     get:
       operationId: getKafkaCatalogs
@@ -2004,6 +2096,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve a paginated list of Kafka Catalogs
+      tags:
+      - SQL
       x-spring-paginated: true
     post:
       operationId: createKafkaCatalog
@@ -2063,6 +2157,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Creates a new Kafka Catalog that can be referenced by Flink Statements
+      tags:
+      - SQL
   /cmf/api/v1/catalogs/kafka/{catName}:
     delete:
       operationId: deleteKafkaCatalog
@@ -2087,6 +2183,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Kafka Catalog not found.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Catalog contains databases and cannot be deleted.
         "500":
           content:
             application/json:
@@ -2097,6 +2202,8 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Deletes the Kafka Catalog of the given name.
+      tags:
+      - SQL
     get:
       operationId: getKafkaCatalog
       parameters:
@@ -2137,6 +2244,1172 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve the Kafka Catalog of the given name.
+      tags:
+      - SQL
+    put:
+      operationId: updateKafkaCatalog
+      parameters:
+      - description: Name of the KafkaCatalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KafkaCatalog'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/KafkaCatalog'
+        required: true
+      responses:
+        "200":
+          description: KafkaCatalog was found and updated.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: KafkaCatalog not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Updates a KafkaCatalog of the given name.
+      tags:
+      - SQL
+  /cmf/api/v1/catalogs/kafka/{catName}/databases:
+    get:
+      operationId: getKafkaDatabases
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Name of the Catalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabasesPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabasesPage'
+          description: Kafka Databases found and returned.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of Kafka Databases
+      tags:
+      - SQL
+      x-spring-paginated: true
+    post:
+      operationId: createKafkaDatabase
+      parameters:
+      - description: Name of the Catalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KafkaDatabase'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/KafkaDatabase'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabase'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabase'
+          description: The Kafka Database was successfully created.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kafka Database already exists.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Creates a new Kafka Database
+      tags:
+      - SQL
+  /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName}:
+    delete:
+      operationId: deleteKafkaDatabase
+      parameters:
+      - description: Name of the Kafka Catalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Kafka Database
+        explode: false
+        in: path
+        name: dbName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Kafka Database was found and deleted.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kafka Database not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes the Kafka Database of the given name in the given KafkaCatalog.
+      tags:
+      - SQL
+    get:
+      operationId: getKafkaDatabase
+      parameters:
+      - description: Name of the Kafka Catalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Kafka Database
+        explode: false
+        in: path
+        name: dbName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabase'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KafkaDatabase'
+          description: Kafka Database found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kafka Database not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve the Kafka Database of the given name in the given KafkaCatalog.
+      tags:
+      - SQL
+    put:
+      operationId: updateKafkaDatabase
+      parameters:
+      - description: Name of the KafkaCatalog
+        explode: false
+        in: path
+        name: catName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the KafkaDatabase
+        explode: false
+        in: path
+        name: dbName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KafkaDatabase'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/KafkaDatabase'
+        required: true
+      responses:
+        "200":
+          description: KafkaDatabase was found and updated.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: KafkaDatabase not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Updates a KafkaDatabase of the given name in the given KafkaCatalog.
+      tags:
+      - SQL
+  /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints:
+    get:
+      operationId: getSavepointsForFlinkApplication
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+          description: Savepoints found and returned. In case, there are no savepoints,
+            an empty list is returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Application not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of all Savepoints for the given Application
+        in the given Environment.
+      tags:
+      - Savepoints
+      x-spring-paginated: true
+    post:
+      operationId: createSavepointForFlinkApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint was successfully created.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Application not found.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Creates a new Savepoint for the given Application in the given Environment.
+      tags:
+      - Savepoints
+  /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}:
+    delete:
+      operationId: deleteSavepointForFlinkApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Savepoint to be deleted.
+        explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: If a Savepoint is marked for deletion, it can be force deleted.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "204":
+          description: Savepoint was found and deleted.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Application or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes the Savepoint of the given name for the given Application in
+        the given Environment.
+      tags:
+      - Savepoints
+    get:
+      operationId: getSavepointForFlinkApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Savepoint
+        explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Application or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve the Savepoint of the given name for the given Application
+        in the given Environment.
+      tags:
+      - Savepoints
+  /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}/detach:
+    post:
+      operationId: detachSavepointFromFlinkApplication
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Application
+        explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Savepoint to be detached.
+        explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint was successfully detached and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Application or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Detaches the Savepoint of the given name for the given Application
+        in the given Environment.
+      tags:
+      - Savepoints
+  /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints:
+    get:
+      operationId: getSavepointsForFlinkStatement
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Statement
+        explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+          description: Savepoints found and returned. In case, there are no savepoints,
+            an empty list is returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Statement not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of all Savepoints for the given Statement
+        in the given Environment.
+      tags:
+      - Savepoints
+      x-spring-paginated: true
+    post:
+      operationId: createSavepointForFlinkStatement
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Statement
+        explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint was successfully created.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Statement not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Creates a new Savepoint for the given Statement in the given Environment.
+      tags:
+      - Savepoints
+  /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName}:
+    delete:
+      operationId: deleteSavepointForFlinkStatement
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Statement
+        explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Savepoint to be deleted.
+        explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: If a Savepoint is marked for deletion, it can be force deleted.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "204":
+          description: Savepoint was found and deleted.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Statement or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes the Savepoint of the given name for the given Statement in
+        the given Environment.
+      tags:
+      - Savepoints
+    get:
+      operationId: getSavepointForFlinkStatement
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Statement
+        explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Savepoint
+        explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Statement or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve the Savepoint of the given name for the given Statement in
+        the given Environment.
+      tags:
+      - Savepoints
+  /cmf/api/v1/detached-savepoints:
+    get:
+      operationId: listDetachedSavepoints
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Filter by detached savepoint name prefix (e.g. ?name=abc)
+        explode: true
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SavepointsPage'
+          description: Detached Savepoints found and returned. In case, there are
+            none, an empty list is returned.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of all Detached Savepoints.
+      tags:
+      - DetachedSavepoints
+      x-spring-paginated: true
+    post:
+      operationId: createDetachedSavepoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Detached Savepoint was successfully created and returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Creates a new detached savepoint.
+      tags:
+      - DetachedSavepoints
+  /cmf/api/v1/detached-savepoints/{detachedSavepointName}:
+    delete:
+      operationId: deleteDetachedSavepoint
+      parameters:
+      - description: Name of the Detached Savepoint
+        explode: false
+        in: path
+        name: detachedSavepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Detached Savepoint was found and deleted.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Detached Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes the Detached Savepoint of the given name.
+      tags:
+      - DetachedSavepoints
+    get:
+      operationId: getDetachedSavepoint
+      parameters:
+      - description: Name of the Detached Savepoint
+        explode: false
+        in: path
+        name: detachedSavepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Detached Savepoint found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Detached Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve the Detached Savepoint of the given name.
+      tags:
+      - DetachedSavepoints
 components:
   parameters:
     pageParam:
@@ -2586,18 +3859,21 @@ components:
         creationTimestamp:
           description: Timestamp when the Catalog was created
           type: string
+        updateTimestamp:
+          description: Timestamp when the Catalog was updated the last time
+          type: string
         uid:
           description: Unique identifier of the Catalog
           type: string
         labels:
           additionalProperties:
             type: string
-          description: Labels of the Statement
+          description: Labels of the Catalog
           type: object
         annotations:
           additionalProperties:
             type: string
-          description: Annotations of the Statement
+          description: Annotations of the Catalog
           type: object
       required:
       - name
@@ -2614,6 +3890,86 @@ components:
       allOf:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/KafkaCatalogsPage_allOf'
+      type: object
+    DatabaseMetadata:
+      description: Metadata about the Database
+      properties:
+        name:
+          description: Name of the Database
+          type: string
+        creationTimestamp:
+          description: Timestamp when the Database was created
+          type: string
+        updateTimestamp:
+          description: Timestamp when the Database was updated the last time
+          type: string
+        uid:
+          description: Unique identifier of the Database
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          description: Labels of the Database
+          type: object
+        annotations:
+          additionalProperties:
+            type: string
+          description: Annotations of the Database
+          type: object
+      required:
+      - name
+      title: DatabaseMetadata
+      type: object
+    KafkaDatabase:
+      allOf:
+      - $ref: '#/components/schemas/ResourceBaseV2'
+      - $ref: '#/components/schemas/KafkaDatabase_allOf'
+      description: Represents a the configuration of a Kafka Database
+      title: KafkaDatabase
+      type: object
+    KafkaDatabasesPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/KafkaDatabasesPage_allOf'
+      type: object
+    Savepoint:
+      allOf:
+      - $ref: '#/components/schemas/ResourceBaseV2'
+      - $ref: '#/components/schemas/Savepoint_allOf'
+      description: Represents a Savepoint for a Flink Application or Statement
+      title: Savepoint
+      type: object
+    SavepointsPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/SavepointsPage_allOf'
+      type: object
+    StatementStartFromSavepoint:
+      description: Configuration for resuming a Statement from a savepoint. Works
+        only with update Statement.
+      properties:
+        savepointName:
+          description: The name of the Savepoint resource to start Statement from.
+            The request will be rejected if savepoint that has not completed is referenced.
+          type: string
+        uid:
+          description: The uuid of the Savepoint resource to start from.
+          type: string
+        initialSavepointPath:
+          description: The path of the savepoint to start the Statement from. This
+            could be an external path too.
+          type: string
+        allowNonRestoredState:
+          description: A boolean flag to allow the job to start even if some state
+            could not be restored.
+          type: boolean
+        savepointRedeployNonce:
+          description: Nonce used to trigger a full redeployment of the job from the
+            savepoint. In order to trigger redeployment, change the number to a different
+            non-null value. Rollback is not possible after redeployment.
+          format: int64
+          type: integer
+      title: StartStatementFromSavepoint
       type: object
     error:
       description: An error
@@ -3033,6 +4389,8 @@ components:
         stopped:
           description: Whether the statement is stopped
           type: boolean
+        startFromSavepoint:
+          $ref: '#/components/schemas/StatementStartFromSavepoint'
       required:
       - computePoolName
       - statement
@@ -3323,7 +4681,6 @@ components:
             $ref: '#/components/schemas/KafkaCatalogSpec_kafkaClusters'
           type: array
       required:
-      - kafkaClusters
       - srInstance
       title: KafkaCatalogSpec
       type: object
@@ -3353,5 +4710,168 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/KafkaCatalog'
+          type: array
+      type: object
+    KafkaDatabaseSpec_kafkaCluster:
+      description: Details about the Kafka cluster of the database
+      properties:
+        connectionConfig:
+          additionalProperties:
+            type: string
+          description: connection options for the Kafka client
+          type: object
+        connectionSecretId:
+          description: an identifier to look up a secret that contains the connection
+            credentials
+          type: string
+      required:
+      - connectionConfig
+      type: object
+    KafkaDatabaseSpec:
+      description: Spec of a Kafka Database
+      properties:
+        kafkaCluster:
+          $ref: '#/components/schemas/KafkaDatabaseSpec_kafkaCluster'
+        alterEnvironments:
+          description: List of environments that have permission to alter the tables
+            of this database
+          items:
+            type: string
+          type: array
+      required:
+      - kafkaCluster
+      title: KafkaDatabaseSpec
+      type: object
+    KafkaDatabase_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/DatabaseMetadata'
+        spec:
+          $ref: '#/components/schemas/KafkaDatabaseSpec'
+      required:
+      - metadata
+      - spec
+      type: object
+    DatabasePageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: DatabasePageMetadata
+      type: object
+    KafkaDatabasesPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/DatabasePageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/KafkaDatabase'
+          type: array
+      type: object
+    SavepointMetadata:
+      description: Metadata about the Savepoint
+      properties:
+        name:
+          description: Name of the Savepoint
+          type: string
+        creationTimestamp:
+          description: Timestamp when the Savepoint was created
+          type: string
+        uid:
+          description: Unique identifier of the Savepoint
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          description: Labels of the Savepoint
+          type: object
+        annotations:
+          additionalProperties:
+            type: string
+          description: Annotations of the Savepoint
+          type: object
+      title: SavepointMetadata
+      type: object
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'
+    SavepointSpec:
+      description: Spec for Savepoint
+      properties:
+        path:
+          description: Path of the Savepoint
+          type: string
+        backoffLimit:
+          default: -1
+          description: Backoff limit for the Savepoint
+          format: int32
+          type: integer
+        formatType:
+          default: CANONICAL
+          description: Format type of the Savepoint
+          enum:
+          - CANONICAL
+          - NATIVE
+          - UNKNOWN
+          type: string
+      title: SavepointSpec
+      type: object
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'
+    SavepointStatus:
+      description: Status for Savepoint
+      properties:
+        state:
+          description: State of the Savepoint
+          type: string
+        path:
+          description: Path of the Savepoint
+          type: string
+        triggerTimestamp:
+          description: Timestamp when the Savepoint was triggered
+          type: string
+        resultTimestamp:
+          description: Timestamp when the Savepoint result was received
+          type: string
+        failures:
+          description: The number of failures of the Savepoint
+          format: int32
+          type: integer
+        error:
+          description: The error message for the Savepoint
+          type: string
+        pendingDeletion:
+          description: Whether the Savepoint is pending deletion
+          type: boolean
+      title: SavepointStatus
+      type: object
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'
+    Savepoint_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SavepointMetadata'
+        spec:
+          $ref: '#/components/schemas/SavepointSpec'
+        status:
+          $ref: '#/components/schemas/SavepointStatus'
+      required:
+      - metadata
+      - spec
+      type: object
+    SavepointPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: SavepointPageMetadata
+      type: object
+    SavepointsPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SavepointPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/Savepoint'
           type: array
       type: object

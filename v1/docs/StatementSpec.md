@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **ComputePoolName** | **string** | Name of the ComputePool | 
 **Parallelism** | Pointer to **int32** | Parallelism of the statement | [optional] 
 **Stopped** | Pointer to **bool** | Whether the statement is stopped | [optional] 
+**StartFromSavepoint** | Pointer to [**StatementStartFromSavepoint**](StatementStartFromSavepoint.md) |  | [optional] 
 
 ## Methods
 
@@ -169,6 +170,31 @@ SetStopped sets Stopped field to given value.
 `func (o *StatementSpec) HasStopped() bool`
 
 HasStopped returns a boolean if a field has been set.
+
+### GetStartFromSavepoint
+
+`func (o *StatementSpec) GetStartFromSavepoint() StatementStartFromSavepoint`
+
+GetStartFromSavepoint returns the StartFromSavepoint field if non-nil, zero value otherwise.
+
+### GetStartFromSavepointOk
+
+`func (o *StatementSpec) GetStartFromSavepointOk() (*StatementStartFromSavepoint, bool)`
+
+GetStartFromSavepointOk returns a tuple with the StartFromSavepoint field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStartFromSavepoint
+
+`func (o *StatementSpec) SetStartFromSavepoint(v StatementStartFromSavepoint)`
+
+SetStartFromSavepoint sets StartFromSavepoint field to given value.
+
+### HasStartFromSavepoint
+
+`func (o *StatementSpec) HasStartFromSavepoint() bool`
+
+HasStartFromSavepoint returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -28,6 +28,7 @@ type StatementSpec struct {
 	Parallelism *int32 `json:"parallelism,omitempty"`
 	// Whether the statement is stopped
 	Stopped *bool `json:"stopped,omitempty"`
+	StartFromSavepoint *StatementStartFromSavepoint `json:"startFromSavepoint,omitempty"`
 }
 
 // NewStatementSpec instantiates a new StatementSpec object
@@ -225,6 +226,38 @@ func (o *StatementSpec) SetStopped(v bool) {
 	o.Stopped = &v
 }
 
+// GetStartFromSavepoint returns the StartFromSavepoint field value if set, zero value otherwise.
+func (o *StatementSpec) GetStartFromSavepoint() StatementStartFromSavepoint {
+	if o == nil || o.StartFromSavepoint == nil {
+		var ret StatementStartFromSavepoint
+		return ret
+	}
+	return *o.StartFromSavepoint
+}
+
+// GetStartFromSavepointOk returns a tuple with the StartFromSavepoint field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementSpec) GetStartFromSavepointOk() (*StatementStartFromSavepoint, bool) {
+	if o == nil || o.StartFromSavepoint == nil {
+		return nil, false
+	}
+	return o.StartFromSavepoint, true
+}
+
+// HasStartFromSavepoint returns a boolean if a field has been set.
+func (o *StatementSpec) HasStartFromSavepoint() bool {
+	if o != nil && o.StartFromSavepoint != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStartFromSavepoint gets a reference to the given StatementStartFromSavepoint and assigns it to the StartFromSavepoint field.
+func (o *StatementSpec) SetStartFromSavepoint(v StatementStartFromSavepoint) {
+	o.StartFromSavepoint = &v
+}
+
 func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -244,6 +277,9 @@ func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	}
 	if o.Stopped != nil {
 		toSerialize["stopped"] = o.Stopped
+	}
+	if o.StartFromSavepoint != nil {
+		toSerialize["startFromSavepoint"] = o.StartFromSavepoint
 	}
 	return json.Marshal(toSerialize)
 }

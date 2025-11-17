@@ -78,44 +78,63 @@ All URIs are relative to *http://localhost:8080*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**CreateComputePool**](docs/DefaultApi.md#createcomputepool) | **Post** /cmf/api/v1/environments/{envName}/compute-pools | Creates a new Flink Compute Pool in the given Environment.
-*DefaultApi* | [**CreateEnvironmentSecretMapping**](docs/DefaultApi.md#createenvironmentsecretmapping) | **Post** /cmf/api/v1/environments/{envName}/secret-mappings | Creates the Environment Secret Mapping for the given Environment.
-*DefaultApi* | [**CreateKafkaCatalog**](docs/DefaultApi.md#createkafkacatalog) | **Post** /cmf/api/v1/catalogs/kafka | Creates a new Kafka Catalog that can be referenced by Flink Statements
-*DefaultApi* | [**CreateOrUpdateApplication**](docs/DefaultApi.md#createorupdateapplication) | **Post** /cmf/api/v1/environments/{envName}/applications | Creates a new Flink Application or updates an existing one in the given Environment.
-*DefaultApi* | [**CreateOrUpdateEnvironment**](docs/DefaultApi.md#createorupdateenvironment) | **Post** /cmf/api/v1/environments | Create or update an Environment
-*DefaultApi* | [**CreateSecret**](docs/DefaultApi.md#createsecret) | **Post** /cmf/api/v1/secrets | Create a Secret.
-*DefaultApi* | [**CreateStatement**](docs/DefaultApi.md#createstatement) | **Post** /cmf/api/v1/environments/{envName}/statements | Creates a new Flink SQL Statement in the given Environment.
-*DefaultApi* | [**DeleteApplication**](docs/DefaultApi.md#deleteapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName} | Deletes an Application of the given name in the given Environment.
-*DefaultApi* | [**DeleteComputePool**](docs/DefaultApi.md#deletecomputepool) | **Delete** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Deletes the ComputePool of the given name in the given Environment.
-*DefaultApi* | [**DeleteEnvironment**](docs/DefaultApi.md#deleteenvironment) | **Delete** /cmf/api/v1/environments/{envName} | 
-*DefaultApi* | [**DeleteEnvironmentSecretMapping**](docs/DefaultApi.md#deleteenvironmentsecretmapping) | **Delete** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Deletes the Environment Secret Mapping for the given Environment and Secret.
-*DefaultApi* | [**DeleteKafkaCatalog**](docs/DefaultApi.md#deletekafkacatalog) | **Delete** /cmf/api/v1/catalogs/kafka/{catName} | Deletes the Kafka Catalog of the given name.
-*DefaultApi* | [**DeleteSecret**](docs/DefaultApi.md#deletesecret) | **Delete** /cmf/api/v1/secrets/{secretName} | Delete the secret with the given name.
-*DefaultApi* | [**DeleteStatement**](docs/DefaultApi.md#deletestatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Deletes the Statement of the given name in the given Environment.
-*DefaultApi* | [**GetApplication**](docs/DefaultApi.md#getapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName} | Retrieve an Application of the given name in the given Environment.
-*DefaultApi* | [**GetApplicationEvents**](docs/DefaultApi.md#getapplicationevents) | **Get** /cmf/api/v1alpha1/environments/{envName}/applications/{appName}/events | Get a paginated list of events of the given Application
-*DefaultApi* | [**GetApplicationInstance**](docs/DefaultApi.md#getapplicationinstance) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances/{instName} | Retrieve an Instance of an Application
-*DefaultApi* | [**GetApplicationInstances**](docs/DefaultApi.md#getapplicationinstances) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances | Get a paginated list of instances of the given Application
-*DefaultApi* | [**GetApplications**](docs/DefaultApi.md#getapplications) | **Get** /cmf/api/v1/environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
-*DefaultApi* | [**GetComputePool**](docs/DefaultApi.md#getcomputepool) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Retrieve the Compute Pool of the given name in the given Environment.
-*DefaultApi* | [**GetComputePools**](docs/DefaultApi.md#getcomputepools) | **Get** /cmf/api/v1/environments/{envName}/compute-pools | Retrieve a paginated list of Compute Pools in the given Environment.
-*DefaultApi* | [**GetEnvironment**](docs/DefaultApi.md#getenvironment) | **Get** /cmf/api/v1/environments/{envName} | Get/Describe an environment with the given name.
-*DefaultApi* | [**GetEnvironmentSecretMapping**](docs/DefaultApi.md#getenvironmentsecretmapping) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Retrieve the Environment Secret Mapping for the given name in the given environment.
-*DefaultApi* | [**GetEnvironmentSecretMappings**](docs/DefaultApi.md#getenvironmentsecretmappings) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings | Retrieve a paginated list of all Environment Secret Mappings.
-*DefaultApi* | [**GetEnvironments**](docs/DefaultApi.md#getenvironments) | **Get** /cmf/api/v1/environments | Retrieve a paginated list of all environments.
-*DefaultApi* | [**GetKafkaCatalog**](docs/DefaultApi.md#getkafkacatalog) | **Get** /cmf/api/v1/catalogs/kafka/{catName} | Retrieve the Kafka Catalog of the given name.
-*DefaultApi* | [**GetKafkaCatalogs**](docs/DefaultApi.md#getkafkacatalogs) | **Get** /cmf/api/v1/catalogs/kafka | Retrieve a paginated list of Kafka Catalogs
-*DefaultApi* | [**GetSecret**](docs/DefaultApi.md#getsecret) | **Get** /cmf/api/v1/secrets/{secretName} | Retrieve the Secret of the given name. Note that the secret data is not returned for security reasons.
-*DefaultApi* | [**GetSecrets**](docs/DefaultApi.md#getsecrets) | **Get** /cmf/api/v1/secrets | Retrieve a paginated list of all secrets. Note that the actual secret data is masked for security reasons.
-*DefaultApi* | [**GetStatement**](docs/DefaultApi.md#getstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Retrieve the Statement of the given name in the given Environment.
-*DefaultApi* | [**GetStatementExceptions**](docs/DefaultApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
-*DefaultApi* | [**GetStatementResult**](docs/DefaultApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
-*DefaultApi* | [**GetStatements**](docs/DefaultApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
-*DefaultApi* | [**StartApplication**](docs/DefaultApi.md#startapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
-*DefaultApi* | [**SuspendApplication**](docs/DefaultApi.md#suspendapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
-*DefaultApi* | [**UpdateEnvironmentSecretMapping**](docs/DefaultApi.md#updateenvironmentsecretmapping) | **Put** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Updates the Environment Secret Mapping for the given Environment.
-*DefaultApi* | [**UpdateSecret**](docs/DefaultApi.md#updatesecret) | **Put** /cmf/api/v1/secrets/{secretName} | Update the secret.
-*DefaultApi* | [**UpdateStatement**](docs/DefaultApi.md#updatestatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.
+*DetachedSavepointsApi* | [**CreateDetachedSavepoint**](docs/DetachedSavepointsApi.md#createdetachedsavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
+*DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the Detached Savepoint of the given name.
+*DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the Detached Savepoint of the given name.
+*DetachedSavepointsApi* | [**ListDetachedSavepoints**](docs/DetachedSavepointsApi.md#listdetachedsavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all Detached Savepoints.
+*EnvironmentsApi* | [**CreateEnvironmentSecretMapping**](docs/EnvironmentsApi.md#createenvironmentsecretmapping) | **Post** /cmf/api/v1/environments/{envName}/secret-mappings | Creates the Environment Secret Mapping for the given Environment.
+*EnvironmentsApi* | [**CreateOrUpdateEnvironment**](docs/EnvironmentsApi.md#createorupdateenvironment) | **Post** /cmf/api/v1/environments | Create or update an Environment
+*EnvironmentsApi* | [**DeleteEnvironment**](docs/EnvironmentsApi.md#deleteenvironment) | **Delete** /cmf/api/v1/environments/{envName} | 
+*EnvironmentsApi* | [**DeleteEnvironmentSecretMapping**](docs/EnvironmentsApi.md#deleteenvironmentsecretmapping) | **Delete** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Deletes the Environment Secret Mapping for the given Environment and Secret.
+*EnvironmentsApi* | [**GetEnvironment**](docs/EnvironmentsApi.md#getenvironment) | **Get** /cmf/api/v1/environments/{envName} | Get/Describe an environment with the given name.
+*EnvironmentsApi* | [**GetEnvironmentSecretMapping**](docs/EnvironmentsApi.md#getenvironmentsecretmapping) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Retrieve the Environment Secret Mapping for the given name in the given environment.
+*EnvironmentsApi* | [**GetEnvironmentSecretMappings**](docs/EnvironmentsApi.md#getenvironmentsecretmappings) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings | Retrieve a paginated list of all Environment Secret Mappings.
+*EnvironmentsApi* | [**GetEnvironments**](docs/EnvironmentsApi.md#getenvironments) | **Get** /cmf/api/v1/environments | Retrieve a paginated list of all environments.
+*EnvironmentsApi* | [**UpdateEnvironmentSecretMapping**](docs/EnvironmentsApi.md#updateenvironmentsecretmapping) | **Put** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Updates the Environment Secret Mapping for the given Environment.
+*FlinkApplicationsApi* | [**CreateOrUpdateApplication**](docs/FlinkApplicationsApi.md#createorupdateapplication) | **Post** /cmf/api/v1/environments/{envName}/applications | Creates a new Flink Application or updates an existing one in the given Environment.
+*FlinkApplicationsApi* | [**DeleteApplication**](docs/FlinkApplicationsApi.md#deleteapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName} | Deletes an Application of the given name in the given Environment.
+*FlinkApplicationsApi* | [**GetApplication**](docs/FlinkApplicationsApi.md#getapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName} | Retrieve an Application of the given name in the given Environment.
+*FlinkApplicationsApi* | [**GetApplicationEvents**](docs/FlinkApplicationsApi.md#getapplicationevents) | **Get** /cmf/api/v1alpha1/environments/{envName}/applications/{appName}/events | Get a paginated list of events of the given Application
+*FlinkApplicationsApi* | [**GetApplicationInstance**](docs/FlinkApplicationsApi.md#getapplicationinstance) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances/{instName} | Retrieve an Instance of an Application
+*FlinkApplicationsApi* | [**GetApplicationInstances**](docs/FlinkApplicationsApi.md#getapplicationinstances) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances | Get a paginated list of instances of the given Application
+*FlinkApplicationsApi* | [**GetApplications**](docs/FlinkApplicationsApi.md#getapplications) | **Get** /cmf/api/v1/environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
+*FlinkApplicationsApi* | [**StartApplication**](docs/FlinkApplicationsApi.md#startapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
+*FlinkApplicationsApi* | [**SuspendApplication**](docs/FlinkApplicationsApi.md#suspendapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
+*SQLApi* | [**CreateComputePool**](docs/SQLApi.md#createcomputepool) | **Post** /cmf/api/v1/environments/{envName}/compute-pools | Creates a new Flink Compute Pool in the given Environment.
+*SQLApi* | [**CreateKafkaCatalog**](docs/SQLApi.md#createkafkacatalog) | **Post** /cmf/api/v1/catalogs/kafka | Creates a new Kafka Catalog that can be referenced by Flink Statements
+*SQLApi* | [**CreateKafkaDatabase**](docs/SQLApi.md#createkafkadatabase) | **Post** /cmf/api/v1/catalogs/kafka/{catName}/databases | Creates a new Kafka Database
+*SQLApi* | [**CreateStatement**](docs/SQLApi.md#createstatement) | **Post** /cmf/api/v1/environments/{envName}/statements | Creates a new Flink SQL Statement in the given Environment.
+*SQLApi* | [**DeleteComputePool**](docs/SQLApi.md#deletecomputepool) | **Delete** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Deletes the ComputePool of the given name in the given Environment.
+*SQLApi* | [**DeleteKafkaCatalog**](docs/SQLApi.md#deletekafkacatalog) | **Delete** /cmf/api/v1/catalogs/kafka/{catName} | Deletes the Kafka Catalog of the given name.
+*SQLApi* | [**DeleteKafkaDatabase**](docs/SQLApi.md#deletekafkadatabase) | **Delete** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Deletes the Kafka Database of the given name in the given KafkaCatalog.
+*SQLApi* | [**DeleteStatement**](docs/SQLApi.md#deletestatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Deletes the Statement of the given name in the given Environment.
+*SQLApi* | [**GetComputePool**](docs/SQLApi.md#getcomputepool) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Retrieve the Compute Pool of the given name in the given Environment.
+*SQLApi* | [**GetComputePools**](docs/SQLApi.md#getcomputepools) | **Get** /cmf/api/v1/environments/{envName}/compute-pools | Retrieve a paginated list of Compute Pools in the given Environment.
+*SQLApi* | [**GetKafkaCatalog**](docs/SQLApi.md#getkafkacatalog) | **Get** /cmf/api/v1/catalogs/kafka/{catName} | Retrieve the Kafka Catalog of the given name.
+*SQLApi* | [**GetKafkaCatalogs**](docs/SQLApi.md#getkafkacatalogs) | **Get** /cmf/api/v1/catalogs/kafka | Retrieve a paginated list of Kafka Catalogs
+*SQLApi* | [**GetKafkaDatabase**](docs/SQLApi.md#getkafkadatabase) | **Get** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Retrieve the Kafka Database of the given name in the given KafkaCatalog.
+*SQLApi* | [**GetKafkaDatabases**](docs/SQLApi.md#getkafkadatabases) | **Get** /cmf/api/v1/catalogs/kafka/{catName}/databases | Retrieve a paginated list of Kafka Databases
+*SQLApi* | [**GetStatement**](docs/SQLApi.md#getstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Retrieve the Statement of the given name in the given Environment.
+*SQLApi* | [**GetStatementExceptions**](docs/SQLApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
+*SQLApi* | [**GetStatementResult**](docs/SQLApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
+*SQLApi* | [**GetStatements**](docs/SQLApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
+*SQLApi* | [**UpdateKafkaCatalog**](docs/SQLApi.md#updatekafkacatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
+*SQLApi* | [**UpdateKafkaDatabase**](docs/SQLApi.md#updatekafkadatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
+*SQLApi* | [**UpdateStatement**](docs/SQLApi.md#updatestatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.
+*SavepointsApi* | [**CreateSavepointForFlinkApplication**](docs/SavepointsApi.md#createsavepointforflinkapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Creates a new Savepoint for the given Application in the given Environment.
+*SavepointsApi* | [**CreateSavepointForFlinkStatement**](docs/SavepointsApi.md#createsavepointforflinkstatement) | **Post** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Creates a new Savepoint for the given Statement in the given Environment.
+*SavepointsApi* | [**DeleteSavepointForFlinkApplication**](docs/SavepointsApi.md#deletesavepointforflinkapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Application in the given Environment.
+*SavepointsApi* | [**DeleteSavepointForFlinkStatement**](docs/SavepointsApi.md#deletesavepointforflinkstatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Statement in the given Environment.
+*SavepointsApi* | [**DetachSavepointFromFlinkApplication**](docs/SavepointsApi.md#detachsavepointfromflinkapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}/detach | Detaches the Savepoint of the given name for the given Application in the given Environment.
+*SavepointsApi* | [**GetSavepointForFlinkApplication**](docs/SavepointsApi.md#getsavepointforflinkapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Application in the given Environment.
+*SavepointsApi* | [**GetSavepointForFlinkStatement**](docs/SavepointsApi.md#getsavepointforflinkstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Statement in the given Environment.
+*SavepointsApi* | [**GetSavepointsForFlinkApplication**](docs/SavepointsApi.md#getsavepointsforflinkapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Retrieve a paginated list of all Savepoints for the given Application in the given Environment.
+*SavepointsApi* | [**GetSavepointsForFlinkStatement**](docs/SavepointsApi.md#getsavepointsforflinkstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Retrieve a paginated list of all Savepoints for the given Statement in the given Environment.
+*SecretsApi* | [**CreateSecret**](docs/SecretsApi.md#createsecret) | **Post** /cmf/api/v1/secrets | Create a Secret.
+*SecretsApi* | [**DeleteSecret**](docs/SecretsApi.md#deletesecret) | **Delete** /cmf/api/v1/secrets/{secretName} | Delete the secret with the given name.
+*SecretsApi* | [**GetSecret**](docs/SecretsApi.md#getsecret) | **Get** /cmf/api/v1/secrets/{secretName} | Retrieve the Secret of the given name. Note that the secret data is not returned for security reasons.
+*SecretsApi* | [**GetSecrets**](docs/SecretsApi.md#getsecrets) | **Get** /cmf/api/v1/secrets | Retrieve a paginated list of all secrets. Note that the actual secret data is masked for security reasons.
+*SecretsApi* | [**UpdateSecret**](docs/SecretsApi.md#updatesecret) | **Put** /cmf/api/v1/secrets/{secretName} | Update the secret.
 
 
 ## Documentation For Models
@@ -144,6 +163,8 @@ Class | Method | HTTP request | Description
  - [ComputePoolsPageAllOf](docs/ComputePoolsPageAllOf.md)
  - [DataType](docs/DataType.md)
  - [DataTypeField](docs/DataTypeField.md)
+ - [DatabaseMetadata](docs/DatabaseMetadata.md)
+ - [DatabasePageMetadata](docs/DatabasePageMetadata.md)
  - [Environment](docs/Environment.md)
  - [EnvironmentSecretMapping](docs/EnvironmentSecretMapping.md)
  - [EnvironmentSecretMappingMetadata](docs/EnvironmentSecretMappingMetadata.md)
@@ -175,6 +196,12 @@ Class | Method | HTTP request | Description
  - [KafkaCatalogSpecSrInstance](docs/KafkaCatalogSpecSrInstance.md)
  - [KafkaCatalogsPage](docs/KafkaCatalogsPage.md)
  - [KafkaCatalogsPageAllOf](docs/KafkaCatalogsPageAllOf.md)
+ - [KafkaDatabase](docs/KafkaDatabase.md)
+ - [KafkaDatabaseAllOf](docs/KafkaDatabaseAllOf.md)
+ - [KafkaDatabaseSpec](docs/KafkaDatabaseSpec.md)
+ - [KafkaDatabaseSpecKafkaCluster](docs/KafkaDatabaseSpecKafkaCluster.md)
+ - [KafkaDatabasesPage](docs/KafkaDatabasesPage.md)
+ - [KafkaDatabasesPageAllOf](docs/KafkaDatabasesPageAllOf.md)
  - [KubernetesNamespace](docs/KubernetesNamespace.md)
  - [ModelError](docs/ModelError.md)
  - [Pageable](docs/Pageable.md)
@@ -186,6 +213,14 @@ Class | Method | HTTP request | Description
  - [RestError](docs/RestError.md)
  - [ResultSchema](docs/ResultSchema.md)
  - [ResultSchemaColumn](docs/ResultSchemaColumn.md)
+ - [Savepoint](docs/Savepoint.md)
+ - [SavepointAllOf](docs/SavepointAllOf.md)
+ - [SavepointMetadata](docs/SavepointMetadata.md)
+ - [SavepointPageMetadata](docs/SavepointPageMetadata.md)
+ - [SavepointSpec](docs/SavepointSpec.md)
+ - [SavepointStatus](docs/SavepointStatus.md)
+ - [SavepointsPage](docs/SavepointsPage.md)
+ - [SavepointsPageAllOf](docs/SavepointsPageAllOf.md)
  - [Secret](docs/Secret.md)
  - [SecretAllOf](docs/SecretAllOf.md)
  - [SecretMetadata](docs/SecretMetadata.md)
@@ -209,6 +244,7 @@ Class | Method | HTTP request | Description
  - [StatementResultMetadata](docs/StatementResultMetadata.md)
  - [StatementResults](docs/StatementResults.md)
  - [StatementSpec](docs/StatementSpec.md)
+ - [StatementStartFromSavepoint](docs/StatementStartFromSavepoint.md)
  - [StatementStatus](docs/StatementStatus.md)
  - [StatementTraits](docs/StatementTraits.md)
  - [StatementsPage](docs/StatementsPage.md)

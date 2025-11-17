@@ -49,7 +49,17 @@ type APIClient struct {
 
 	// API Services
 
-	DefaultApi DefaultApi
+	DetachedSavepointsApi DetachedSavepointsApi
+
+	EnvironmentsApi EnvironmentsApi
+
+	FlinkApplicationsApi FlinkApplicationsApi
+
+	SQLApi SQLApi
+
+	SavepointsApi SavepointsApi
+
+	SecretsApi SecretsApi
 }
 
 type service struct {
@@ -68,7 +78,12 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
-	c.DefaultApi = (*DefaultApiService)(&c.common)
+	c.DetachedSavepointsApi = (*DetachedSavepointsApiService)(&c.common)
+	c.EnvironmentsApi = (*EnvironmentsApiService)(&c.common)
+	c.FlinkApplicationsApi = (*FlinkApplicationsApiService)(&c.common)
+	c.SQLApi = (*SQLApiService)(&c.common)
+	c.SavepointsApi = (*SavepointsApiService)(&c.common)
+	c.SecretsApi = (*SecretsApiService)(&c.common)
 
 	return c
 }
