@@ -14,66 +14,71 @@ import (
 	"encoding/json"
 )
 
-// CatalogMetadata Metadata about the Catalog
-type CatalogMetadata struct {
-	// Name of the Catalog
-	Name string `json:"name"`
-	// Timestamp when the Catalog was created
+// SavepointMetadata Metadata about the Savepoint
+type SavepointMetadata struct {
+	// Name of the Savepoint
+	Name *string `json:"name,omitempty"`
+	// Timestamp when the Savepoint was created
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
-	// Timestamp when the Catalog was updated the last time
-	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
-	// Unique identifier of the Catalog
+	// Unique identifier of the Savepoint
 	Uid *string `json:"uid,omitempty"`
-	// Labels of the Catalog
+	// Labels of the Savepoint
 	Labels *map[string]string `json:"labels,omitempty"`
-	// Annotations of the Catalog
+	// Annotations of the Savepoint
 	Annotations *map[string]string `json:"annotations,omitempty"`
 }
 
-// NewCatalogMetadata instantiates a new CatalogMetadata object
+// NewSavepointMetadata instantiates a new SavepointMetadata object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCatalogMetadata(name string) *CatalogMetadata {
-	this := CatalogMetadata{}
-	this.Name = name
+func NewSavepointMetadata() *SavepointMetadata {
+	this := SavepointMetadata{}
 	return &this
 }
 
-// NewCatalogMetadataWithDefaults instantiates a new CatalogMetadata object
+// NewSavepointMetadataWithDefaults instantiates a new SavepointMetadata object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewCatalogMetadataWithDefaults() *CatalogMetadata {
-	this := CatalogMetadata{}
+func NewSavepointMetadataWithDefaults() *SavepointMetadata {
+	this := SavepointMetadata{}
 	return &this
 }
 
-// GetName returns the Name field value
-func (o *CatalogMetadata) GetName() string {
-	if o == nil {
+// GetName returns the Name field value if set, zero value otherwise.
+func (o *SavepointMetadata) GetName() string {
+	if o == nil || o.Name == nil {
 		var ret string
 		return ret
 	}
-
-	return o.Name
+	return *o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value
+// GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetNameOk() (*string, bool) {
-	if o == nil  {
+func (o *SavepointMetadata) GetNameOk() (*string, bool) {
+	if o == nil || o.Name == nil {
 		return nil, false
 	}
-	return &o.Name, true
+	return o.Name, true
 }
 
-// SetName sets field value
-func (o *CatalogMetadata) SetName(v string) {
-	o.Name = v
+// HasName returns a boolean if a field has been set.
+func (o *SavepointMetadata) HasName() bool {
+	if o != nil && o.Name != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetName gets a reference to the given string and assigns it to the Name field.
+func (o *SavepointMetadata) SetName(v string) {
+	o.Name = &v
 }
 
 // GetCreationTimestamp returns the CreationTimestamp field value if set, zero value otherwise.
-func (o *CatalogMetadata) GetCreationTimestamp() string {
+func (o *SavepointMetadata) GetCreationTimestamp() string {
 	if o == nil || o.CreationTimestamp == nil {
 		var ret string
 		return ret
@@ -83,7 +88,7 @@ func (o *CatalogMetadata) GetCreationTimestamp() string {
 
 // GetCreationTimestampOk returns a tuple with the CreationTimestamp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetCreationTimestampOk() (*string, bool) {
+func (o *SavepointMetadata) GetCreationTimestampOk() (*string, bool) {
 	if o == nil || o.CreationTimestamp == nil {
 		return nil, false
 	}
@@ -91,7 +96,7 @@ func (o *CatalogMetadata) GetCreationTimestampOk() (*string, bool) {
 }
 
 // HasCreationTimestamp returns a boolean if a field has been set.
-func (o *CatalogMetadata) HasCreationTimestamp() bool {
+func (o *SavepointMetadata) HasCreationTimestamp() bool {
 	if o != nil && o.CreationTimestamp != nil {
 		return true
 	}
@@ -100,44 +105,12 @@ func (o *CatalogMetadata) HasCreationTimestamp() bool {
 }
 
 // SetCreationTimestamp gets a reference to the given string and assigns it to the CreationTimestamp field.
-func (o *CatalogMetadata) SetCreationTimestamp(v string) {
+func (o *SavepointMetadata) SetCreationTimestamp(v string) {
 	o.CreationTimestamp = &v
 }
 
-// GetUpdateTimestamp returns the UpdateTimestamp field value if set, zero value otherwise.
-func (o *CatalogMetadata) GetUpdateTimestamp() string {
-	if o == nil || o.UpdateTimestamp == nil {
-		var ret string
-		return ret
-	}
-	return *o.UpdateTimestamp
-}
-
-// GetUpdateTimestampOk returns a tuple with the UpdateTimestamp field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetUpdateTimestampOk() (*string, bool) {
-	if o == nil || o.UpdateTimestamp == nil {
-		return nil, false
-	}
-	return o.UpdateTimestamp, true
-}
-
-// HasUpdateTimestamp returns a boolean if a field has been set.
-func (o *CatalogMetadata) HasUpdateTimestamp() bool {
-	if o != nil && o.UpdateTimestamp != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetUpdateTimestamp gets a reference to the given string and assigns it to the UpdateTimestamp field.
-func (o *CatalogMetadata) SetUpdateTimestamp(v string) {
-	o.UpdateTimestamp = &v
-}
-
 // GetUid returns the Uid field value if set, zero value otherwise.
-func (o *CatalogMetadata) GetUid() string {
+func (o *SavepointMetadata) GetUid() string {
 	if o == nil || o.Uid == nil {
 		var ret string
 		return ret
@@ -147,7 +120,7 @@ func (o *CatalogMetadata) GetUid() string {
 
 // GetUidOk returns a tuple with the Uid field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetUidOk() (*string, bool) {
+func (o *SavepointMetadata) GetUidOk() (*string, bool) {
 	if o == nil || o.Uid == nil {
 		return nil, false
 	}
@@ -155,7 +128,7 @@ func (o *CatalogMetadata) GetUidOk() (*string, bool) {
 }
 
 // HasUid returns a boolean if a field has been set.
-func (o *CatalogMetadata) HasUid() bool {
+func (o *SavepointMetadata) HasUid() bool {
 	if o != nil && o.Uid != nil {
 		return true
 	}
@@ -164,12 +137,12 @@ func (o *CatalogMetadata) HasUid() bool {
 }
 
 // SetUid gets a reference to the given string and assigns it to the Uid field.
-func (o *CatalogMetadata) SetUid(v string) {
+func (o *SavepointMetadata) SetUid(v string) {
 	o.Uid = &v
 }
 
 // GetLabels returns the Labels field value if set, zero value otherwise.
-func (o *CatalogMetadata) GetLabels() map[string]string {
+func (o *SavepointMetadata) GetLabels() map[string]string {
 	if o == nil || o.Labels == nil {
 		var ret map[string]string
 		return ret
@@ -179,7 +152,7 @@ func (o *CatalogMetadata) GetLabels() map[string]string {
 
 // GetLabelsOk returns a tuple with the Labels field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetLabelsOk() (*map[string]string, bool) {
+func (o *SavepointMetadata) GetLabelsOk() (*map[string]string, bool) {
 	if o == nil || o.Labels == nil {
 		return nil, false
 	}
@@ -187,7 +160,7 @@ func (o *CatalogMetadata) GetLabelsOk() (*map[string]string, bool) {
 }
 
 // HasLabels returns a boolean if a field has been set.
-func (o *CatalogMetadata) HasLabels() bool {
+func (o *SavepointMetadata) HasLabels() bool {
 	if o != nil && o.Labels != nil {
 		return true
 	}
@@ -196,12 +169,12 @@ func (o *CatalogMetadata) HasLabels() bool {
 }
 
 // SetLabels gets a reference to the given map[string]string and assigns it to the Labels field.
-func (o *CatalogMetadata) SetLabels(v map[string]string) {
+func (o *SavepointMetadata) SetLabels(v map[string]string) {
 	o.Labels = &v
 }
 
 // GetAnnotations returns the Annotations field value if set, zero value otherwise.
-func (o *CatalogMetadata) GetAnnotations() map[string]string {
+func (o *SavepointMetadata) GetAnnotations() map[string]string {
 	if o == nil || o.Annotations == nil {
 		var ret map[string]string
 		return ret
@@ -211,7 +184,7 @@ func (o *CatalogMetadata) GetAnnotations() map[string]string {
 
 // GetAnnotationsOk returns a tuple with the Annotations field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CatalogMetadata) GetAnnotationsOk() (*map[string]string, bool) {
+func (o *SavepointMetadata) GetAnnotationsOk() (*map[string]string, bool) {
 	if o == nil || o.Annotations == nil {
 		return nil, false
 	}
@@ -219,7 +192,7 @@ func (o *CatalogMetadata) GetAnnotationsOk() (*map[string]string, bool) {
 }
 
 // HasAnnotations returns a boolean if a field has been set.
-func (o *CatalogMetadata) HasAnnotations() bool {
+func (o *SavepointMetadata) HasAnnotations() bool {
 	if o != nil && o.Annotations != nil {
 		return true
 	}
@@ -228,20 +201,17 @@ func (o *CatalogMetadata) HasAnnotations() bool {
 }
 
 // SetAnnotations gets a reference to the given map[string]string and assigns it to the Annotations field.
-func (o *CatalogMetadata) SetAnnotations(v map[string]string) {
+func (o *SavepointMetadata) SetAnnotations(v map[string]string) {
 	o.Annotations = &v
 }
 
-func (o CatalogMetadata) MarshalJSON() ([]byte, error) {
+func (o SavepointMetadata) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if true {
+	if o.Name != nil {
 		toSerialize["name"] = o.Name
 	}
 	if o.CreationTimestamp != nil {
 		toSerialize["creationTimestamp"] = o.CreationTimestamp
-	}
-	if o.UpdateTimestamp != nil {
-		toSerialize["updateTimestamp"] = o.UpdateTimestamp
 	}
 	if o.Uid != nil {
 		toSerialize["uid"] = o.Uid
@@ -255,38 +225,38 @@ func (o CatalogMetadata) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableCatalogMetadata struct {
-	value *CatalogMetadata
+type NullableSavepointMetadata struct {
+	value *SavepointMetadata
 	isSet bool
 }
 
-func (v NullableCatalogMetadata) Get() *CatalogMetadata {
+func (v NullableSavepointMetadata) Get() *SavepointMetadata {
 	return v.value
 }
 
-func (v *NullableCatalogMetadata) Set(val *CatalogMetadata) {
+func (v *NullableSavepointMetadata) Set(val *SavepointMetadata) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableCatalogMetadata) IsSet() bool {
+func (v NullableSavepointMetadata) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableCatalogMetadata) Unset() {
+func (v *NullableSavepointMetadata) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableCatalogMetadata(val *CatalogMetadata) *NullableCatalogMetadata {
-	return &NullableCatalogMetadata{value: val, isSet: true}
+func NewNullableSavepointMetadata(val *SavepointMetadata) *NullableSavepointMetadata {
+	return &NullableSavepointMetadata{value: val, isSet: true}
 }
 
-func (v NullableCatalogMetadata) MarshalJSON() ([]byte, error) {
+func (v NullableSavepointMetadata) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableCatalogMetadata) UnmarshalJSON(src []byte) error {
+func (v *NullableSavepointMetadata) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -17,17 +17,16 @@ import (
 // KafkaCatalogSpec Spec of a Kafka Catalog
 type KafkaCatalogSpec struct {
 	SrInstance KafkaCatalogSpecSrInstance `json:"srInstance"`
-	KafkaClusters []KafkaCatalogSpecKafkaClusters `json:"kafkaClusters"`
+	KafkaClusters *[]KafkaCatalogSpecKafkaClusters `json:"kafkaClusters,omitempty"`
 }
 
 // NewKafkaCatalogSpec instantiates a new KafkaCatalogSpec object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewKafkaCatalogSpec(srInstance KafkaCatalogSpecSrInstance, kafkaClusters []KafkaCatalogSpecKafkaClusters) *KafkaCatalogSpec {
+func NewKafkaCatalogSpec(srInstance KafkaCatalogSpecSrInstance) *KafkaCatalogSpec {
 	this := KafkaCatalogSpec{}
 	this.SrInstance = srInstance
-	this.KafkaClusters = kafkaClusters
 	return &this
 }
 
@@ -63,28 +62,36 @@ func (o *KafkaCatalogSpec) SetSrInstance(v KafkaCatalogSpecSrInstance) {
 	o.SrInstance = v
 }
 
-// GetKafkaClusters returns the KafkaClusters field value
+// GetKafkaClusters returns the KafkaClusters field value if set, zero value otherwise.
 func (o *KafkaCatalogSpec) GetKafkaClusters() []KafkaCatalogSpecKafkaClusters {
-	if o == nil {
+	if o == nil || o.KafkaClusters == nil {
 		var ret []KafkaCatalogSpecKafkaClusters
 		return ret
 	}
-
-	return o.KafkaClusters
+	return *o.KafkaClusters
 }
 
-// GetKafkaClustersOk returns a tuple with the KafkaClusters field value
+// GetKafkaClustersOk returns a tuple with the KafkaClusters field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *KafkaCatalogSpec) GetKafkaClustersOk() (*[]KafkaCatalogSpecKafkaClusters, bool) {
-	if o == nil  {
+	if o == nil || o.KafkaClusters == nil {
 		return nil, false
 	}
-	return &o.KafkaClusters, true
+	return o.KafkaClusters, true
 }
 
-// SetKafkaClusters sets field value
+// HasKafkaClusters returns a boolean if a field has been set.
+func (o *KafkaCatalogSpec) HasKafkaClusters() bool {
+	if o != nil && o.KafkaClusters != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetKafkaClusters gets a reference to the given []KafkaCatalogSpecKafkaClusters and assigns it to the KafkaClusters field.
 func (o *KafkaCatalogSpec) SetKafkaClusters(v []KafkaCatalogSpecKafkaClusters) {
-	o.KafkaClusters = v
+	o.KafkaClusters = &v
 }
 
 func (o KafkaCatalogSpec) MarshalJSON() ([]byte, error) {
@@ -92,7 +99,7 @@ func (o KafkaCatalogSpec) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["srInstance"] = o.SrInstance
 	}
-	if true {
+	if o.KafkaClusters != nil {
 		toSerialize["kafkaClusters"] = o.KafkaClusters
 	}
 	return json.Marshal(toSerialize)
