@@ -49,6 +49,8 @@ type APIClient struct {
 
 	// API Services
 
+	CMFInformationApi CMFInformationApi
+
 	DetachedSavepointsApi DetachedSavepointsApi
 
 	EnvironmentsApi EnvironmentsApi
@@ -78,6 +80,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.CMFInformationApi = (*CMFInformationApiService)(&c.common)
 	c.DetachedSavepointsApi = (*DetachedSavepointsApiService)(&c.common)
 	c.EnvironmentsApi = (*EnvironmentsApiService)(&c.common)
 	c.FlinkApplicationsApi = (*FlinkApplicationsApiService)(&c.common)

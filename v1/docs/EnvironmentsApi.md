@@ -287,7 +287,7 @@ No authorization required
 
 ## GetEnvironment
 
-> Environment GetEnvironment(ctx, envName).Execute()
+> Environment GetEnvironment(ctx, envName).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Get/Describe an environment with the given name.
 
@@ -305,10 +305,11 @@ import (
 
 func main() {
     envName := "envName_example" // string | Name of the Environment to be retrieved.
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.EnvironmentsApi.GetEnvironment(context.Background(), envName).Execute()
+    resp, r, err := api_client.EnvironmentsApi.GetEnvironment(context.Background(), envName).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `EnvironmentsApi.GetEnvironment``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -334,6 +335,7 @@ Other parameters are passed through a pointer to a apiGetEnvironmentRequest stru
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 
@@ -500,7 +502,7 @@ No authorization required
 
 ## GetEnvironments
 
-> EnvironmentsPage GetEnvironments(ctx).Page(page).Size(size).Sort(sort).Execute()
+> EnvironmentsPage GetEnvironments(ctx).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve a paginated list of all environments.
 
@@ -520,10 +522,11 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.EnvironmentsApi.GetEnvironments(context.Background()).Page(page).Size(size).Sort(sort).Execute()
+    resp, r, err := api_client.EnvironmentsApi.GetEnvironments(context.Background()).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `EnvironmentsApi.GetEnvironments``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -547,6 +550,7 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 

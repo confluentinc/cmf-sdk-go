@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Metadata** | [**CatalogMetadata**](CatalogMetadata.md) |  | 
 **Spec** | [**KafkaCatalogSpec**](KafkaCatalogSpec.md) |  | 
+**Status** | Pointer to [**KafkaCatalogStatus**](KafkaCatalogStatus.md) |  | [optional] 
 
 ## Methods
 
@@ -65,6 +66,31 @@ and a boolean to check if the value has been set.
 
 SetSpec sets Spec field to given value.
 
+
+### GetStatus
+
+`func (o *KafkaCatalogAllOf) GetStatus() KafkaCatalogStatus`
+
+GetStatus returns the Status field if non-nil, zero value otherwise.
+
+### GetStatusOk
+
+`func (o *KafkaCatalogAllOf) GetStatusOk() (*KafkaCatalogStatus, bool)`
+
+GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStatus
+
+`func (o *KafkaCatalogAllOf) SetStatus(v KafkaCatalogStatus)`
+
+SetStatus sets Status field to given value.
+
+### HasStatus
+
+`func (o *KafkaCatalogAllOf) HasStatus() bool`
+
+HasStatus returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

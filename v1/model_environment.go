@@ -19,6 +19,8 @@ import (
 type Environment struct {
 	// The secrets mapping for the environment. This is a mapping between connection_secret_id and the secret name.
 	Secrets *map[string]string `json:"secrets,omitempty"`
+	// Status for the environment
+	Status *map[string]interface{} `json:"status,omitempty"`
 	// A unique name for the resource.
 	Name string `json:"name"`
 	CreatedTime *time.Time `json:"created_time,omitempty"`
@@ -79,6 +81,38 @@ func (o *Environment) HasSecrets() bool {
 // SetSecrets gets a reference to the given map[string]string and assigns it to the Secrets field.
 func (o *Environment) SetSecrets(v map[string]string) {
 	o.Secrets = &v
+}
+
+// GetStatus returns the Status field value if set, zero value otherwise.
+func (o *Environment) GetStatus() map[string]interface{} {
+	if o == nil || o.Status == nil {
+		var ret map[string]interface{}
+		return ret
+	}
+	return *o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Environment) GetStatusOk() (*map[string]interface{}, bool) {
+	if o == nil || o.Status == nil {
+		return nil, false
+	}
+	return o.Status, true
+}
+
+// HasStatus returns a boolean if a field has been set.
+func (o *Environment) HasStatus() bool {
+	if o != nil && o.Status != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given map[string]interface{} and assigns it to the Status field.
+func (o *Environment) SetStatus(v map[string]interface{}) {
+	o.Status = &v
 }
 
 // GetName returns the Name field value
@@ -293,6 +327,9 @@ func (o Environment) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Secrets != nil {
 		toSerialize["secrets"] = o.Secrets
+	}
+	if o.Status != nil {
+		toSerialize["status"] = o.Status
 	}
 	if true {
 		toSerialize["name"] = o.Name

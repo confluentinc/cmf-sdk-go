@@ -78,6 +78,8 @@ All URIs are relative to *http://localhost:8080*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*CMFInformationApi* | [**GetResourceInformation**](docs/CMFInformationApi.md#getresourceinformation) | **Get** /cmf/api/v1/resource-information | Retrieve resource information about the CMF deployment.
+*CMFInformationApi* | [**GetSystemInformation**](docs/CMFInformationApi.md#getsysteminformation) | **Get** /cmf/api/v1/system-information | Retrieve system information about the CMF deployment.
 *DetachedSavepointsApi* | [**CreateDetachedSavepoint**](docs/DetachedSavepointsApi.md#createdetachedsavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
 *DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the Detached Savepoint of the given name.
 *DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the Detached Savepoint of the given name.
@@ -189,17 +191,20 @@ Class | Method | HTTP request | Description
  - [FlinkApplicationInstance](docs/FlinkApplicationInstance.md)
  - [FlinkApplicationInstanceAllOf](docs/FlinkApplicationInstanceAllOf.md)
  - [GetResourceBase](docs/GetResourceBase.md)
+ - [JobManager](docs/JobManager.md)
  - [KafkaCatalog](docs/KafkaCatalog.md)
  - [KafkaCatalogAllOf](docs/KafkaCatalogAllOf.md)
  - [KafkaCatalogSpec](docs/KafkaCatalogSpec.md)
  - [KafkaCatalogSpecKafkaClusters](docs/KafkaCatalogSpecKafkaClusters.md)
  - [KafkaCatalogSpecSrInstance](docs/KafkaCatalogSpecSrInstance.md)
+ - [KafkaCatalogStatus](docs/KafkaCatalogStatus.md)
  - [KafkaCatalogsPage](docs/KafkaCatalogsPage.md)
  - [KafkaCatalogsPageAllOf](docs/KafkaCatalogsPageAllOf.md)
  - [KafkaDatabase](docs/KafkaDatabase.md)
  - [KafkaDatabaseAllOf](docs/KafkaDatabaseAllOf.md)
  - [KafkaDatabaseSpec](docs/KafkaDatabaseSpec.md)
  - [KafkaDatabaseSpecKafkaCluster](docs/KafkaDatabaseSpecKafkaCluster.md)
+ - [KafkaDatabaseStatus](docs/KafkaDatabaseStatus.md)
  - [KafkaDatabasesPage](docs/KafkaDatabasesPage.md)
  - [KafkaDatabasesPageAllOf](docs/KafkaDatabasesPageAllOf.md)
  - [KubernetesNamespace](docs/KubernetesNamespace.md)
@@ -209,7 +214,12 @@ Class | Method | HTTP request | Description
  - [PostEnvironment](docs/PostEnvironment.md)
  - [PostResourceBase](docs/PostResourceBase.md)
  - [ResourceBaseV2](docs/ResourceBaseV2.md)
+ - [ResourceInformation](docs/ResourceInformation.md)
+ - [ResourceInformationStatus](docs/ResourceInformationStatus.md)
+ - [ResourceSummary](docs/ResourceSummary.md)
+ - [ResourceUsageSummary](docs/ResourceUsageSummary.md)
  - [ResourceWithFlinkApplicationDefaults](docs/ResourceWithFlinkApplicationDefaults.md)
+ - [Resources](docs/Resources.md)
  - [RestError](docs/RestError.md)
  - [ResultSchema](docs/ResultSchema.md)
  - [ResultSchemaColumn](docs/ResultSchemaColumn.md)
@@ -249,6 +259,9 @@ Class | Method | HTTP request | Description
  - [StatementTraits](docs/StatementTraits.md)
  - [StatementsPage](docs/StatementsPage.md)
  - [StatementsPageAllOf](docs/StatementsPageAllOf.md)
+ - [SystemInformation](docs/SystemInformation.md)
+ - [SystemInformationStatus](docs/SystemInformationStatus.md)
+ - [TaskManager](docs/TaskManager.md)
 
 
 ## Documentation For Authorization
