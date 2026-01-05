@@ -23,3 +23,14 @@ blocks:
             - sem-version go 1.22.7
             - checkout
             - go build ./...
+
+  - name: Validate API
+    dependencies: []
+    task:
+      jobs:
+        - name: Validate
+          commands:
+            - sem-version go 1.22.7
+            - checkout
+            - ci/check_version_compatibility.sh
+
