@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Phase** | **string** | Phase of the ComputePool | 
+**ResourceSummary** | Pointer to [**ResourceUsageSummary**](ResourceUsageSummary.md) |  | [optional] 
 
 ## Methods
 
@@ -44,6 +45,31 @@ and a boolean to check if the value has been set.
 
 SetPhase sets Phase field to given value.
 
+
+### GetResourceSummary
+
+`func (o *ComputePoolStatus) GetResourceSummary() ResourceUsageSummary`
+
+GetResourceSummary returns the ResourceSummary field if non-nil, zero value otherwise.
+
+### GetResourceSummaryOk
+
+`func (o *ComputePoolStatus) GetResourceSummaryOk() (*ResourceUsageSummary, bool)`
+
+GetResourceSummaryOk returns a tuple with the ResourceSummary field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetResourceSummary
+
+`func (o *ComputePoolStatus) SetResourceSummary(v ResourceUsageSummary)`
+
+SetResourceSummary sets ResourceSummary field to given value.
+
+### HasResourceSummary
+
+`func (o *ComputePoolStatus) HasResourceSummary() bool`
+
+HasResourceSummary returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

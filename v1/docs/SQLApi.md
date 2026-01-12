@@ -577,7 +577,7 @@ No authorization required
 
 ## GetComputePool
 
-> ComputePool GetComputePool(ctx, envName, computePoolName).Execute()
+> ComputePool GetComputePool(ctx, envName, computePoolName).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve the Compute Pool of the given name in the given Environment.
 
@@ -596,10 +596,11 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     computePoolName := "computePoolName_example" // string | Name of the Compute Pool
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.SQLApi.GetComputePool(context.Background(), envName, computePoolName).Execute()
+    resp, r, err := api_client.SQLApi.GetComputePool(context.Background(), envName, computePoolName).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `SQLApi.GetComputePool``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -627,6 +628,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 
@@ -648,7 +650,7 @@ No authorization required
 
 ## GetComputePools
 
-> ComputePoolsPage GetComputePools(ctx, envName).Page(page).Size(size).Sort(sort).Execute()
+> ComputePoolsPage GetComputePools(ctx, envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve a paginated list of Compute Pools in the given Environment.
 
@@ -669,10 +671,11 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.SQLApi.GetComputePools(context.Background(), envName).Page(page).Size(size).Sort(sort).Execute()
+    resp, r, err := api_client.SQLApi.GetComputePools(context.Background(), envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `SQLApi.GetComputePools``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -701,6 +704,7 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 
@@ -1003,7 +1007,7 @@ No authorization required
 
 ## GetStatement
 
-> Statement GetStatement(ctx, envName, stmtName).Execute()
+> Statement GetStatement(ctx, envName, stmtName).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve the Statement of the given name in the given Environment.
 
@@ -1022,10 +1026,11 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     stmtName := "stmtName_example" // string | Name of the Statement
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.SQLApi.GetStatement(context.Background(), envName, stmtName).Execute()
+    resp, r, err := api_client.SQLApi.GetStatement(context.Background(), envName, stmtName).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `SQLApi.GetStatement``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1053,6 +1058,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 
@@ -1218,7 +1224,7 @@ No authorization required
 
 ## GetStatements
 
-> StatementsPage GetStatements(ctx, envName).Page(page).Size(size).Sort(sort).ComputePool(computePool).Phase(phase).Execute()
+> StatementsPage GetStatements(ctx, envName).Page(page).Size(size).Sort(sort).ComputePool(computePool).Phase(phase).IncludeResourceInformation(includeResourceInformation).Name(name).Execute()
 
 Retrieve a paginated list of Statements in the given Environment.
 
@@ -1241,10 +1247,12 @@ func main() {
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
     computePool := "computePool_example" // string | Name of the ComputePool to filter on (optional)
     phase := "phase_example" // string | Phase to filter on (optional)
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
+    name := "name_example" // string | Wildcard filter by statement name (e.g. ?name=abc) (optional)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.SQLApi.GetStatements(context.Background(), envName).Page(page).Size(size).Sort(sort).ComputePool(computePool).Phase(phase).Execute()
+    resp, r, err := api_client.SQLApi.GetStatements(context.Background(), envName).Page(page).Size(size).Sort(sort).ComputePool(computePool).Phase(phase).IncludeResourceInformation(includeResourceInformation).Name(name).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `SQLApi.GetStatements``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1275,6 +1283,8 @@ Name | Type | Description  | Notes
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
  **computePool** | **string** | Name of the ComputePool to filter on | 
  **phase** | **string** | Phase to filter on | 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
+ **name** | **string** | Wildcard filter by statement name (e.g. ?name&#x3D;abc) | 
 
 ### Return type
 

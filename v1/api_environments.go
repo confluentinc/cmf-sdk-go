@@ -661,8 +661,14 @@ type ApiGetEnvironmentRequest struct {
 	ctx _context.Context
 	ApiService EnvironmentsApi
 	envName string
+	includeResourceInformation *bool
 }
 
+// Whether to include resource summary in the response.
+func (r ApiGetEnvironmentRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetEnvironmentRequest {
+	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
 
 func (r ApiGetEnvironmentRequest) Execute() (Environment, *_nethttp.Response, error) {
 	return r.ApiService.GetEnvironmentExecute(r)
@@ -707,6 +713,9 @@ func (a *EnvironmentsApiService) GetEnvironmentExecute(r ApiGetEnvironmentReques
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1071,6 +1080,7 @@ type ApiGetEnvironmentsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	includeResourceInformation *bool
 }
 
 // Zero-based page index (0..N)
@@ -1086,6 +1096,11 @@ func (r ApiGetEnvironmentsRequest) Size(size int32) ApiGetEnvironmentsRequest {
 // Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
 func (r ApiGetEnvironmentsRequest) Sort(sort []string) ApiGetEnvironmentsRequest {
 	r.sort = &sort
+	return r
+}
+// Whether to include resource summary in the response.
+func (r ApiGetEnvironmentsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetEnvironmentsRequest {
+	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
 
@@ -1145,6 +1160,9 @@ func (a *EnvironmentsApiService) GetEnvironmentsExecute(r ApiGetEnvironmentsRequ
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

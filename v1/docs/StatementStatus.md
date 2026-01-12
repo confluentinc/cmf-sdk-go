@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Phase** | **string** | The lifecycle phase of the statement | 
 **Detail** | Pointer to **string** | Details about the execution status of the statement | [optional] 
 **Traits** | Pointer to [**StatementTraits**](StatementTraits.md) |  | [optional] 
+**ResourceSummary** | Pointer to [**ResourceUsageSummary**](ResourceUsageSummary.md) |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetTraits sets Traits field to given value.
 `func (o *StatementStatus) HasTraits() bool`
 
 HasTraits returns a boolean if a field has been set.
+
+### GetResourceSummary
+
+`func (o *StatementStatus) GetResourceSummary() ResourceUsageSummary`
+
+GetResourceSummary returns the ResourceSummary field if non-nil, zero value otherwise.
+
+### GetResourceSummaryOk
+
+`func (o *StatementStatus) GetResourceSummaryOk() (*ResourceUsageSummary, bool)`
+
+GetResourceSummaryOk returns a tuple with the ResourceSummary field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetResourceSummary
+
+`func (o *StatementStatus) SetResourceSummary(v ResourceUsageSummary)`
+
+SetResourceSummary sets ResourceSummary field to given value.
+
+### HasResourceSummary
+
+`func (o *StatementStatus) HasResourceSummary() bool`
+
+HasResourceSummary returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
