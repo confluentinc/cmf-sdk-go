@@ -21,6 +21,7 @@ type StatementStatus struct {
 	// Details about the execution status of the statement
 	Detail *string `json:"detail,omitempty"`
 	Traits *StatementTraits `json:"traits,omitempty"`
+	ResourceSummary *ResourceUsageSummary `json:"resourceSummary,omitempty"`
 }
 
 // NewStatementStatus instantiates a new StatementStatus object
@@ -129,6 +130,38 @@ func (o *StatementStatus) SetTraits(v StatementTraits) {
 	o.Traits = &v
 }
 
+// GetResourceSummary returns the ResourceSummary field value if set, zero value otherwise.
+func (o *StatementStatus) GetResourceSummary() ResourceUsageSummary {
+	if o == nil || o.ResourceSummary == nil {
+		var ret ResourceUsageSummary
+		return ret
+	}
+	return *o.ResourceSummary
+}
+
+// GetResourceSummaryOk returns a tuple with the ResourceSummary field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementStatus) GetResourceSummaryOk() (*ResourceUsageSummary, bool) {
+	if o == nil || o.ResourceSummary == nil {
+		return nil, false
+	}
+	return o.ResourceSummary, true
+}
+
+// HasResourceSummary returns a boolean if a field has been set.
+func (o *StatementStatus) HasResourceSummary() bool {
+	if o != nil && o.ResourceSummary != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetResourceSummary gets a reference to the given ResourceUsageSummary and assigns it to the ResourceSummary field.
+func (o *StatementStatus) SetResourceSummary(v ResourceUsageSummary) {
+	o.ResourceSummary = &v
+}
+
 func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -139,6 +172,9 @@ func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.Traits != nil {
 		toSerialize["traits"] = o.Traits
+	}
+	if o.ResourceSummary != nil {
+		toSerialize["resourceSummary"] = o.ResourceSummary
 	}
 	return json.Marshal(toSerialize)
 }

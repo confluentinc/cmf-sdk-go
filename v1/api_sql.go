@@ -1408,8 +1408,14 @@ type ApiGetComputePoolRequest struct {
 	ApiService SQLApi
 	envName string
 	computePoolName string
+	includeResourceInformation *bool
 }
 
+// Whether to include resource summary in the response.
+func (r ApiGetComputePoolRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetComputePoolRequest {
+	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
 
 func (r ApiGetComputePoolRequest) Execute() (ComputePool, *_nethttp.Response, error) {
 	return r.ApiService.GetComputePoolExecute(r)
@@ -1457,6 +1463,9 @@ func (a *SQLApiService) GetComputePoolExecute(r ApiGetComputePoolRequest) (Compu
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1537,6 +1546,7 @@ type ApiGetComputePoolsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	includeResourceInformation *bool
 }
 
 // Zero-based page index (0..N)
@@ -1552,6 +1562,11 @@ func (r ApiGetComputePoolsRequest) Size(size int32) ApiGetComputePoolsRequest {
 // Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
 func (r ApiGetComputePoolsRequest) Sort(sort []string) ApiGetComputePoolsRequest {
 	r.sort = &sort
+	return r
+}
+// Whether to include resource summary in the response.
+func (r ApiGetComputePoolsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetComputePoolsRequest {
+	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
 
@@ -1614,6 +1629,9 @@ func (a *SQLApiService) GetComputePoolsExecute(r ApiGetComputePoolsRequest) (Com
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2235,8 +2253,14 @@ type ApiGetStatementRequest struct {
 	ApiService SQLApi
 	envName string
 	stmtName string
+	includeResourceInformation *bool
 }
 
+// Whether to include resource summary in the response.
+func (r ApiGetStatementRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetStatementRequest {
+	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
 
 func (r ApiGetStatementRequest) Execute() (Statement, *_nethttp.Response, error) {
 	return r.ApiService.GetStatementExecute(r)
@@ -2284,6 +2308,9 @@ func (a *SQLApiService) GetStatementExecute(r ApiGetStatementRequest) (Statement
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -2649,6 +2676,8 @@ type ApiGetStatementsRequest struct {
 	sort *[]string
 	computePool *string
 	phase *string
+	includeResourceInformation *bool
+	name *string
 }
 
 // Zero-based page index (0..N)
@@ -2674,6 +2703,16 @@ func (r ApiGetStatementsRequest) ComputePool(computePool string) ApiGetStatement
 // Phase to filter on
 func (r ApiGetStatementsRequest) Phase(phase string) ApiGetStatementsRequest {
 	r.phase = &phase
+	return r
+}
+// Whether to include resource summary in the response.
+func (r ApiGetStatementsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetStatementsRequest {
+	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
+// Wildcard filter by statement name (e.g. ?name&#x3D;abc)
+func (r ApiGetStatementsRequest) Name(name string) ApiGetStatementsRequest {
+	r.name = &name
 	return r
 }
 
@@ -2742,6 +2781,12 @@ func (a *SQLApiService) GetStatementsExecute(r ApiGetStatementsRequest) (Stateme
 	}
 	if r.phase != nil {
 		localVarQueryParams.Add("phase", parameterToString(*r.phase, ""))
+	}
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
+	if r.name != nil {
+		localVarQueryParams.Add("name", parameterToString(*r.name, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

@@ -43,6 +43,15 @@ paths:
             type: string
           type: array
         style: form
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "200":
           content:
@@ -168,6 +177,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "200":
           content:
@@ -229,6 +247,15 @@ paths:
           items:
             type: string
           type: array
+        style: form
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
         style: form
       - description: Name of the Environment
         explode: false
@@ -396,6 +423,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "200":
           content:
@@ -1120,6 +1156,15 @@ paths:
           - stopped
           type: string
         style: form
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       - description: Name of the Environment
         explode: false
         in: path
@@ -1128,6 +1173,14 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Wildcard filter by statement name (e.g. ?name=abc)
+        explode: true
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
@@ -1303,6 +1356,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "200":
           content:
@@ -1565,6 +1627,15 @@ paths:
             type: string
           type: array
         style: form
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       - description: Name of the Environment
         explode: false
         in: path
@@ -1746,6 +1817,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Whether to include resource summary in the response.
+        explode: true
+        in: query
+        name: include-resource-information
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "200":
           content:
@@ -3410,6 +3490,56 @@ paths:
       summary: Retrieve the Detached Savepoint of the given name.
       tags:
       - DetachedSavepoints
+  /cmf/api/v1/system-information:
+    get:
+      operationId: getSystemInformation
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemInformation'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SystemInformation'
+          description: System information retrieved successfully.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve system information about the CMF deployment.
+      tags:
+      - CMFInformation
+  /cmf/api/v1/resource-information:
+    get:
+      operationId: getResourceInformation
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceInformation'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ResourceInformation'
+          description: Resource information retrieved successfully.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve resource information about the CMF deployment.
+      tags:
+      - CMFInformation
 components:
   parameters:
     pageParam:
@@ -3450,6 +3580,16 @@ components:
       required: false
       schema:
         type: string
+      style: form
+    includeResourceInformationParam:
+      description: Whether to include resource summary in the response.
+      explode: true
+      in: query
+      name: include-resource-information
+      required: false
+      schema:
+        default: false
+        type: boolean
       style: form
     computePoolParam:
       description: Name of the ComputePool to filter on
@@ -3537,7 +3677,6 @@ components:
       properties:
         name:
           description: A unique name for the resource.
-          maxLength: 253
           minLength: 4
           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
           title: Name
@@ -3616,6 +3755,7 @@ components:
       example:
         secrets:
           key: secrets
+        status: '{}'
       properties:
         secrets:
           additionalProperties:
@@ -3624,6 +3764,13 @@ components:
           description: The secrets mapping for the environment. This is a mapping
             between connection_secret_id and the secret name.
           title: Secrets
+          type: object
+        status:
+          description: Status for the environment
+          properties:
+            resourceSummary:
+              $ref: '#/components/schemas/ResourceUsageSummary'
+          title: Status
           type: object
       required:
       - kubernetesNamespace
@@ -3970,6 +4117,48 @@ components:
           format: int64
           type: integer
       title: StartStatementFromSavepoint
+      type: object
+    SystemInformation:
+      description: Represents system information about the CMF application
+      example:
+        status:
+          version: version
+          revision: revision
+      properties:
+        status:
+          $ref: '#/components/schemas/SystemInformationStatus'
+      title: SystemInformation
+      type: object
+    ResourceInformation:
+      description: Represents resource information and usage statistics for the CMF
+        application
+      example:
+        status:
+          resourceSummary:
+            memory: 2
+            cpu: 3.616076749251911
+          resources:
+            detachedSavepoints: 9
+            computePools: 1
+            environments: 0
+            catalogs: 2
+            savepoints: 7
+            statements: 5
+            secrets: 5
+            applications: 6
+      properties:
+        status:
+          $ref: '#/components/schemas/ResourceInformationStatus'
+      title: ResourceInformation
+      type: object
+    ResourceUsageSummary:
+      description: Represents a summary of resource usage for the CMF resource
+      properties:
+        jobManager:
+          $ref: '#/components/schemas/JobManager'
+        taskManager:
+          $ref: '#/components/schemas/TaskManager'
+      title: ResourceUsageSummary
       type: object
     error:
       description: An error
@@ -4429,6 +4618,8 @@ components:
           type: string
         traits:
           $ref: '#/components/schemas/StatementTraits'
+        resourceSummary:
+          $ref: '#/components/schemas/ResourceUsageSummary'
       required:
       - phase
       title: StatementStatus
@@ -4603,6 +4794,8 @@ components:
         phase:
           description: Phase of the ComputePool
           type: string
+        resourceSummary:
+          $ref: '#/components/schemas/ResourceUsageSummary'
       required:
       - phase
       title: ComputePoolStatus
@@ -4684,12 +4877,24 @@ components:
       - srInstance
       title: KafkaCatalogSpec
       type: object
+    KafkaCatalogStatus:
+      description: Status for Kafka Catalog
+      properties:
+        environmentsWithAccess:
+          description: Environments with access to the Kafka Catalog
+          items:
+            type: string
+          type: array
+      title: KafkaCatalogStatus
+      type: object
     KafkaCatalog_allOf:
       properties:
         metadata:
           $ref: '#/components/schemas/CatalogMetadata'
         spec:
           $ref: '#/components/schemas/KafkaCatalogSpec'
+        status:
+          $ref: '#/components/schemas/KafkaCatalogStatus'
       required:
       - metadata
       - spec
@@ -4742,12 +4947,24 @@ components:
       - kafkaCluster
       title: KafkaDatabaseSpec
       type: object
+    KafkaDatabaseStatus:
+      description: Status for Kafka Database
+      properties:
+        environmentsWithAccess:
+          description: Environments with access to the Kafka Database
+          items:
+            type: string
+          type: array
+      title: KafkaDatabaseStatus
+      type: object
     KafkaDatabase_allOf:
       properties:
         metadata:
           $ref: '#/components/schemas/DatabaseMetadata'
         spec:
           $ref: '#/components/schemas/KafkaDatabaseSpec'
+        status:
+          $ref: '#/components/schemas/KafkaDatabaseStatus'
       required:
       - metadata
       - spec
@@ -4874,4 +5091,124 @@ components:
           items:
             $ref: '#/components/schemas/Savepoint'
           type: array
+      type: object
+    SystemInformationStatus:
+      example:
+        version: version
+        revision: revision
+      properties:
+        version:
+          description: Version of the CMF application
+          type: string
+        revision:
+          description: Git commit hash of the CMF application
+          type: string
+      title: SystemInformationStatus
+      type: object
+    Resources:
+      description: Count of various resource types managed by CMF
+      example:
+        detachedSavepoints: 9
+        computePools: 1
+        environments: 0
+        catalogs: 2
+        savepoints: 7
+        statements: 5
+        secrets: 5
+        applications: 6
+      properties:
+        environments:
+          description: Number of environments
+          type: integer
+        applications:
+          description: Number of applications
+          type: integer
+        computePools:
+          description: Number of compute pools
+          type: integer
+        statements:
+          description: Number of statements
+          type: integer
+        secrets:
+          description: Number of secrets
+          type: integer
+        catalogs:
+          description: Number of catalogs
+          type: integer
+        savepoints:
+          description: Number of savepoints
+          type: integer
+        detachedSavepoints:
+          description: Number of detached savepoints
+          type: integer
+      title: Resources
+      type: object
+    ResourceSummary:
+      description: Summary of resource usage
+      example:
+        memory: 2
+        cpu: 3.616076749251911
+      properties:
+        cpu:
+          description: Total CPU units allocated
+          format: double
+          type: number
+        memory:
+          description: Total memory allocated in bytes
+          format: int64
+          type: integer
+      title: ResourceSummary
+      type: object
+    ResourceInformationStatus:
+      example:
+        resourceSummary:
+          memory: 2
+          cpu: 3.616076749251911
+        resources:
+          detachedSavepoints: 9
+          computePools: 1
+          environments: 0
+          catalogs: 2
+          savepoints: 7
+          statements: 5
+          secrets: 5
+          applications: 6
+      properties:
+        resources:
+          $ref: '#/components/schemas/Resources'
+        resourceSummary:
+          $ref: '#/components/schemas/ResourceSummary'
+      title: ResourceInformationStatus
+      type: object
+    JobManager:
+      description: JobManager resource usage
+      properties:
+        cpu:
+          description: Total CPU units allocated
+          format: double
+          type: number
+        memory:
+          description: Total memory allocated in bytes
+          format: int64
+          type: integer
+        count:
+          description: Number of instances
+          type: integer
+      title: JobManager
+      type: object
+    TaskManager:
+      description: TaskManager resource usage
+      properties:
+        cpu:
+          description: Total CPU units allocated
+          format: double
+          type: number
+        memory:
+          description: Total memory allocated in bytes
+          format: int64
+          type: integer
+        count:
+          description: Number of instances
+          type: integer
+      title: TaskManager
       type: object

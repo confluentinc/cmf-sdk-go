@@ -157,7 +157,7 @@ No authorization required
 
 ## GetApplication
 
-> FlinkApplication GetApplication(ctx, envName, appName).Execute()
+> FlinkApplication GetApplication(ctx, envName, appName).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve an Application of the given name in the given Environment.
 
@@ -176,10 +176,11 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     appName := "appName_example" // string | Name of the Application
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.FlinkApplicationsApi.GetApplication(context.Background(), envName, appName).Execute()
+    resp, r, err := api_client.FlinkApplicationsApi.GetApplication(context.Background(), envName, appName).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `FlinkApplicationsApi.GetApplication``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -207,6 +208,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 
@@ -456,7 +458,7 @@ No authorization required
 
 ## GetApplications
 
-> ApplicationsPage GetApplications(ctx, envName).Page(page).Size(size).Sort(sort).Execute()
+> ApplicationsPage GetApplications(ctx, envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
 
 Retrieve a paginated list of all applications in the given Environment.
 
@@ -477,10 +479,11 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
+    includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.FlinkApplicationsApi.GetApplications(context.Background(), envName).Page(page).Size(size).Sort(sort).Execute()
+    resp, r, err := api_client.FlinkApplicationsApi.GetApplications(context.Background(), envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `FlinkApplicationsApi.GetApplications``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -509,6 +512,7 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
+ **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
 
 ### Return type
 

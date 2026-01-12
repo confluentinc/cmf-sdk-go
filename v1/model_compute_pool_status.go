@@ -18,6 +18,7 @@ import (
 type ComputePoolStatus struct {
 	// Phase of the ComputePool
 	Phase string `json:"phase"`
+	ResourceSummary *ResourceUsageSummary `json:"resourceSummary,omitempty"`
 }
 
 // NewComputePoolStatus instantiates a new ComputePoolStatus object
@@ -62,10 +63,45 @@ func (o *ComputePoolStatus) SetPhase(v string) {
 	o.Phase = v
 }
 
+// GetResourceSummary returns the ResourceSummary field value if set, zero value otherwise.
+func (o *ComputePoolStatus) GetResourceSummary() ResourceUsageSummary {
+	if o == nil || o.ResourceSummary == nil {
+		var ret ResourceUsageSummary
+		return ret
+	}
+	return *o.ResourceSummary
+}
+
+// GetResourceSummaryOk returns a tuple with the ResourceSummary field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ComputePoolStatus) GetResourceSummaryOk() (*ResourceUsageSummary, bool) {
+	if o == nil || o.ResourceSummary == nil {
+		return nil, false
+	}
+	return o.ResourceSummary, true
+}
+
+// HasResourceSummary returns a boolean if a field has been set.
+func (o *ComputePoolStatus) HasResourceSummary() bool {
+	if o != nil && o.ResourceSummary != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetResourceSummary gets a reference to the given ResourceUsageSummary and assigns it to the ResourceSummary field.
+func (o *ComputePoolStatus) SetResourceSummary(v ResourceUsageSummary) {
+	o.ResourceSummary = &v
+}
+
 func (o ComputePoolStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["phase"] = o.Phase
+	}
+	if o.ResourceSummary != nil {
+		toSerialize["resourceSummary"] = o.ResourceSummary
 	}
 	return json.Marshal(toSerialize)
 }

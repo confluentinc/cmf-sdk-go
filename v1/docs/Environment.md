@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Secrets** | Pointer to **map[string]string** | The secrets mapping for the environment. This is a mapping between connection_secret_id and the secret name. | [optional] [default to {}]
+**Status** | Pointer to **map[string]interface{}** | Status for the environment | [optional] 
 **Name** | **string** | A unique name for the resource. | 
 **CreatedTime** | Pointer to **time.Time** |  | [optional] 
 **UpdatedTime** | Pointer to **time.Time** |  | [optional] 
@@ -56,6 +57,31 @@ SetSecrets sets Secrets field to given value.
 `func (o *Environment) HasSecrets() bool`
 
 HasSecrets returns a boolean if a field has been set.
+
+### GetStatus
+
+`func (o *Environment) GetStatus() map[string]interface{}`
+
+GetStatus returns the Status field if non-nil, zero value otherwise.
+
+### GetStatusOk
+
+`func (o *Environment) GetStatusOk() (*map[string]interface{}, bool)`
+
+GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStatus
+
+`func (o *Environment) SetStatus(v map[string]interface{})`
+
+SetStatus sets Status field to given value.
+
+### HasStatus
+
+`func (o *Environment) HasStatus() bool`
+
+HasStatus returns a boolean if a field has been set.
 
 ### GetName
 

@@ -22,6 +22,7 @@ type KafkaCatalog struct {
 	Kind string `json:"kind"`
 	Metadata CatalogMetadata `json:"metadata"`
 	Spec KafkaCatalogSpec `json:"spec"`
+	Status *KafkaCatalogStatus `json:"status,omitempty"`
 }
 
 // NewKafkaCatalog instantiates a new KafkaCatalog object
@@ -141,6 +142,38 @@ func (o *KafkaCatalog) SetSpec(v KafkaCatalogSpec) {
 	o.Spec = v
 }
 
+// GetStatus returns the Status field value if set, zero value otherwise.
+func (o *KafkaCatalog) GetStatus() KafkaCatalogStatus {
+	if o == nil || o.Status == nil {
+		var ret KafkaCatalogStatus
+		return ret
+	}
+	return *o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *KafkaCatalog) GetStatusOk() (*KafkaCatalogStatus, bool) {
+	if o == nil || o.Status == nil {
+		return nil, false
+	}
+	return o.Status, true
+}
+
+// HasStatus returns a boolean if a field has been set.
+func (o *KafkaCatalog) HasStatus() bool {
+	if o != nil && o.Status != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given KafkaCatalogStatus and assigns it to the Status field.
+func (o *KafkaCatalog) SetStatus(v KafkaCatalogStatus) {
+	o.Status = &v
+}
+
 func (o KafkaCatalog) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -154,6 +187,9 @@ func (o KafkaCatalog) MarshalJSON() ([]byte, error) {
 	}
 	if true {
 		toSerialize["spec"] = o.Spec
+	}
+	if o.Status != nil {
+		toSerialize["status"] = o.Status
 	}
 	return json.Marshal(toSerialize)
 }

@@ -409,8 +409,14 @@ type ApiGetApplicationRequest struct {
 	ApiService FlinkApplicationsApi
 	envName string
 	appName string
+	includeResourceInformation *bool
 }
 
+// Whether to include resource summary in the response.
+func (r ApiGetApplicationRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetApplicationRequest {
+	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
 
 func (r ApiGetApplicationRequest) Execute() (FlinkApplication, *_nethttp.Response, error) {
 	return r.ApiService.GetApplicationExecute(r)
@@ -458,6 +464,9 @@ func (a *FlinkApplicationsApiService) GetApplicationExecute(r ApiGetApplicationR
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -993,6 +1002,7 @@ type ApiGetApplicationsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	includeResourceInformation *bool
 }
 
 // Zero-based page index (0..N)
@@ -1008,6 +1018,11 @@ func (r ApiGetApplicationsRequest) Size(size int32) ApiGetApplicationsRequest {
 // Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
 func (r ApiGetApplicationsRequest) Sort(sort []string) ApiGetApplicationsRequest {
 	r.sort = &sort
+	return r
+}
+// Whether to include resource summary in the response.
+func (r ApiGetApplicationsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetApplicationsRequest {
+	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
 
@@ -1070,6 +1085,9 @@ func (a *FlinkApplicationsApiService) GetApplicationsExecute(r ApiGetApplication
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.includeResourceInformation != nil {
+		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
