@@ -33,4 +33,3 @@ blocks:
             - sem-version go 1.22.7
             - checkout
             - ci/check_version_compatibility.sh
-
