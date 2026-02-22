@@ -14,25 +14,30 @@ semaphore:
   enable: true
   pipeline_enable: false
   tasks:
-  - name: tag-release
-    branch: master
-    scheduled: false
-    pipeline_file: .semaphore/tag-release.yml
-    parameters:
-      - name: GIT_REF
-        required: true
-        default_value: 'master'
-        description: |-
-          What git reference to tag. This could be a branch name, or
-          a commit hash, or even an existing tag.
-      - name: TAG_NAME
-        required: true
-        description: The tag name that the ref will be tagged with.
-      - name: DRY_RUN
-        required: true
-        default_value: 'True'
-        description: |-
-          Do a dry run, without changes to the selected repository.
-        options:
-          - 'True'
-          - 'False'
+    - name: tag-release
+      branch: master
+      scheduled: false
+      pipeline_file: .semaphore/tag-release.yml
+      parameters:
+        - name: GIT_REF
+          required: true
+          default_value: 'master'
+          description: |-
+            What git reference to tag. This could be a branch name, or
+            a commit hash, or even an existing tag.
+        - name: TAG_NAME
+          required: true
+          description: The tag name that the ref will be tagged with.
+        - name: DRY_RUN
+          required: true
+          default_value: 'True'
+          description: |-
+            Do a dry run, without changes to the selected repository.
+          options:
+            - 'True'
+            - 'False'
+  managed_sections:
+    - version
+    - name
+    - agent
+    - global_job_config
