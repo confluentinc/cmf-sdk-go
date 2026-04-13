@@ -49,6 +49,8 @@ type APIClient struct {
 
 	// API Services
 
+	C3Api C3Api
+
 	CMFInformationApi CMFInformationApi
 
 	DetachedSavepointsApi DetachedSavepointsApi
@@ -56,6 +58,8 @@ type APIClient struct {
 	EnvironmentsApi EnvironmentsApi
 
 	FlinkApplicationsApi FlinkApplicationsApi
+
+	KubernetesClustersApi KubernetesClustersApi
 
 	SQLApi SQLApi
 
@@ -80,10 +84,12 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.C3Api = (*C3ApiService)(&c.common)
 	c.CMFInformationApi = (*CMFInformationApiService)(&c.common)
 	c.DetachedSavepointsApi = (*DetachedSavepointsApiService)(&c.common)
 	c.EnvironmentsApi = (*EnvironmentsApiService)(&c.common)
 	c.FlinkApplicationsApi = (*FlinkApplicationsApiService)(&c.common)
+	c.KubernetesClustersApi = (*KubernetesClustersApiService)(&c.common)
 	c.SQLApi = (*SQLApiService)(&c.common)
 	c.SavepointsApi = (*SavepointsApiService)(&c.common)
 	c.SecretsApi = (*SecretsApiService)(&c.common)

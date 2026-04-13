@@ -30,6 +30,8 @@ type SavepointStatus struct {
 	Error *string `json:"error,omitempty"`
 	// Whether the Savepoint is pending deletion
 	PendingDeletion *bool `json:"pendingDeletion,omitempty"`
+	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	Warning *string `json:"warning,omitempty"`
 }
 
 // NewSavepointStatus instantiates a new SavepointStatus object
@@ -273,6 +275,38 @@ func (o *SavepointStatus) SetPendingDeletion(v bool) {
 	o.PendingDeletion = &v
 }
 
+// GetWarning returns the Warning field value if set, zero value otherwise.
+func (o *SavepointStatus) GetWarning() string {
+	if o == nil || o.Warning == nil {
+		var ret string
+		return ret
+	}
+	return *o.Warning
+}
+
+// GetWarningOk returns a tuple with the Warning field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SavepointStatus) GetWarningOk() (*string, bool) {
+	if o == nil || o.Warning == nil {
+		return nil, false
+	}
+	return o.Warning, true
+}
+
+// HasWarning returns a boolean if a field has been set.
+func (o *SavepointStatus) HasWarning() bool {
+	if o != nil && o.Warning != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetWarning gets a reference to the given string and assigns it to the Warning field.
+func (o *SavepointStatus) SetWarning(v string) {
+	o.Warning = &v
+}
+
 func (o SavepointStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.State != nil {
@@ -295,6 +329,9 @@ func (o SavepointStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.PendingDeletion != nil {
 		toSerialize["pendingDeletion"] = o.PendingDeletion
+	}
+	if o.Warning != nil {
+		toSerialize["warning"] = o.Warning
 	}
 	return json.Marshal(toSerialize)
 }

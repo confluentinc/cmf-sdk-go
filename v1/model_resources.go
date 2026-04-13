@@ -18,12 +18,10 @@ import (
 type Resources struct {
 	// Number of environments
 	Environments *int32 `json:"environments,omitempty"`
-	// Number of applications
-	Applications *int32 `json:"applications,omitempty"`
+	Applications *ApplicationsByStatusSummary `json:"applications,omitempty"`
 	// Number of compute pools
 	ComputePools *int32 `json:"computePools,omitempty"`
-	// Number of statements
-	Statements *int32 `json:"statements,omitempty"`
+	Statements *StatementsByStatusSummary `json:"statements,omitempty"`
 	// Number of secrets
 	Secrets *int32 `json:"secrets,omitempty"`
 	// Number of catalogs
@@ -32,6 +30,7 @@ type Resources struct {
 	Savepoints *int32 `json:"savepoints,omitempty"`
 	// Number of detached savepoints
 	DetachedSavepoints *int32 `json:"detachedSavepoints,omitempty"`
+	KubernetesClusters *KubernetesClustersByStateSummary `json:"kubernetesClusters,omitempty"`
 }
 
 // NewResources instantiates a new Resources object
@@ -84,9 +83,9 @@ func (o *Resources) SetEnvironments(v int32) {
 }
 
 // GetApplications returns the Applications field value if set, zero value otherwise.
-func (o *Resources) GetApplications() int32 {
+func (o *Resources) GetApplications() ApplicationsByStatusSummary {
 	if o == nil || o.Applications == nil {
-		var ret int32
+		var ret ApplicationsByStatusSummary
 		return ret
 	}
 	return *o.Applications
@@ -94,7 +93,7 @@ func (o *Resources) GetApplications() int32 {
 
 // GetApplicationsOk returns a tuple with the Applications field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Resources) GetApplicationsOk() (*int32, bool) {
+func (o *Resources) GetApplicationsOk() (*ApplicationsByStatusSummary, bool) {
 	if o == nil || o.Applications == nil {
 		return nil, false
 	}
@@ -110,8 +109,8 @@ func (o *Resources) HasApplications() bool {
 	return false
 }
 
-// SetApplications gets a reference to the given int32 and assigns it to the Applications field.
-func (o *Resources) SetApplications(v int32) {
+// SetApplications gets a reference to the given ApplicationsByStatusSummary and assigns it to the Applications field.
+func (o *Resources) SetApplications(v ApplicationsByStatusSummary) {
 	o.Applications = &v
 }
 
@@ -148,9 +147,9 @@ func (o *Resources) SetComputePools(v int32) {
 }
 
 // GetStatements returns the Statements field value if set, zero value otherwise.
-func (o *Resources) GetStatements() int32 {
+func (o *Resources) GetStatements() StatementsByStatusSummary {
 	if o == nil || o.Statements == nil {
-		var ret int32
+		var ret StatementsByStatusSummary
 		return ret
 	}
 	return *o.Statements
@@ -158,7 +157,7 @@ func (o *Resources) GetStatements() int32 {
 
 // GetStatementsOk returns a tuple with the Statements field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Resources) GetStatementsOk() (*int32, bool) {
+func (o *Resources) GetStatementsOk() (*StatementsByStatusSummary, bool) {
 	if o == nil || o.Statements == nil {
 		return nil, false
 	}
@@ -174,8 +173,8 @@ func (o *Resources) HasStatements() bool {
 	return false
 }
 
-// SetStatements gets a reference to the given int32 and assigns it to the Statements field.
-func (o *Resources) SetStatements(v int32) {
+// SetStatements gets a reference to the given StatementsByStatusSummary and assigns it to the Statements field.
+func (o *Resources) SetStatements(v StatementsByStatusSummary) {
 	o.Statements = &v
 }
 
@@ -307,6 +306,38 @@ func (o *Resources) SetDetachedSavepoints(v int32) {
 	o.DetachedSavepoints = &v
 }
 
+// GetKubernetesClusters returns the KubernetesClusters field value if set, zero value otherwise.
+func (o *Resources) GetKubernetesClusters() KubernetesClustersByStateSummary {
+	if o == nil || o.KubernetesClusters == nil {
+		var ret KubernetesClustersByStateSummary
+		return ret
+	}
+	return *o.KubernetesClusters
+}
+
+// GetKubernetesClustersOk returns a tuple with the KubernetesClusters field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Resources) GetKubernetesClustersOk() (*KubernetesClustersByStateSummary, bool) {
+	if o == nil || o.KubernetesClusters == nil {
+		return nil, false
+	}
+	return o.KubernetesClusters, true
+}
+
+// HasKubernetesClusters returns a boolean if a field has been set.
+func (o *Resources) HasKubernetesClusters() bool {
+	if o != nil && o.KubernetesClusters != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetKubernetesClusters gets a reference to the given KubernetesClustersByStateSummary and assigns it to the KubernetesClusters field.
+func (o *Resources) SetKubernetesClusters(v KubernetesClustersByStateSummary) {
+	o.KubernetesClusters = &v
+}
+
 func (o Resources) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Environments != nil {
@@ -332,6 +363,9 @@ func (o Resources) MarshalJSON() ([]byte, error) {
 	}
 	if o.DetachedSavepoints != nil {
 		toSerialize["detachedSavepoints"] = o.DetachedSavepoints
+	}
+	if o.KubernetesClusters != nil {
+		toSerialize["kubernetesClusters"] = o.KubernetesClusters
 	}
 	return json.Marshal(toSerialize)
 }

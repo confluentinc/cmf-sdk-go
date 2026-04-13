@@ -4,17 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** | A unique name for the resource. | 
+**Name** | Pointer to **string** | A unique name for the resource. | [optional] 
 **FlinkApplicationDefaults** | Pointer to **map[string]interface{}** |  | [optional] 
 **KubernetesNamespace** | Pointer to **string** |  | [optional] 
+**KubernetesClusterName** | Pointer to **string** |  | [optional] 
 **ComputePoolDefaults** | Pointer to **map[string]interface{}** | the defaults as YAML or JSON for ComputePools | [optional] 
 **StatementDefaults** | Pointer to [**AllStatementDefaults1**](AllStatementDefaults1.md) |  | [optional] 
+**Metadata** | Pointer to [**EnvironmentMetadata**](EnvironmentMetadata.md) |  | [optional] 
 
 ## Methods
 
 ### NewPostEnvironment
 
-`func NewPostEnvironment(name string, ) *PostEnvironment`
+`func NewPostEnvironment() *PostEnvironment`
 
 NewPostEnvironment instantiates a new PostEnvironment object
 This constructor will assign default values to properties that have it defined,
@@ -48,6 +50,11 @@ and a boolean to check if the value has been set.
 
 SetName sets Name field to given value.
 
+### HasName
+
+`func (o *PostEnvironment) HasName() bool`
+
+HasName returns a boolean if a field has been set.
 
 ### GetFlinkApplicationDefaults
 
@@ -99,6 +106,31 @@ SetKubernetesNamespace sets KubernetesNamespace field to given value.
 
 HasKubernetesNamespace returns a boolean if a field has been set.
 
+### GetKubernetesClusterName
+
+`func (o *PostEnvironment) GetKubernetesClusterName() string`
+
+GetKubernetesClusterName returns the KubernetesClusterName field if non-nil, zero value otherwise.
+
+### GetKubernetesClusterNameOk
+
+`func (o *PostEnvironment) GetKubernetesClusterNameOk() (*string, bool)`
+
+GetKubernetesClusterNameOk returns a tuple with the KubernetesClusterName field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetKubernetesClusterName
+
+`func (o *PostEnvironment) SetKubernetesClusterName(v string)`
+
+SetKubernetesClusterName sets KubernetesClusterName field to given value.
+
+### HasKubernetesClusterName
+
+`func (o *PostEnvironment) HasKubernetesClusterName() bool`
+
+HasKubernetesClusterName returns a boolean if a field has been set.
+
 ### GetComputePoolDefaults
 
 `func (o *PostEnvironment) GetComputePoolDefaults() map[string]interface{}`
@@ -148,6 +180,31 @@ SetStatementDefaults sets StatementDefaults field to given value.
 `func (o *PostEnvironment) HasStatementDefaults() bool`
 
 HasStatementDefaults returns a boolean if a field has been set.
+
+### GetMetadata
+
+`func (o *PostEnvironment) GetMetadata() EnvironmentMetadata`
+
+GetMetadata returns the Metadata field if non-nil, zero value otherwise.
+
+### GetMetadataOk
+
+`func (o *PostEnvironment) GetMetadataOk() (*EnvironmentMetadata, bool)`
+
+GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetadata
+
+`func (o *PostEnvironment) SetMetadata(v EnvironmentMetadata)`
+
+SetMetadata sets Metadata field to given value.
+
+### HasMetadata
+
+`func (o *PostEnvironment) HasMetadata() bool`
+
+HasMetadata returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Name** | **string** | Name of the ComputePool | 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the ComputePool was created | [optional] 
+**UpdateTimestamp** | Pointer to **string** | Timestamp when the ComputePool was last updated | [optional] 
 **Uid** | Pointer to **string** | Unique identifier of the ComputePool | [optional] 
 **Labels** | Pointer to **map[string]string** | Labels of the ComputePool | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the ComputePool | [optional] 
@@ -73,6 +74,31 @@ SetCreationTimestamp sets CreationTimestamp field to given value.
 `func (o *ComputePoolMetadata) HasCreationTimestamp() bool`
 
 HasCreationTimestamp returns a boolean if a field has been set.
+
+### GetUpdateTimestamp
+
+`func (o *ComputePoolMetadata) GetUpdateTimestamp() string`
+
+GetUpdateTimestamp returns the UpdateTimestamp field if non-nil, zero value otherwise.
+
+### GetUpdateTimestampOk
+
+`func (o *ComputePoolMetadata) GetUpdateTimestampOk() (*string, bool)`
+
+GetUpdateTimestampOk returns a tuple with the UpdateTimestamp field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpdateTimestamp
+
+`func (o *ComputePoolMetadata) SetUpdateTimestamp(v string)`
+
+SetUpdateTimestamp sets UpdateTimestamp field to given value.
+
+### HasUpdateTimestamp
+
+`func (o *ComputePoolMetadata) HasUpdateTimestamp() bool`
+
+HasUpdateTimestamp returns a boolean if a field has been set.
 
 ### GetUid
 

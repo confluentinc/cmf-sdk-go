@@ -11,8 +11,10 @@ Name | Type | Description | Notes
 **UpdatedTime** | Pointer to **time.Time** |  | [optional] 
 **FlinkApplicationDefaults** | Pointer to **map[string]interface{}** |  | [optional] 
 **KubernetesNamespace** | **string** |  | 
+**KubernetesClusterName** | Pointer to **string** |  | [optional] 
 **ComputePoolDefaults** | Pointer to **map[string]interface{}** | the defaults as YAML or JSON for ComputePools | [optional] 
 **StatementDefaults** | Pointer to [**AllStatementDefaults1**](AllStatementDefaults1.md) |  | [optional] 
+**Metadata** | Pointer to [**EnvironmentMetadata**](EnvironmentMetadata.md) |  | [optional] 
 
 ## Methods
 
@@ -198,6 +200,31 @@ and a boolean to check if the value has been set.
 SetKubernetesNamespace sets KubernetesNamespace field to given value.
 
 
+### GetKubernetesClusterName
+
+`func (o *Environment) GetKubernetesClusterName() string`
+
+GetKubernetesClusterName returns the KubernetesClusterName field if non-nil, zero value otherwise.
+
+### GetKubernetesClusterNameOk
+
+`func (o *Environment) GetKubernetesClusterNameOk() (*string, bool)`
+
+GetKubernetesClusterNameOk returns a tuple with the KubernetesClusterName field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetKubernetesClusterName
+
+`func (o *Environment) SetKubernetesClusterName(v string)`
+
+SetKubernetesClusterName sets KubernetesClusterName field to given value.
+
+### HasKubernetesClusterName
+
+`func (o *Environment) HasKubernetesClusterName() bool`
+
+HasKubernetesClusterName returns a boolean if a field has been set.
+
 ### GetComputePoolDefaults
 
 `func (o *Environment) GetComputePoolDefaults() map[string]interface{}`
@@ -247,6 +274,31 @@ SetStatementDefaults sets StatementDefaults field to given value.
 `func (o *Environment) HasStatementDefaults() bool`
 
 HasStatementDefaults returns a boolean if a field has been set.
+
+### GetMetadata
+
+`func (o *Environment) GetMetadata() EnvironmentMetadata`
+
+GetMetadata returns the Metadata field if non-nil, zero value otherwise.
+
+### GetMetadataOk
+
+`func (o *Environment) GetMetadataOk() (*EnvironmentMetadata, bool)`
+
+GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetadata
+
+`func (o *Environment) SetMetadata(v EnvironmentMetadata)`
+
+SetMetadata sets Metadata field to given value.
+
+### HasMetadata
+
+`func (o *Environment) HasMetadata() bool`
+
+HasMetadata returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

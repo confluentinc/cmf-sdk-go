@@ -22,6 +22,8 @@ type StatementStatus struct {
 	Detail *string `json:"detail,omitempty"`
 	Traits *StatementTraits `json:"traits,omitempty"`
 	ResourceSummary *ResourceUsageSummary `json:"resourceSummary,omitempty"`
+	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	Warning *string `json:"warning,omitempty"`
 }
 
 // NewStatementStatus instantiates a new StatementStatus object
@@ -162,6 +164,38 @@ func (o *StatementStatus) SetResourceSummary(v ResourceUsageSummary) {
 	o.ResourceSummary = &v
 }
 
+// GetWarning returns the Warning field value if set, zero value otherwise.
+func (o *StatementStatus) GetWarning() string {
+	if o == nil || o.Warning == nil {
+		var ret string
+		return ret
+	}
+	return *o.Warning
+}
+
+// GetWarningOk returns a tuple with the Warning field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementStatus) GetWarningOk() (*string, bool) {
+	if o == nil || o.Warning == nil {
+		return nil, false
+	}
+	return o.Warning, true
+}
+
+// HasWarning returns a boolean if a field has been set.
+func (o *StatementStatus) HasWarning() bool {
+	if o != nil && o.Warning != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetWarning gets a reference to the given string and assigns it to the Warning field.
+func (o *StatementStatus) SetWarning(v string) {
+	o.Warning = &v
+}
+
 func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -175,6 +209,9 @@ func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.ResourceSummary != nil {
 		toSerialize["resourceSummary"] = o.ResourceSummary
+	}
+	if o.Warning != nil {
+		toSerialize["warning"] = o.Warning
 	}
 	return json.Marshal(toSerialize)
 }

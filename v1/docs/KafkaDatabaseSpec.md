@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **KafkaCluster** | [**KafkaDatabaseSpecKafkaCluster**](KafkaDatabaseSpecKafkaCluster.md) |  | 
-**AlterEnvironments** | Pointer to **[]string** | List of environments that have permission to alter the tables of this database | [optional] 
+**DdlEnvironments** | Pointer to **[]string** | List of environments that have permission to execute DDL statements on the tables of this database | [optional] 
 
 ## Methods
 
@@ -46,30 +46,30 @@ and a boolean to check if the value has been set.
 SetKafkaCluster sets KafkaCluster field to given value.
 
 
-### GetAlterEnvironments
+### GetDdlEnvironments
 
-`func (o *KafkaDatabaseSpec) GetAlterEnvironments() []string`
+`func (o *KafkaDatabaseSpec) GetDdlEnvironments() []string`
 
-GetAlterEnvironments returns the AlterEnvironments field if non-nil, zero value otherwise.
+GetDdlEnvironments returns the DdlEnvironments field if non-nil, zero value otherwise.
 
-### GetAlterEnvironmentsOk
+### GetDdlEnvironmentsOk
 
-`func (o *KafkaDatabaseSpec) GetAlterEnvironmentsOk() (*[]string, bool)`
+`func (o *KafkaDatabaseSpec) GetDdlEnvironmentsOk() (*[]string, bool)`
 
-GetAlterEnvironmentsOk returns a tuple with the AlterEnvironments field if it's non-nil, zero value otherwise
+GetDdlEnvironmentsOk returns a tuple with the DdlEnvironments field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetAlterEnvironments
+### SetDdlEnvironments
 
-`func (o *KafkaDatabaseSpec) SetAlterEnvironments(v []string)`
+`func (o *KafkaDatabaseSpec) SetDdlEnvironments(v []string)`
 
-SetAlterEnvironments sets AlterEnvironments field to given value.
+SetDdlEnvironments sets DdlEnvironments field to given value.
 
-### HasAlterEnvironments
+### HasDdlEnvironments
 
-`func (o *KafkaDatabaseSpec) HasAlterEnvironments() bool`
+`func (o *KafkaDatabaseSpec) HasDdlEnvironments() bool`
 
-HasAlterEnvironments returns a boolean if a field has been set.
+HasDdlEnvironments returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
