@@ -18,6 +18,8 @@ import (
 type ComputePoolSpec struct {
 	// Type of the ComputePool
 	Type string `json:"type"`
+	// Desired state of the compute pool. Can only be specified for shared compute pools. Defaults to RUNNING if not specified.
+	State *string `json:"state,omitempty"`
 	// Cluster Spec
 	ClusterSpec map[string]interface{} `json:"clusterSpec"`
 }
@@ -65,6 +67,38 @@ func (o *ComputePoolSpec) SetType(v string) {
 	o.Type = v
 }
 
+// GetState returns the State field value if set, zero value otherwise.
+func (o *ComputePoolSpec) GetState() string {
+	if o == nil || o.State == nil {
+		var ret string
+		return ret
+	}
+	return *o.State
+}
+
+// GetStateOk returns a tuple with the State field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ComputePoolSpec) GetStateOk() (*string, bool) {
+	if o == nil || o.State == nil {
+		return nil, false
+	}
+	return o.State, true
+}
+
+// HasState returns a boolean if a field has been set.
+func (o *ComputePoolSpec) HasState() bool {
+	if o != nil && o.State != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetState gets a reference to the given string and assigns it to the State field.
+func (o *ComputePoolSpec) SetState(v string) {
+	o.State = &v
+}
+
 // GetClusterSpec returns the ClusterSpec field value
 func (o *ComputePoolSpec) GetClusterSpec() map[string]interface{} {
 	if o == nil {
@@ -93,6 +127,9 @@ func (o ComputePoolSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["type"] = o.Type
+	}
+	if o.State != nil {
+		toSerialize["state"] = o.State
 	}
 	if true {
 		toSerialize["clusterSpec"] = o.ClusterSpec

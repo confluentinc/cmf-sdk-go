@@ -18,7 +18,8 @@ import (
 type ComputePoolAllOf struct {
 	Metadata ComputePoolMetadata `json:"metadata"`
 	Spec ComputePoolSpec `json:"spec"`
-	Status *ComputePoolStatus `json:"status,omitempty"`
+	// Status for ComputePool
+	Status *map[string]map[string]interface{} `json:"status,omitempty"`
 }
 
 // NewComputePoolAllOf instantiates a new ComputePoolAllOf object
@@ -89,9 +90,9 @@ func (o *ComputePoolAllOf) SetSpec(v ComputePoolSpec) {
 }
 
 // GetStatus returns the Status field value if set, zero value otherwise.
-func (o *ComputePoolAllOf) GetStatus() ComputePoolStatus {
+func (o *ComputePoolAllOf) GetStatus() map[string]map[string]interface{} {
 	if o == nil || o.Status == nil {
-		var ret ComputePoolStatus
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return *o.Status
@@ -99,7 +100,7 @@ func (o *ComputePoolAllOf) GetStatus() ComputePoolStatus {
 
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ComputePoolAllOf) GetStatusOk() (*ComputePoolStatus, bool) {
+func (o *ComputePoolAllOf) GetStatusOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil || o.Status == nil {
 		return nil, false
 	}
@@ -115,8 +116,8 @@ func (o *ComputePoolAllOf) HasStatus() bool {
 	return false
 }
 
-// SetStatus gets a reference to the given ComputePoolStatus and assigns it to the Status field.
-func (o *ComputePoolAllOf) SetStatus(v ComputePoolStatus) {
+// SetStatus gets a reference to the given map[string]map[string]interface{} and assigns it to the Status field.
+func (o *ComputePoolAllOf) SetStatus(v map[string]map[string]interface{}) {
 	o.Status = &v
 }
 

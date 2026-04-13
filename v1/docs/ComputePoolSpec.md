@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Type** | **string** | Type of the ComputePool | 
+**State** | Pointer to **string** | Desired state of the compute pool. Can only be specified for shared compute pools. Defaults to RUNNING if not specified. | [optional] 
 **ClusterSpec** | **map[string]interface{}** | Cluster Spec | 
 
 ## Methods
@@ -45,6 +46,31 @@ and a boolean to check if the value has been set.
 
 SetType sets Type field to given value.
 
+
+### GetState
+
+`func (o *ComputePoolSpec) GetState() string`
+
+GetState returns the State field if non-nil, zero value otherwise.
+
+### GetStateOk
+
+`func (o *ComputePoolSpec) GetStateOk() (*string, bool)`
+
+GetStateOk returns a tuple with the State field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetState
+
+`func (o *ComputePoolSpec) SetState(v string)`
+
+SetState sets State field to given value.
+
+### HasState
+
+`func (o *ComputePoolSpec) HasState() bool`
+
+HasState returns a boolean if a field has been set.
 
 ### GetClusterSpec
 
