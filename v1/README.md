@@ -78,6 +78,7 @@ All URIs are relative to *http://localhost:8080*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*C3Api* | [**GetC3LicenseInformation**](docs/C3Api.md#getc3licenseinformation) | **Get** /cmf/api/v1/c3/license | Retrieve license information for C3 integration.
 *CMFInformationApi* | [**GetResourceInformation**](docs/CMFInformationApi.md#getresourceinformation) | **Get** /cmf/api/v1/resource-information | Retrieve resource information about the CMF deployment.
 *CMFInformationApi* | [**GetSystemInformation**](docs/CMFInformationApi.md#getsysteminformation) | **Get** /cmf/api/v1/system-information | Retrieve system information about the CMF deployment.
 *DetachedSavepointsApi* | [**CreateDetachedSavepoint**](docs/DetachedSavepointsApi.md#createdetachedsavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
@@ -102,6 +103,9 @@ Class | Method | HTTP request | Description
 *FlinkApplicationsApi* | [**GetApplications**](docs/FlinkApplicationsApi.md#getapplications) | **Get** /cmf/api/v1/environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
 *FlinkApplicationsApi* | [**StartApplication**](docs/FlinkApplicationsApi.md#startapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
 *FlinkApplicationsApi* | [**SuspendApplication**](docs/FlinkApplicationsApi.md#suspendapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
+*KubernetesClustersApi* | [**GetKubernetesCluster**](docs/KubernetesClustersApi.md#getkubernetescluster) | **Get** /cmf/api/v1/kubernetes-clusters/{kubernetesClusterName} | Retrieve a Kubernetes cluster by name.
+*KubernetesClustersApi* | [**GetKubernetesClusters**](docs/KubernetesClustersApi.md#getkubernetesclusters) | **Get** /cmf/api/v1/kubernetes-clusters | Retrieve a list of all registered Kubernetes clusters.
+*KubernetesClustersApi* | [**UpdateKubernetesCluster**](docs/KubernetesClustersApi.md#updatekubernetescluster) | **Put** /cmf/api/v1/kubernetes-clusters/{kubernetesClusterName} | Update a Kubernetes cluster (lifecycle state, labels, annotations).
 *SQLApi* | [**CreateComputePool**](docs/SQLApi.md#createcomputepool) | **Post** /cmf/api/v1/environments/{envName}/compute-pools | Creates a new Flink Compute Pool in the given Environment.
 *SQLApi* | [**CreateKafkaCatalog**](docs/SQLApi.md#createkafkacatalog) | **Post** /cmf/api/v1/catalogs/kafka | Creates a new Kafka Catalog that can be referenced by Flink Statements
 *SQLApi* | [**CreateKafkaDatabase**](docs/SQLApi.md#createkafkadatabase) | **Post** /cmf/api/v1/catalogs/kafka/{catName}/databases | Creates a new Kafka Database
@@ -120,6 +124,7 @@ Class | Method | HTTP request | Description
 *SQLApi* | [**GetStatementExceptions**](docs/SQLApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatementResult**](docs/SQLApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatements**](docs/SQLApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
+*SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates a Compute Pool of the given name in the given Environment.
 *SQLApi* | [**UpdateKafkaCatalog**](docs/SQLApi.md#updatekafkacatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
 *SQLApi* | [**UpdateKafkaDatabase**](docs/SQLApi.md#updatekafkadatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
 *SQLApi* | [**UpdateStatement**](docs/SQLApi.md#updatestatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.
@@ -150,8 +155,11 @@ Class | Method | HTTP request | Description
  - [ApplicationInstancesPageAllOf](docs/ApplicationInstancesPageAllOf.md)
  - [ApplicationInstancesPageMetadata](docs/ApplicationInstancesPageMetadata.md)
  - [ApplicationPageMetadata](docs/ApplicationPageMetadata.md)
+ - [ApplicationsByStatusSummary](docs/ApplicationsByStatusSummary.md)
  - [ApplicationsPage](docs/ApplicationsPage.md)
  - [ApplicationsPageAllOf](docs/ApplicationsPageAllOf.md)
+ - [C3LicenseInformation](docs/C3LicenseInformation.md)
+ - [C3LicenseInformationStatus](docs/C3LicenseInformationStatus.md)
  - [CatalogMetadata](docs/CatalogMetadata.md)
  - [CatalogPageMetadata](docs/CatalogPageMetadata.md)
  - [ComputePool](docs/ComputePool.md)
@@ -160,7 +168,6 @@ Class | Method | HTTP request | Description
  - [ComputePoolMetadata](docs/ComputePoolMetadata.md)
  - [ComputePoolPageMetadata](docs/ComputePoolPageMetadata.md)
  - [ComputePoolSpec](docs/ComputePoolSpec.md)
- - [ComputePoolStatus](docs/ComputePoolStatus.md)
  - [ComputePoolsPage](docs/ComputePoolsPage.md)
  - [ComputePoolsPageAllOf](docs/ComputePoolsPageAllOf.md)
  - [DataType](docs/DataType.md)
@@ -168,6 +175,7 @@ Class | Method | HTTP request | Description
  - [DatabaseMetadata](docs/DatabaseMetadata.md)
  - [DatabasePageMetadata](docs/DatabasePageMetadata.md)
  - [Environment](docs/Environment.md)
+ - [EnvironmentMetadata](docs/EnvironmentMetadata.md)
  - [EnvironmentSecretMapping](docs/EnvironmentSecretMapping.md)
  - [EnvironmentSecretMappingMetadata](docs/EnvironmentSecretMappingMetadata.md)
  - [EnvironmentSecretMappingSpec](docs/EnvironmentSecretMappingSpec.md)
@@ -207,11 +215,22 @@ Class | Method | HTTP request | Description
  - [KafkaDatabaseStatus](docs/KafkaDatabaseStatus.md)
  - [KafkaDatabasesPage](docs/KafkaDatabasesPage.md)
  - [KafkaDatabasesPageAllOf](docs/KafkaDatabasesPageAllOf.md)
+ - [KubernetesCluster](docs/KubernetesCluster.md)
+ - [KubernetesClusterAllOf](docs/KubernetesClusterAllOf.md)
+ - [KubernetesClusterMetadata](docs/KubernetesClusterMetadata.md)
+ - [KubernetesClusterName](docs/KubernetesClusterName.md)
+ - [KubernetesClusterSpec](docs/KubernetesClusterSpec.md)
+ - [KubernetesClusterStatus](docs/KubernetesClusterStatus.md)
+ - [KubernetesClustersByStateSummary](docs/KubernetesClustersByStateSummary.md)
+ - [KubernetesClustersPage](docs/KubernetesClustersPage.md)
+ - [KubernetesClustersPageAllOf](docs/KubernetesClustersPageAllOf.md)
+ - [KubernetesClustersPageMetadata](docs/KubernetesClustersPageMetadata.md)
  - [KubernetesNamespace](docs/KubernetesNamespace.md)
  - [ModelError](docs/ModelError.md)
  - [Pageable](docs/Pageable.md)
  - [PaginationResponse](docs/PaginationResponse.md)
  - [PostEnvironment](docs/PostEnvironment.md)
+ - [PostEnvironmentAllOf](docs/PostEnvironmentAllOf.md)
  - [PostResourceBase](docs/PostResourceBase.md)
  - [ResourceBaseV2](docs/ResourceBaseV2.md)
  - [ResourceInformation](docs/ResourceInformation.md)
@@ -220,6 +239,7 @@ Class | Method | HTTP request | Description
  - [ResourceUsageSummary](docs/ResourceUsageSummary.md)
  - [ResourceWithFlinkApplicationDefaults](docs/ResourceWithFlinkApplicationDefaults.md)
  - [Resources](docs/Resources.md)
+ - [ResourcesByStatusAndTypeSummary](docs/ResourcesByStatusAndTypeSummary.md)
  - [RestError](docs/RestError.md)
  - [ResultSchema](docs/ResultSchema.md)
  - [ResultSchemaColumn](docs/ResultSchemaColumn.md)
@@ -257,6 +277,7 @@ Class | Method | HTTP request | Description
  - [StatementStartFromSavepoint](docs/StatementStartFromSavepoint.md)
  - [StatementStatus](docs/StatementStatus.md)
  - [StatementTraits](docs/StatementTraits.md)
+ - [StatementsByStatusSummary](docs/StatementsByStatusSummary.md)
  - [StatementsPage](docs/StatementsPage.md)
  - [StatementsPageAllOf](docs/StatementsPageAllOf.md)
  - [SystemInformation](docs/SystemInformation.md)

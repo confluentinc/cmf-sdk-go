@@ -477,6 +477,10 @@ type ApiGetSecretsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	filter *string
+	search *string
+	searchScope *string
+	fields *string
 }
 
 // Zero-based page index (0..N)
@@ -492,6 +496,26 @@ func (r ApiGetSecretsRequest) Size(size int32) ApiGetSecretsRequest {
 // Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
 func (r ApiGetSecretsRequest) Sort(sort []string) ApiGetSecretsRequest {
 	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiGetSecretsRequest) Filter(filter string) ApiGetSecretsRequest {
+	r.filter = &filter
+	return r
+}
+// Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace
+func (r ApiGetSecretsRequest) Search(search string) ApiGetSecretsRequest {
+	r.search = &search
+	return r
+}
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+func (r ApiGetSecretsRequest) SearchScope(searchScope string) ApiGetSecretsRequest {
+	r.searchScope = &searchScope
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetSecretsRequest) Fields(fields string) ApiGetSecretsRequest {
+	r.fields = &fields
 	return r
 }
 
@@ -551,6 +575,18 @@ func (a *SecretsApiService) GetSecretsExecute(r ApiGetSecretsRequest) (SecretsPa
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.search != nil {
+		localVarQueryParams.Add("search", parameterToString(*r.search, ""))
+	}
+	if r.searchScope != nil {
+		localVarQueryParams.Add("searchScope", parameterToString(*r.searchScope, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}

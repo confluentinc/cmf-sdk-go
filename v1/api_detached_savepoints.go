@@ -457,6 +457,8 @@ type ApiListDetachedSavepointsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	filter *string
+	fields *string
 	name *string
 }
 
@@ -475,7 +477,18 @@ func (r ApiListDetachedSavepointsRequest) Sort(sort []string) ApiListDetachedSav
 	r.sort = &sort
 	return r
 }
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiListDetachedSavepointsRequest) Filter(filter string) ApiListDetachedSavepointsRequest {
+	r.filter = &filter
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiListDetachedSavepointsRequest) Fields(fields string) ApiListDetachedSavepointsRequest {
+	r.fields = &fields
+	return r
+}
 // Filter by detached savepoint name prefix (e.g. ?name&#x3D;abc)
+// Deprecated
 func (r ApiListDetachedSavepointsRequest) Name(name string) ApiListDetachedSavepointsRequest {
 	r.name = &name
 	return r
@@ -537,6 +550,12 @@ func (a *DetachedSavepointsApiService) ListDetachedSavepointsExecute(r ApiListDe
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
 	}
 	if r.name != nil {
 		localVarQueryParams.Add("name", parameterToString(*r.name, ""))

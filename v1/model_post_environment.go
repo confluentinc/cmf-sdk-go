@@ -17,21 +17,23 @@ import (
 // PostEnvironment Environment
 type PostEnvironment struct {
 	// A unique name for the resource.
-	Name string `json:"name"`
+	// Deprecated
+	Name *string `json:"name,omitempty"`
 	FlinkApplicationDefaults *map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 	KubernetesNamespace *string `json:"kubernetesNamespace,omitempty"`
+	KubernetesClusterName *string `json:"kubernetesClusterName,omitempty"`
 	// the defaults as YAML or JSON for ComputePools
 	ComputePoolDefaults *map[string]interface{} `json:"computePoolDefaults,omitempty"`
 	StatementDefaults *AllStatementDefaults1 `json:"statementDefaults,omitempty"`
+	Metadata *EnvironmentMetadata `json:"metadata,omitempty"`
 }
 
 // NewPostEnvironment instantiates a new PostEnvironment object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPostEnvironment(name string) *PostEnvironment {
+func NewPostEnvironment() *PostEnvironment {
 	this := PostEnvironment{}
-	this.Name = name
 	return &this
 }
 
@@ -43,28 +45,39 @@ func NewPostEnvironmentWithDefaults() *PostEnvironment {
 	return &this
 }
 
-// GetName returns the Name field value
+// GetName returns the Name field value if set, zero value otherwise.
+// Deprecated
 func (o *PostEnvironment) GetName() string {
-	if o == nil {
+	if o == nil || o.Name == nil {
 		var ret string
 		return ret
 	}
-
-	return o.Name
+	return *o.Name
 }
 
-// GetNameOk returns a tuple with the Name field value
+// GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// Deprecated
 func (o *PostEnvironment) GetNameOk() (*string, bool) {
-	if o == nil  {
+	if o == nil || o.Name == nil {
 		return nil, false
 	}
-	return &o.Name, true
+	return o.Name, true
 }
 
-// SetName sets field value
+// HasName returns a boolean if a field has been set.
+func (o *PostEnvironment) HasName() bool {
+	if o != nil && o.Name != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetName gets a reference to the given string and assigns it to the Name field.
+// Deprecated
 func (o *PostEnvironment) SetName(v string) {
-	o.Name = v
+	o.Name = &v
 }
 
 // GetFlinkApplicationDefaults returns the FlinkApplicationDefaults field value if set, zero value otherwise.
@@ -131,6 +144,38 @@ func (o *PostEnvironment) SetKubernetesNamespace(v string) {
 	o.KubernetesNamespace = &v
 }
 
+// GetKubernetesClusterName returns the KubernetesClusterName field value if set, zero value otherwise.
+func (o *PostEnvironment) GetKubernetesClusterName() string {
+	if o == nil || o.KubernetesClusterName == nil {
+		var ret string
+		return ret
+	}
+	return *o.KubernetesClusterName
+}
+
+// GetKubernetesClusterNameOk returns a tuple with the KubernetesClusterName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PostEnvironment) GetKubernetesClusterNameOk() (*string, bool) {
+	if o == nil || o.KubernetesClusterName == nil {
+		return nil, false
+	}
+	return o.KubernetesClusterName, true
+}
+
+// HasKubernetesClusterName returns a boolean if a field has been set.
+func (o *PostEnvironment) HasKubernetesClusterName() bool {
+	if o != nil && o.KubernetesClusterName != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetKubernetesClusterName gets a reference to the given string and assigns it to the KubernetesClusterName field.
+func (o *PostEnvironment) SetKubernetesClusterName(v string) {
+	o.KubernetesClusterName = &v
+}
+
 // GetComputePoolDefaults returns the ComputePoolDefaults field value if set, zero value otherwise.
 func (o *PostEnvironment) GetComputePoolDefaults() map[string]interface{} {
 	if o == nil || o.ComputePoolDefaults == nil {
@@ -195,9 +240,41 @@ func (o *PostEnvironment) SetStatementDefaults(v AllStatementDefaults1) {
 	o.StatementDefaults = &v
 }
 
+// GetMetadata returns the Metadata field value if set, zero value otherwise.
+func (o *PostEnvironment) GetMetadata() EnvironmentMetadata {
+	if o == nil || o.Metadata == nil {
+		var ret EnvironmentMetadata
+		return ret
+	}
+	return *o.Metadata
+}
+
+// GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PostEnvironment) GetMetadataOk() (*EnvironmentMetadata, bool) {
+	if o == nil || o.Metadata == nil {
+		return nil, false
+	}
+	return o.Metadata, true
+}
+
+// HasMetadata returns a boolean if a field has been set.
+func (o *PostEnvironment) HasMetadata() bool {
+	if o != nil && o.Metadata != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetMetadata gets a reference to the given EnvironmentMetadata and assigns it to the Metadata field.
+func (o *PostEnvironment) SetMetadata(v EnvironmentMetadata) {
+	o.Metadata = &v
+}
+
 func (o PostEnvironment) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if true {
+	if o.Name != nil {
 		toSerialize["name"] = o.Name
 	}
 	if o.FlinkApplicationDefaults != nil {
@@ -206,11 +283,17 @@ func (o PostEnvironment) MarshalJSON() ([]byte, error) {
 	if o.KubernetesNamespace != nil {
 		toSerialize["kubernetesNamespace"] = o.KubernetesNamespace
 	}
+	if o.KubernetesClusterName != nil {
+		toSerialize["kubernetesClusterName"] = o.KubernetesClusterName
+	}
 	if o.ComputePoolDefaults != nil {
 		toSerialize["computePoolDefaults"] = o.ComputePoolDefaults
 	}
 	if o.StatementDefaults != nil {
 		toSerialize["statementDefaults"] = o.StatementDefaults
+	}
+	if o.Metadata != nil {
+		toSerialize["metadata"] = o.Metadata
 	}
 	return json.Marshal(toSerialize)
 }

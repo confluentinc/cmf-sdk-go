@@ -303,8 +303,14 @@ type ApiDeleteApplicationRequest struct {
 	ApiService FlinkApplicationsApi
 	envName string
 	appName string
+	force *bool
 }
 
+// If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity.
+func (r ApiDeleteApplicationRequest) Force(force bool) ApiDeleteApplicationRequest {
+	r.force = &force
+	return r
+}
 
 func (r ApiDeleteApplicationRequest) Execute() (*_nethttp.Response, error) {
 	return r.ApiService.DeleteApplicationExecute(r)
@@ -350,6 +356,9 @@ func (a *FlinkApplicationsApiService) DeleteApplicationExecute(r ApiDeleteApplic
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.force != nil {
+		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -548,6 +557,10 @@ type ApiGetApplicationEventsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	filter *string
+	search *string
+	searchScope *string
+	fields *string
 }
 
 // Zero-based page index (0..N)
@@ -563,6 +576,26 @@ func (r ApiGetApplicationEventsRequest) Size(size int32) ApiGetApplicationEvents
 // Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
 func (r ApiGetApplicationEventsRequest) Sort(sort []string) ApiGetApplicationEventsRequest {
 	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiGetApplicationEventsRequest) Filter(filter string) ApiGetApplicationEventsRequest {
+	r.filter = &filter
+	return r
+}
+// Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace
+func (r ApiGetApplicationEventsRequest) Search(search string) ApiGetApplicationEventsRequest {
+	r.search = &search
+	return r
+}
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+func (r ApiGetApplicationEventsRequest) SearchScope(searchScope string) ApiGetApplicationEventsRequest {
+	r.searchScope = &searchScope
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetApplicationEventsRequest) Fields(fields string) ApiGetApplicationEventsRequest {
+	r.fields = &fields
 	return r
 }
 
@@ -628,6 +661,18 @@ func (a *FlinkApplicationsApiService) GetApplicationEventsExecute(r ApiGetApplic
 		} else {
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.search != nil {
+		localVarQueryParams.Add("search", parameterToString(*r.search, ""))
+	}
+	if r.searchScope != nil {
+		localVarQueryParams.Add("searchScope", parameterToString(*r.searchScope, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1003,6 +1048,8 @@ type ApiGetApplicationsRequest struct {
 	size *int32
 	sort *[]string
 	includeResourceInformation *bool
+	filter *string
+	fields *string
 }
 
 // Zero-based page index (0..N)
@@ -1015,7 +1062,7 @@ func (r ApiGetApplicationsRequest) Size(size int32) ApiGetApplicationsRequest {
 	r.size = &size
 	return r
 }
-// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Supported properties: name, metadata.name, creationTimestamp, metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note: updateTimestamp sorts by the most recent spec update time. The displayed metadata.updateTimestamp may differ as it reflects the latest of spec or status changes.
 func (r ApiGetApplicationsRequest) Sort(sort []string) ApiGetApplicationsRequest {
 	r.sort = &sort
 	return r
@@ -1023,6 +1070,16 @@ func (r ApiGetApplicationsRequest) Sort(sort []string) ApiGetApplicationsRequest
 // Whether to include resource summary in the response.
 func (r ApiGetApplicationsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetApplicationsRequest {
 	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiGetApplicationsRequest) Filter(filter string) ApiGetApplicationsRequest {
+	r.filter = &filter
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetApplicationsRequest) Fields(fields string) ApiGetApplicationsRequest {
+	r.fields = &fields
 	return r
 }
 
@@ -1088,6 +1145,12 @@ func (a *FlinkApplicationsApiService) GetApplicationsExecute(r ApiGetApplication
 	}
 	if r.includeResourceInformation != nil {
 		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1170,7 +1233,7 @@ type ApiStartApplicationRequest struct {
 	startFromSavepointUid *string
 }
 
-// UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a deatched savepoint.
+// UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a detached savepoint.
 func (r ApiStartApplicationRequest) StartFromSavepointUid(startFromSavepointUid string) ApiStartApplicationRequest {
 	r.startFromSavepointUid = &startFromSavepointUid
 	return r
