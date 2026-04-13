@@ -20,6 +20,8 @@ type ComputePoolMetadata struct {
 	Name string `json:"name"`
 	// Timestamp when the ComputePool was created
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
+	// Timestamp when the ComputePool was last updated
+	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
 	// Unique identifier of the ComputePool
 	Uid *string `json:"uid,omitempty"`
 	// Labels of the ComputePool
@@ -100,6 +102,38 @@ func (o *ComputePoolMetadata) HasCreationTimestamp() bool {
 // SetCreationTimestamp gets a reference to the given string and assigns it to the CreationTimestamp field.
 func (o *ComputePoolMetadata) SetCreationTimestamp(v string) {
 	o.CreationTimestamp = &v
+}
+
+// GetUpdateTimestamp returns the UpdateTimestamp field value if set, zero value otherwise.
+func (o *ComputePoolMetadata) GetUpdateTimestamp() string {
+	if o == nil || o.UpdateTimestamp == nil {
+		var ret string
+		return ret
+	}
+	return *o.UpdateTimestamp
+}
+
+// GetUpdateTimestampOk returns a tuple with the UpdateTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ComputePoolMetadata) GetUpdateTimestampOk() (*string, bool) {
+	if o == nil || o.UpdateTimestamp == nil {
+		return nil, false
+	}
+	return o.UpdateTimestamp, true
+}
+
+// HasUpdateTimestamp returns a boolean if a field has been set.
+func (o *ComputePoolMetadata) HasUpdateTimestamp() bool {
+	if o != nil && o.UpdateTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUpdateTimestamp gets a reference to the given string and assigns it to the UpdateTimestamp field.
+func (o *ComputePoolMetadata) SetUpdateTimestamp(v string) {
+	o.UpdateTimestamp = &v
 }
 
 // GetUid returns the Uid field value if set, zero value otherwise.
@@ -205,6 +239,9 @@ func (o ComputePoolMetadata) MarshalJSON() ([]byte, error) {
 	}
 	if o.CreationTimestamp != nil {
 		toSerialize["creationTimestamp"] = o.CreationTimestamp
+	}
+	if o.UpdateTimestamp != nil {
+		toSerialize["updateTimestamp"] = o.UpdateTimestamp
 	}
 	if o.Uid != nil {
 		toSerialize["uid"] = o.Uid

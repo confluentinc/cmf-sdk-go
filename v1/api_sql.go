@@ -264,6 +264,20 @@ type SQLApi interface {
 	GetStatementsExecute(r ApiGetStatementsRequest) (StatementsPage, *_nethttp.Response, error)
 
 	/*
+	UpdateComputePool Updates a Compute Pool of the given name in the given Environment.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param computePoolName Name of the Compute Pool
+	 @return ApiUpdateComputePoolRequest
+	*/
+	UpdateComputePool(ctx _context.Context, envName string, computePoolName string) ApiUpdateComputePoolRequest
+
+	// UpdateComputePoolExecute executes the request
+	//  @return ComputePool
+	UpdateComputePoolExecute(r ApiUpdateComputePoolRequest) (ComputePool, *_nethttp.Response, error)
+
+	/*
 	UpdateKafkaCatalog Updates a KafkaCatalog of the given name.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -928,8 +942,14 @@ type ApiDeleteComputePoolRequest struct {
 	ApiService SQLApi
 	envName string
 	computePoolName string
+	force *bool
 }
 
+// If true, deletes the ComputePool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment may be orphaned. Has no additional effect on dedicated compute pools, which are always metadata-only.
+func (r ApiDeleteComputePoolRequest) Force(force bool) ApiDeleteComputePoolRequest {
+	r.force = &force
+	return r
+}
 
 func (r ApiDeleteComputePoolRequest) Execute() (*_nethttp.Response, error) {
 	return r.ApiService.DeleteComputePoolExecute(r)
@@ -975,6 +995,9 @@ func (a *SQLApiService) DeleteComputePoolExecute(r ApiDeleteComputePoolRequest) 
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.force != nil {
+		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1292,8 +1315,14 @@ type ApiDeleteStatementRequest struct {
 	ApiService SQLApi
 	envName string
 	stmtName string
+	force *bool
 }
 
+// If true, deletes the Statement from CMF metadata only, without requiring Kubernetes cluster connectivity.
+func (r ApiDeleteStatementRequest) Force(force bool) ApiDeleteStatementRequest {
+	r.force = &force
+	return r
+}
 
 func (r ApiDeleteStatementRequest) Execute() (*_nethttp.Response, error) {
 	return r.ApiService.DeleteStatementExecute(r)
@@ -1339,6 +1368,9 @@ func (a *SQLApiService) DeleteStatementExecute(r ApiDeleteStatementRequest) (*_n
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if r.force != nil {
+		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1546,7 +1578,9 @@ type ApiGetComputePoolsRequest struct {
 	page *int32
 	size *int32
 	sort *[]string
+	filter *string
 	includeResourceInformation *bool
+	fields *string
 }
 
 // Zero-based page index (0..N)
@@ -1564,9 +1598,19 @@ func (r ApiGetComputePoolsRequest) Sort(sort []string) ApiGetComputePoolsRequest
 	r.sort = &sort
 	return r
 }
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiGetComputePoolsRequest) Filter(filter string) ApiGetComputePoolsRequest {
+	r.filter = &filter
+	return r
+}
 // Whether to include resource summary in the response.
 func (r ApiGetComputePoolsRequest) IncludeResourceInformation(includeResourceInformation bool) ApiGetComputePoolsRequest {
 	r.includeResourceInformation = &includeResourceInformation
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetComputePoolsRequest) Fields(fields string) ApiGetComputePoolsRequest {
+	r.fields = &fields
 	return r
 }
 
@@ -1630,8 +1674,14 @@ func (a *SQLApiService) GetComputePoolsExecute(r ApiGetComputePoolsRequest) (Com
 			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
 		}
 	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
 	if r.includeResourceInformation != nil {
 		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2677,6 +2727,10 @@ type ApiGetStatementsRequest struct {
 	computePool *string
 	phase *string
 	includeResourceInformation *bool
+	filter *string
+	search *string
+	searchScope *string
+	fields *string
 	name *string
 }
 
@@ -2710,7 +2764,28 @@ func (r ApiGetStatementsRequest) IncludeResourceInformation(includeResourceInfor
 	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
-// Wildcard filter by statement name (e.g. ?name&#x3D;abc)
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+func (r ApiGetStatementsRequest) Filter(filter string) ApiGetStatementsRequest {
+	r.filter = &filter
+	return r
+}
+// Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace
+func (r ApiGetStatementsRequest) Search(search string) ApiGetStatementsRequest {
+	r.search = &search
+	return r
+}
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+func (r ApiGetStatementsRequest) SearchScope(searchScope string) ApiGetStatementsRequest {
+	r.searchScope = &searchScope
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetStatementsRequest) Fields(fields string) ApiGetStatementsRequest {
+	r.fields = &fields
+	return r
+}
+// Wildcard filter by statement name (e.g. ?name&#x3D;abc). Deprecated: use filter parameter instead.
+// Deprecated
 func (r ApiGetStatementsRequest) Name(name string) ApiGetStatementsRequest {
 	r.name = &name
 	return r
@@ -2785,6 +2860,18 @@ func (a *SQLApiService) GetStatementsExecute(r ApiGetStatementsRequest) (Stateme
 	if r.includeResourceInformation != nil {
 		localVarQueryParams.Add("include-resource-information", parameterToString(*r.includeResourceInformation, ""))
 	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.search != nil {
+		localVarQueryParams.Add("search", parameterToString(*r.search, ""))
+	}
+	if r.searchScope != nil {
+		localVarQueryParams.Add("searchScope", parameterToString(*r.searchScope, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
+	}
 	if r.name != nil {
 		localVarQueryParams.Add("name", parameterToString(*r.name, ""))
 	}
@@ -2828,6 +2915,173 @@ func (a *SQLApiService) GetStatementsExecute(r ApiGetStatementsRequest) (Stateme
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateComputePoolRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	computePoolName string
+	computePool *ComputePool
+}
+
+func (r ApiUpdateComputePoolRequest) ComputePool(computePool ComputePool) ApiUpdateComputePoolRequest {
+	r.computePool = &computePool
+	return r
+}
+
+func (r ApiUpdateComputePoolRequest) Execute() (ComputePool, *_nethttp.Response, error) {
+	return r.ApiService.UpdateComputePoolExecute(r)
+}
+
+/*
+UpdateComputePool Updates a Compute Pool of the given name in the given Environment.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param computePoolName Name of the Compute Pool
+ @return ApiUpdateComputePoolRequest
+*/
+func (a *SQLApiService) UpdateComputePool(ctx _context.Context, envName string, computePoolName string) ApiUpdateComputePoolRequest {
+	return ApiUpdateComputePoolRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		computePoolName: computePoolName,
+	}
+}
+
+// Execute executes the request
+//  @return ComputePool
+func (a *SQLApiService) UpdateComputePoolExecute(r ApiUpdateComputePoolRequest) (ComputePool, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  ComputePool
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.UpdateComputePool")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"computePoolName"+"}", _neturl.PathEscape(parameterToString(r.computePoolName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.computePool == nil {
+		return localVarReturnValue, nil, reportError("computePool is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "application/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.computePool
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 422 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

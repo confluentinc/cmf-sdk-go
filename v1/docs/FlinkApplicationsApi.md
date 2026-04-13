@@ -35,7 +35,7 @@ import (
 )
 
 func main() {
-    envName := "envName_example" // string | Name of the Environment
+    envName := "production" // string | Name of the Environment
     flinkApplication := *openapiclient.NewFlinkApplication("ApiVersion_example", "Kind_example", map[string]interface{}(123), map[string]interface{}(123)) // FlinkApplication | 
 
     configuration := openapiclient.NewConfiguration()
@@ -88,7 +88,7 @@ No authorization required
 
 ## DeleteApplication
 
-> DeleteApplication(ctx, envName, appName).Execute()
+> DeleteApplication(ctx, envName, appName).Force(force).Execute()
 
 Deletes an Application of the given name in the given Environment.
 
@@ -107,10 +107,11 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     appName := "appName_example" // string | Name of the Application
+    force := true // bool | If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.FlinkApplicationsApi.DeleteApplication(context.Background(), envName, appName).Execute()
+    resp, r, err := api_client.FlinkApplicationsApi.DeleteApplication(context.Background(), envName, appName).Force(force).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `FlinkApplicationsApi.DeleteApplication``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -136,6 +137,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
+ **force** | **bool** | If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity. | [default to false]
 
 ### Return type
 
@@ -230,7 +232,7 @@ No authorization required
 
 ## GetApplicationEvents
 
-> EventsPage GetApplicationEvents(ctx, envName, appName).Page(page).Size(size).Sort(sort).Execute()
+> EventsPage GetApplicationEvents(ctx, envName, appName).Page(page).Size(size).Sort(sort).Filter(filter).Search(search).SearchScope(searchScope).Fields(fields).Execute()
 
 Get a paginated list of events of the given Application
 
@@ -252,10 +254,14 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
+    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) (optional)
+    search := "search_example" // string | Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace (optional)
+    searchScope := "searchScope_example" // string | Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING) (optional)
+    fields := "fields_example" // string | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase (optional)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.FlinkApplicationsApi.GetApplicationEvents(context.Background(), envName, appName).Page(page).Size(size).Sort(sort).Execute()
+    resp, r, err := api_client.FlinkApplicationsApi.GetApplicationEvents(context.Background(), envName, appName).Page(page).Size(size).Sort(sort).Filter(filter).Search(search).SearchScope(searchScope).Fields(fields).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `FlinkApplicationsApi.GetApplicationEvents``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -286,6 +292,10 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
+ **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) | 
+ **search** | **string** | Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace | 
+ **searchScope** | **string** | Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING) | 
+ **fields** | **string** | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase | 
 
 ### Return type
 
@@ -458,7 +468,7 @@ No authorization required
 
 ## GetApplications
 
-> ApplicationsPage GetApplications(ctx, envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
+> ApplicationsPage GetApplications(ctx, envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Filter(filter).Fields(fields).Execute()
 
 Retrieve a paginated list of all applications in the given Environment.
 
@@ -478,12 +488,14 @@ func main() {
     envName := "envName_example" // string | Name of the Environment
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
-    sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
+    sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Supported properties: name, metadata.name, creationTimestamp, metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note: updateTimestamp sorts by the most recent spec update time. The displayed metadata.updateTimestamp may differ as it reflects the latest of spec or status changes. (optional)
     includeResourceInformation := true // bool | Whether to include resource summary in the response. (optional) (default to false)
+    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) (optional)
+    fields := "fields_example" // string | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase (optional)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
-    resp, r, err := api_client.FlinkApplicationsApi.GetApplications(context.Background(), envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Execute()
+    resp, r, err := api_client.FlinkApplicationsApi.GetApplications(context.Background(), envName).Page(page).Size(size).Sort(sort).IncludeResourceInformation(includeResourceInformation).Filter(filter).Fields(fields).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `FlinkApplicationsApi.GetApplications``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -511,8 +523,10 @@ Name | Type | Description  | Notes
 
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
- **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
+ **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Supported properties: name, metadata.name, creationTimestamp, metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note: updateTimestamp sorts by the most recent spec update time. The displayed metadata.updateTimestamp may differ as it reflects the latest of spec or status changes. | 
  **includeResourceInformation** | **bool** | Whether to include resource summary in the response. | [default to false]
+ **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) | 
+ **fields** | **string** | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase | 
 
 ### Return type
 
@@ -553,7 +567,7 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     appName := "appName_example" // string | Name of the Application
-    startFromSavepointUid := "startFromSavepointUid_example" // string | UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a deatched savepoint. (optional)
+    startFromSavepointUid := "startFromSavepointUid_example" // string | UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a detached savepoint. (optional)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -585,7 +599,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **startFromSavepointUid** | **string** | UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a deatched savepoint. | 
+ **startFromSavepointUid** | **string** | UID of the Savepoint from which the application should be started. This savepoint could belong to the application or can be a detached savepoint. | 
 
 ### Return type
 

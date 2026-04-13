@@ -6,11 +6,13 @@ info:
 servers:
 - url: http://localhost:8080
 tags:
+- name: C3
 - name: Environments
 - name: FlinkApplications
 - name: Secrets
 - name: SQL
 - name: Savepoints
+- name: KubernetesClusters
 paths:
   /cmf/api/v1/environments:
     get:
@@ -52,6 +54,65 @@ paths:
           default: false
           type: boolean
         style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one
+          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of fields to search in. Must be provided
+          together with the search parameter. Unsupported field names will result
+          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement. For Events: supported
+          fields are message, flinkApplicationInstance. For Secrets: supported fields
+          are name, environments. When multiple fields are specified, the search uses
+          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
+          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
+          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
+          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
+          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+        explode: true
+        in: query
+        name: searchScope
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
@@ -92,16 +153,102 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              basic-environment:
+                summary: Basic Environment
+                value:
+                  name: production
+                  kubernetesNamespace: flink-production
+                  flinkApplicationDefaults:
+                    spec:
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "4"
+                        rest.profiling.enabled: "true"
+                      jobManager:
+                        resource:
+                          memory: 1024m
+                          cpu: 1
+                      taskManager:
+                        resource:
+                          memory: 1024m
+                          cpu: 1
+                  computePoolDefaults:
+                    clusterSpec:
+                      flinkVersion: v1_19
+                      image: confluentinc/cp-flink-sql:1.19-cp5
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "4"
+                  statementDefaults:
+                    detached:
+                      flinkConfiguration:
+                        state.backend.type: hashmap
+                    interactive:
+                      flinkConfiguration:
+                        state.backend.type: hashmap
             schema:
               $ref: '#/components/schemas/PostEnvironment'
           application/yaml:
+            examples:
+              basic-environment-yaml:
+                summary: Basic Environment (YAML)
+                value:
+                  name: staging
+                  kubernetesNamespace: flink-staging
+                  flinkApplicationDefaults:
+                    spec:
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "2"
+                        rest.profiling.enabled: "true"
+                      jobManager:
+                        resource:
+                          memory: 1024m
+                          cpu: 1
+                      taskManager:
+                        resource:
+                          memory: 1024m
+                          cpu: 1
             schema:
               $ref: '#/components/schemas/PostEnvironment'
         required: true
       responses:
-        "201":
+        "200":
           content:
             application/json:
+              examples:
+                created-environment:
+                  summary: Created Environment
+                  value:
+                    name: production
+                    kubernetesNamespace: flink-production
+                    created_time: 2024-01-15T10:30:00Z
+                    updated_time: 2024-01-15T10:30:00Z
+                    flinkApplicationDefaults:
+                      spec:
+                        flinkConfiguration:
+                          taskmanager.numberOfTaskSlots: "4"
+                          rest.profiling.enabled: "true"
+                        jobManager:
+                          resource:
+                            memory: 1024m
+                            cpu: 1
+                        taskManager:
+                          resource:
+                            memory: 1024m
+                            cpu: 1
+                    computePoolDefaults:
+                      clusterSpec:
+                        flinkVersion: v1_19
+                        image: confluentinc/cp-flink-sql:1.19-cp5
+                        flinkConfiguration:
+                          taskmanager.numberOfTaskSlots: "4"
+                    statementDefaults:
+                      detached:
+                        flinkConfiguration:
+                          state.backend.type: hashmap
+                      interactive:
+                        flinkConfiguration:
+                          state.backend.type: hashmap
+                    secrets: {}
               schema:
                 $ref: '#/components/schemas/Environment'
             application/yaml:
@@ -111,6 +258,15 @@ paths:
         "400":
           content:
             application/json:
+              examples:
+                validation-error:
+                  summary: Validation Error
+                  value:
+                    errors:
+                    - message: 'name: size must be between 4 and 2147483647'
+                    - message: Environment's kubernetesNamespace 'fl' does not exist.
+                    - message: Environment's kubernetesClusterName 'nonexistent' does
+                        not exist.
               schema:
                 $ref: '#/components/schemas/RestError'
             application/yaml:
@@ -141,8 +297,19 @@ paths:
         schema:
           type: string
         style: simple
+      - description: If true, deletes the Environment from CMF metadata only, without
+          requiring Kubernetes cluster connectivity. Kubernetes resources (service
+          account, secret) may be orphaned.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
-        "200":
+        "204":
           description: Environment found and deleted.
         "304":
           description: Not modified.
@@ -238,7 +405,11 @@ paths:
           type: integer
         style: form
       - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+          sort order is ascending. Supported properties: name, metadata.name, creationTimestamp,
+          metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note:
+          updateTimestamp sorts by the most recent spec update time. The displayed
+          metadata.updateTimestamp may differ as it reflects the latest of spec or
+          status changes.'
         explode: true
         in: query
         name: sort
@@ -256,6 +427,37 @@ paths:
         schema:
           default: false
           type: boolean
+        style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
         style: form
       - description: Name of the Environment
         explode: false
@@ -310,6 +512,7 @@ paths:
       operationId: createOrUpdateApplication
       parameters:
       - description: Name of the Environment
+        example: production
         explode: false
         in: path
         name: envName
@@ -320,9 +523,75 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              basic-application:
+                summary: Basic Flink Application
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: FlinkApplication
+                  metadata:
+                    name: state-machine
+                    labels:
+                      app: state-machine
+                      environment: production
+                    annotations:
+                      description: Real-time fraud detection application
+                  spec:
+                    image: confluentinc/cp-flink:1.19.3-cp2
+                    flinkVersion: v1_19
+                    flinkConfiguration:
+                      taskmanager.numberOfTaskSlots: "2"
+                      metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+                      metrics.reporter.prom.port: 9249-9250
+                    serviceAccount: flink
+                    jobManager:
+                      resource:
+                        memory: 1024m
+                        cpu: 1
+                    taskManager:
+                      resource:
+                        memory: 1024m
+                        cpu: 1
+                    job:
+                      jarURI: local:///opt/flink/examples/streaming/StateMachineExample.jar
+                      state: running
+                      parallelism: 2
+                      upgradeMode: stateless
             schema:
               $ref: '#/components/schemas/FlinkApplication'
           application/yaml:
+            examples:
+              yaml-application:
+                summary: Flink Application (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: FlinkApplication
+                  metadata:
+                    name: news-aggregator
+                    labels:
+                      app: news-aggregator
+                      environment: staging
+                  spec:
+                    image: confluentinc/cp-flink:1.19.3-cp2
+                    flinkVersion: v1_19
+                    flinkConfiguration:
+                      taskmanager.numberOfTaskSlots: "4"
+                      metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+                      metrics.reporter.prom.port: 9249-9250
+                    serviceAccount: flink
+                    jobManager:
+                      resource:
+                        memory: 1024m
+                        cpu: 1
+                    taskManager:
+                      resource:
+                        memory: 1024m
+                        cpu: 1
+                    job:
+                      jarURI: local:///opt/flink/examples/streaming/WordCount.jar
+                      state: running
+                      parallelism: 4
+                      upgradeMode: stateless
             schema:
               $ref: '#/components/schemas/FlinkApplication'
         required: true
@@ -387,8 +656,18 @@ paths:
         schema:
           type: string
         style: simple
+      - description: If true, deletes the Application from CMF metadata only, without
+          requiring Kubernetes cluster connectivity.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
-        "200":
+        "204":
           description: Application found and deleted.
         "304":
           description: Not modified.
@@ -503,6 +782,65 @@ paths:
             type: string
           type: array
         style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one
+          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of fields to search in. Must be provided
+          together with the search parameter. Unsupported field names will result
+          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement. For Events: supported
+          fields are message, flinkApplicationInstance. For Secrets: supported fields
+          are name, environments. When multiple fields are specified, the search uses
+          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
+          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
+          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
+          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
+          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+        explode: true
+        in: query
+        name: searchScope
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
       - description: Name of the Environment
         explode: false
         in: path
@@ -572,7 +910,7 @@ paths:
           type: string
         style: simple
       - description: UID of the Savepoint from which the application should be started.
-          This savepoint could belong to the application or can be a deatched savepoint.
+          This savepoint could belong to the application or can be a detached savepoint.
         explode: true
         in: query
         name: startFromSavepointUid
@@ -1165,6 +1503,65 @@ paths:
           default: false
           type: boolean
         style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one
+          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of fields to search in. Must be provided
+          together with the search parameter. Unsupported field names will result
+          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement. For Events: supported
+          fields are message, flinkApplicationInstance. For Secrets: supported fields
+          are name, environments. When multiple fields are specified, the search uses
+          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
+          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
+          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
+          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
+          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+        explode: true
+        in: query
+        name: searchScope
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
       - description: Name of the Environment
         explode: false
         in: path
@@ -1173,7 +1570,9 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Wildcard filter by statement name (e.g. ?name=abc)
+      - deprecated: true
+        description: 'Wildcard filter by statement name (e.g. ?name=abc). Deprecated:
+          use filter parameter instead.'
         explode: true
         in: query
         name: name
@@ -1227,9 +1626,49 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              basic-statement:
+                summary: Basic SQL Statement
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: Statement
+                  metadata:
+                    name: test-stmt
+                    labels:
+                      app: data-processing
+                      environment: production
+                    annotations:
+                      description: Test SQL statement for data processing
+                  spec:
+                    statement: INSERT INTO blackhole SELECT click_id FROM clicks;
+                    computePoolName: test-pool
+                    parallelism: 2
+                    stopped: false
+                    flinkConfiguration:
+                      state.backend.type: hashmap
+                      execution.checkpointing.interval: "2000"
             schema:
               $ref: '#/components/schemas/Statement'
           application/yaml:
+            examples:
+              yaml-statement:
+                summary: Statement (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: Statement
+                  metadata:
+                    name: data-streaming
+                    labels:
+                      app: streaming
+                      environment: staging
+                  spec:
+                    statement: INSERT INTO blackhole SELECT click_id FROM clicks;
+                    computePoolName: streaming-pool
+                    parallelism: 2
+                    stopped: false
+                    flinkConfiguration:
+                      state.backend.type: hashmap
+                      execution.checkpointing.interval: "2000"
             schema:
               $ref: '#/components/schemas/Statement'
         required: true
@@ -1311,6 +1750,16 @@ paths:
         schema:
           type: string
         style: simple
+      - description: If true, deletes the Statement from CMF metadata only, without
+          requiring Kubernetes cluster connectivity.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "204":
           description: Statement was found and deleted.
@@ -1400,6 +1849,7 @@ paths:
       operationId: updateStatement
       parameters:
       - description: Name of the Environment
+        example: production
         explode: false
         in: path
         name: envName
@@ -1627,6 +2077,27 @@ paths:
             type: string
           type: array
         style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
       - description: Whether to include resource summary in the response.
         explode: true
         in: query
@@ -1635,6 +2106,16 @@ paths:
         schema:
           default: false
           type: boolean
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
         style: form
       - description: Name of the Environment
         explode: false
@@ -1680,6 +2161,7 @@ paths:
       operationId: createComputePool
       parameters:
       - description: Name of the Environment
+        example: production
         explode: false
         in: path
         name: envName
@@ -1690,9 +2172,107 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              dedicated-compute-pool:
+                summary: Dedicated Compute Pool
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: ComputePool
+                  metadata:
+                    name: test-pool
+                    labels:
+                      environment: production
+                    annotations:
+                      description: Standard compute pool for production workloads
+                  spec:
+                    type: DEDICATED
+                    clusterSpec:
+                      flinkVersion: v1_19
+                      image: confluentinc/cp-flink-sql:1.19-cp5
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "1"
+                      taskManager:
+                        resource:
+                          cpu: 0.5
+                          memory: 1024m
+                      jobManager:
+                        resource:
+                          cpu: 0.5
+                          memory: 1024m
+              shared-compute-pool:
+                summary: Shared Compute Pool
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: ComputePool
+                  metadata:
+                    name: shared-pool-1
+                  spec:
+                    type: SHARED
+                    state: RUNNING
+                    clusterSpec:
+                      flinkVersion: v1_19
+                      image: confluentinc/cp-flink-sql:1.19-cp5
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "2"
+                      taskManager:
+                        resource:
+                          cpu: 1
+                          memory: 2048m
+                      jobManager:
+                        resource:
+                          cpu: 1
+                          memory: 2048m
             schema:
               $ref: '#/components/schemas/ComputePool'
           application/yaml:
+            examples:
+              yaml-dedicated-compute-pool:
+                summary: Dedicated Compute Pool (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: ComputePool
+                  metadata:
+                    name: staging-pool
+                    labels:
+                      environment: staging
+                  spec:
+                    type: DEDICATED
+                    clusterSpec:
+                      flinkVersion: v1_19
+                      image: confluentinc/cp-flink-sql:1.19-cp5
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "2"
+                      taskManager:
+                        resource:
+                          cpu: 1
+                          memory: 1024m
+                      jobManager:
+                        resource:
+                          cpu: 1
+                          memory: 1024m
+              yaml-shared-compute-pool:
+                summary: Shared Compute Pool (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: ComputePool
+                  metadata:
+                    name: shared-pool-1
+                  spec:
+                    type: SHARED
+                    state: RUNNING
+                    clusterSpec:
+                      flinkVersion: v1_19
+                      image: confluentinc/cp-flink-sql:1.19-cp5
+                      flinkConfiguration:
+                        taskmanager.numberOfTaskSlots: "2"
+                      taskManager:
+                        resource:
+                          cpu: 1
+                          memory: 2048m
+                      jobManager:
+                        resource:
+                          cpu: 1
+                          memory: 2048m
             schema:
               $ref: '#/components/schemas/ComputePool'
         required: true
@@ -1765,6 +2345,18 @@ paths:
         schema:
           type: string
         style: simple
+      - description: If true, deletes the ComputePool from CMF metadata only, without
+          requiring Kubernetes cluster connectivity. For shared compute pools, the
+          session cluster FlinkDeployment may be orphaned. Has no additional effect
+          on dedicated compute pools, which are always metadata-only.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
       responses:
         "204":
           description: Compute Pool was found and deleted.
@@ -1857,6 +2449,92 @@ paths:
       summary: Retrieve the Compute Pool of the given name in the given Environment.
       tags:
       - SQL
+    put:
+      operationId: updateComputePool
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Compute Pool
+        explode: false
+        in: path
+        name: computePoolName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputePool'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/ComputePool'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputePool'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ComputePool'
+          description: Compute Pool was found and updated.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Compute Pool not found.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Compute Pool cannot be updated (e.g., statements running).
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Request valid but invalid content.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Updates a Compute Pool of the given name in the given Environment.
+      tags:
+      - SQL
   /cmf/api/v1/secrets:
     get:
       operationId: getSecrets
@@ -1887,6 +2565,65 @@ paths:
           items:
             type: string
           type: array
+        style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one
+          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of fields to search in. Must be provided
+          together with the search parameter. Unsupported field names will result
+          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement. For Events: supported
+          fields are message, flinkApplicationInstance. For Secrets: supported fields
+          are name, environments. When multiple fields are specified, the search uses
+          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
+          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
+          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
+          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
+          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+        explode: true
+        in: query
+        name: searchScope
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
         style: form
       responses:
         "200":
@@ -2184,9 +2921,42 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              basic-kafka-catalog:
+                summary: Basic Kafka Catalog
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: KafkaCatalog
+                  metadata:
+                    name: test-cat
+                    labels:
+                      environment: production
+                      managedBy: CMF
+                    annotations:
+                      description: Production Kafka catalog for Flink statements
+                  spec:
+                    srInstance:
+                      connectionConfig:
+                        schema.registry.url: https://schema-registry.example.com
+                      connectionSecretId: sr-secret-id
             schema:
               $ref: '#/components/schemas/KafkaCatalog'
           application/yaml:
+            examples:
+              yaml-kafka-catalog:
+                summary: Kafka Catalog (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: KafkaCatalog
+                  metadata:
+                    name: staging-catalog
+                    labels:
+                      environment: staging
+                  spec:
+                    srInstance:
+                      connectionConfig:
+                        schema.registry.url: https://sr-staging.example.com
+                      connectionSecretId: sr-staging-secret
             schema:
               $ref: '#/components/schemas/KafkaCatalog'
         required: true
@@ -2464,9 +3234,49 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              basic-kafka-database:
+                summary: Basic Kafka Database
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: KafkaDatabase
+                  metadata:
+                    name: dev
+                    labels:
+                      environment: production
+                      managedBy: CMF
+                    annotations:
+                      description: Development Kafka database
+                  spec:
+                    kafkaCluster:
+                      connectionConfig:
+                        bootstrap.servers: kafka-dev.example.com:9092
+                        security.protocol: SASL_PLAINTEXT
+                        sasl.mechanism: PLAIN
+                      connectionSecretId: dev-secret-id
+                    ddlEnvironments:
+                    - production
             schema:
               $ref: '#/components/schemas/KafkaDatabase'
           application/yaml:
+            examples:
+              yaml-kafka-database:
+                summary: Kafka Database (YAML)
+                value:
+                  apiVersion: cmf.confluent.io/v1
+                  kind: KafkaDatabase
+                  metadata:
+                    name: staging
+                    labels:
+                      environment: staging
+                  spec:
+                    kafkaCluster:
+                      connectionConfig:
+                        bootstrap.servers: kafka-staging.example.com:9092
+                        security.protocol: SASL_PLAINTEXT
+                      connectionSecretId: staging-kafka-secret
+                    ddlEnvironments:
+                    - staging
             schema:
               $ref: '#/components/schemas/KafkaDatabase'
         required: true
@@ -2713,6 +3523,37 @@ paths:
           items:
             type: string
           type: array
+        style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
         style: form
       - description: Name of the Environment
         explode: false
@@ -3052,6 +3893,37 @@ paths:
             type: string
           type: array
         style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
       - description: Name of the Environment
         explode: false
         in: path
@@ -3330,7 +4202,39 @@ paths:
             type: string
           type: array
         style: form
-      - description: Filter by detached savepoint name prefix (e.g. ?name=abc)
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
+      - deprecated: true
+        description: Filter by detached savepoint name prefix (e.g. ?name=abc)
         explode: true
         in: query
         name: name
@@ -3490,6 +4394,339 @@ paths:
       summary: Retrieve the Detached Savepoint of the given name.
       tags:
       - DetachedSavepoints
+  /cmf/api/v1/kubernetes-clusters:
+    get:
+      operationId: getKubernetesClusters
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'Sorting criteria in the format: property,(asc|desc). Default
+          sort order is ascending. Multiple sort criteria are supported.'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: 'Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+          = value or labels.key != value - Label set-based: labels.key in (value1,
+          value2) or labels.key notin (value1, value2) - Label existence: labels.key
+          (exists) or !labels.key (does not exist) - State filtering (Applications
+          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
+          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
+          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
+          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
+          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
+          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
+          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
+          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
+          in (CMF_STATUS, JOB_STATUS)'
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Comma-separated list of field paths to include in the response.
+          Supports nested fields using dot notation. Always includes apiVersion and
+          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                clusters-list:
+                  summary: List of Kubernetes clusters
+                  value:
+                    metadata:
+                      size: 2
+                    items:
+                    - apiVersion: cmf.confluent.io/v1
+                      kind: KubernetesCluster
+                      metadata:
+                        name: default-k8s-cluster
+                        creationTimestamp: 2026-01-10T08:00:00Z
+                        updateTimestamp: 2026-02-16T10:30:00Z
+                        labels:
+                          env: production
+                          region: us-east-1
+                      spec:
+                        lifecycleState: ACTIVE
+                      status:
+                        state: CONNECTED
+                        lastHeartbeatTimestamp: 2026-02-16T10:30:00Z
+                    - apiVersion: cmf.confluent.io/v1
+                      kind: KubernetesCluster
+                      metadata:
+                        name: azure-k8s-cluster
+                        creationTimestamp: 2026-02-01T12:00:00Z
+                        updateTimestamp: 2026-02-16T10:30:00Z
+                        labels:
+                          env: production
+                          region: westeurope
+                          provider: azure
+                      spec:
+                        lifecycleState: ACTIVE
+                      status:
+                        state: CONNECTED
+                        lastHeartbeatTimestamp: 2026-02-16T10:30:00Z
+              schema:
+                $ref: '#/components/schemas/KubernetesClustersPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KubernetesClustersPage'
+          description: List of Kubernetes clusters. If no clusters are found, an empty
+            list is returned.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a list of all registered Kubernetes clusters.
+      tags:
+      - KubernetesClusters
+      x-spring-paginated: true
+  /cmf/api/v1/kubernetes-clusters/{kubernetesClusterName}:
+    get:
+      operationId: getKubernetesCluster
+      parameters:
+      - description: Name of the Kubernetes cluster
+        explode: false
+        in: path
+        name: kubernetesClusterName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                connected-cluster:
+                  summary: Connected Kubernetes cluster
+                  value:
+                    apiVersion: cmf.confluent.io/v1
+                    kind: KubernetesCluster
+                    metadata:
+                      name: azure-k8s-cluster
+                      creationTimestamp: 2026-02-01T12:00:00Z
+                      updateTimestamp: 2026-02-16T10:30:00Z
+                      labels:
+                        env: production
+                        region: westeurope
+                        provider: azure
+                    spec:
+                      lifecycleState: ACTIVE
+                    status:
+                      state: CONNECTED
+                      lastHeartbeatTimestamp: 2026-02-16T10:30:00Z
+                disconnected-cluster:
+                  summary: Disconnected Kubernetes cluster
+                  value:
+                    apiVersion: cmf.confluent.io/v1
+                    kind: KubernetesCluster
+                    metadata:
+                      name: gcp-k8s-cluster
+                      creationTimestamp: 2026-02-01T12:00:00Z
+                      updateTimestamp: 2026-02-15T08:00:00Z
+                      labels:
+                        env: staging
+                        region: us-central1
+                        provider: gcp
+                    spec:
+                      lifecycleState: ACTIVE
+                    status:
+                      state: DISCONNECTED
+                      message: 'Failed to connect to cluster: connection timed out'
+                      lastHeartbeatTimestamp: 2026-02-15T08:00:00Z
+              schema:
+                $ref: '#/components/schemas/KubernetesCluster'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KubernetesCluster'
+          description: Kubernetes cluster found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kubernetes cluster not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a Kubernetes cluster by name.
+      tags:
+      - KubernetesClusters
+    put:
+      operationId: updateKubernetesCluster
+      parameters:
+      - description: Name of the Kubernetes cluster
+        explode: false
+        in: path
+        name: kubernetesClusterName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              decommission:
+                summary: Decommission a cluster
+                value:
+                  spec:
+                    lifecycleState: DECOMMISSIONED
+              recommission:
+                summary: Recommission a cluster
+                value:
+                  spec:
+                    lifecycleState: ACTIVE
+              update-labels:
+                summary: Update cluster labels
+                value:
+                  metadata:
+                    name: azure-k8s-cluster
+                    labels:
+                      env: production
+                      region: westeurope
+            schema:
+              $ref: '#/components/schemas/KubernetesCluster'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/KubernetesCluster'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                decommissioned-cluster:
+                  summary: Decommissioned cluster
+                  value:
+                    apiVersion: cmf.confluent.io/v1
+                    kind: KubernetesCluster
+                    metadata:
+                      name: azure-k8s-cluster
+                      creationTimestamp: 2026-02-01T12:00:00Z
+                      updateTimestamp: 2026-02-16T11:00:00Z
+                      labels:
+                        env: production
+                        region: westeurope
+                        provider: azure
+                    spec:
+                      lifecycleState: DECOMMISSIONED
+                    status:
+                      state: DECOMMISSIONED
+              schema:
+                $ref: '#/components/schemas/KubernetesCluster'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/KubernetesCluster'
+          description: The Kubernetes cluster was successfully updated.
+        "400":
+          content:
+            application/json:
+              examples:
+                environments-exist:
+                  summary: Cluster has active environments
+                  value:
+                    errors:
+                    - message: 'Cannot decommission cluster ''azure-k8s-cluster'':
+                        referenced by environments [prod-azure, staging-azure]'
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request. Validation failed (e.g., cannot decommission cluster
+            because it is in use by environments).
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kubernetes cluster not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Update a Kubernetes cluster (lifecycle state, labels, annotations).
+      tags:
+      - KubernetesClusters
+  /cmf/api/v1/c3/license:
+    get:
+      operationId: getC3LicenseInformation
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/C3LicenseInformation'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/C3LicenseInformation'
+          description: License information retrieved successfully.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve license information for C3 integration.
+      tags:
+      - C3
   /cmf/api/v1/system-information:
     get:
       operationId: getSystemInformation
@@ -3617,6 +4854,105 @@ components:
         - stopped
         type: string
       style: form
+    filterParam:
+      description: 'Filter query string with comma-separated expressions. Supports:
+        - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
+        = value or labels.key != value - Label set-based: labels.key in (value1, value2)
+        or labels.key notin (value1, value2) - Label existence: labels.key (exists)
+        or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING
+        or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering
+        (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING)
+        or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS
+        or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+        Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+        Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example
+        (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with
+        type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)'
+      explode: true
+      in: query
+      name: filter
+      required: false
+      schema:
+        type: string
+      style: form
+    searchParam:
+      description: 'Search term to match against fields specified in searchScope.
+        Note: Both search and searchScope must be provided together. If only one is
+        provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      explode: true
+      in: query
+      name: search
+      required: false
+      schema:
+        type: string
+      style: form
+    searchScopeParam:
+      description: 'Comma-separated list of fields to search in. Must be provided
+        together with the search parameter. Unsupported field names will result in
+        a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
+        For Statements: supported fields are name, statement. For Events: supported
+        fields are message, flinkApplicationInstance. For Secrets: supported fields
+        are name, environments. When multiple fields are specified, the search uses
+        OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
+        means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
+        ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement
+        contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
+        means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      explode: true
+      in: query
+      name: searchScope
+      required: false
+      schema:
+        type: string
+      style: form
+    fieldsParam:
+      description: 'Comma-separated list of field paths to include in the response.
+        Supports nested fields using dot notation. Always includes apiVersion and
+        kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      explode: true
+      in: query
+      name: fields
+      required: false
+      schema:
+        type: string
+      style: form
+  responses:
+    InternalServerError:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+        application/yaml:
+          schema:
+            $ref: '#/components/schemas/RestError'
+      description: Server error.
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+        application/yaml:
+          schema:
+            $ref: '#/components/schemas/RestError'
+      description: Bad request.
+    UnprocessableEntity:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+        application/yaml:
+          schema:
+            $ref: '#/components/schemas/RestError'
+      description: Request valid but invalid content.
+    NotModified:
+      description: Not modified.
+      headers:
+        ETag:
+          description: An ID for this version of the response.
+          explode: false
+          schema:
+            type: string
+          style: simple
   schemas:
     RestError:
       description: The schema for all error responses.
@@ -3676,6 +5012,7 @@ components:
     PostResourceBase:
       properties:
         name:
+          deprecated: true
           description: A unique name for the resource.
           minLength: 4
           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -3701,6 +5038,16 @@ components:
           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
           title: Kubernetes namespace name where resources referencing this environment
             are created in.
+          type: string
+      type: object
+    KubernetesClusterName:
+      properties:
+        kubernetesClusterName:
+          maxLength: 253
+          minLength: 1
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+          title: Name of the Kubernetes cluster where this environment's resources
+            are deployed.
           type: string
       type: object
     ResourceWithFlinkApplicationDefaults:
@@ -3736,11 +5083,11 @@ components:
       - $ref: '#/components/schemas/PostResourceBase'
       - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
       - $ref: '#/components/schemas/KubernetesNamespace'
+      - $ref: '#/components/schemas/KubernetesClusterName'
       - $ref: '#/components/schemas/ComputePoolDefaults'
       - $ref: '#/components/schemas/AllStatementDefaults'
+      - $ref: '#/components/schemas/PostEnvironment_allOf'
       description: Environment
-      required:
-      - name
       title: Environment
       type: object
     Environment:
@@ -3749,8 +5096,10 @@ components:
       - $ref: '#/components/schemas/GetResourceBase'
       - $ref: '#/components/schemas/ResourceWithFlinkApplicationDefaults'
       - $ref: '#/components/schemas/KubernetesNamespace'
+      - $ref: '#/components/schemas/KubernetesClusterName'
       - $ref: '#/components/schemas/ComputePoolDefaults'
       - $ref: '#/components/schemas/AllStatementDefaults'
+      - $ref: '#/components/schemas/PostEnvironment_allOf'
       description: Environment
       example:
         secrets:
@@ -3768,8 +5117,12 @@ components:
         status:
           description: Status for the environment
           properties:
+            resources:
+              $ref: '#/components/schemas/ResourcesByStatusAndTypeSummary'
             resourceSummary:
               $ref: '#/components/schemas/ResourceUsageSummary'
+            kubernetesCluster:
+              $ref: '#/components/schemas/KubernetesClusterStatus'
           title: Status
           type: object
       required:
@@ -3826,6 +5179,18 @@ components:
       allOf:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/SecretsPage_allOf'
+      type: object
+    KubernetesCluster:
+      allOf:
+      - $ref: '#/components/schemas/ResourceBaseV2'
+      - $ref: '#/components/schemas/KubernetesCluster_allOf'
+      description: Represents a registered Kubernetes cluster managed by CMF.
+      title: KubernetesCluster
+      type: object
+    KubernetesClustersPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/KubernetesClustersPage_allOf'
       type: object
     EnvironmentsPage:
       allOf:
@@ -4067,6 +5432,34 @@ components:
       - name
       title: DatabaseMetadata
       type: object
+    EnvironmentMetadata:
+      description: Metadata about the Environment
+      properties:
+        name:
+          description: Name of the Environment
+          type: string
+        creationTimestamp:
+          description: Timestamp when the Environment was created
+          readOnly: true
+          type: string
+        updateTimestamp:
+          description: Timestamp when the Environment was updated the last time
+          readOnly: true
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          description: Labels of the Environment
+          type: object
+        annotations:
+          additionalProperties:
+            type: string
+          description: Annotations of the Environment
+          type: object
+      required:
+      - name
+      title: EnvironmentMetadata
+      type: object
     KafkaDatabase:
       allOf:
       - $ref: '#/components/schemas/ResourceBaseV2'
@@ -4129,23 +5522,36 @@ components:
           $ref: '#/components/schemas/SystemInformationStatus'
       title: SystemInformation
       type: object
+    C3LicenseInformation:
+      description: License information for C3 integration
+      example:
+        kind: kind
+        status:
+          licenseType: licenseType
+          expiration: 0
+          status: status
+      properties:
+        kind:
+          type: string
+        status:
+          $ref: '#/components/schemas/C3LicenseInformationStatus'
+      title: C3LicenseInformation
+      type: object
     ResourceInformation:
       description: Represents resource information and usage statistics for the CMF
         application
       example:
         status:
           resourceSummary:
-            memory: 2
-            cpu: 3.616076749251911
+            memory: 9
+            cpu: 7.061401241503109
           resources:
-            detachedSavepoints: 9
-            computePools: 1
+            detachedSavepoints: 2
+            computePools: 6
             environments: 0
-            catalogs: 2
-            savepoints: 7
-            statements: 5
-            secrets: 5
-            applications: 6
+            catalogs: 5
+            savepoints: 5
+            secrets: 1
       properties:
         status:
           $ref: '#/components/schemas/ResourceInformationStatus'
@@ -4159,6 +5565,61 @@ components:
         taskManager:
           $ref: '#/components/schemas/TaskManager'
       title: ResourceUsageSummary
+      type: object
+    ResourcesByStatusAndTypeSummary:
+      description: Summary of resources by status and type
+      properties:
+        applications:
+          $ref: '#/components/schemas/ApplicationsByStatusSummary'
+        statements:
+          $ref: '#/components/schemas/StatementsByStatusSummary'
+      title: ResourcesByStatusAndTypeSummary
+      type: object
+    ApplicationsByStatusSummary:
+      additionalProperties:
+        type: integer
+      description: Summary of applications by status
+      title: ApplicationsByStatusSummary
+      type: object
+    StatementsByStatusSummary:
+      additionalProperties:
+        type: integer
+      description: Summary of statements by status
+      title: StatementsByStatusSummary
+      type: object
+    KubernetesClustersByStateSummary:
+      additionalProperties:
+        type: integer
+      description: Summary of Kubernetes clusters by state (CONNECTED, DISCONNECTED,
+        DECOMMISSIONED)
+      title: KubernetesClustersByStateSummary
+      type: object
+    KubernetesClusterStatus:
+      description: Status of the Kubernetes cluster.
+      properties:
+        state:
+          description: The effective state of the cluster. CONNECTED when the cluster
+            is reachable, DISCONNECTED when unreachable, or DECOMMISSIONED when intentionally
+            taken offline.
+          enum:
+          - CONNECTED
+          - DISCONNECTED
+          - DECOMMISSIONED
+          type: string
+        message:
+          description: A human-readable message providing details about the current
+            state (e.g., connection error details).
+          type: string
+        lastHeartbeatTimestamp:
+          description: Timestamp of the last successful heartbeat check.
+          format: date-time
+          type: string
+        kubernetesVersion:
+          description: The Kubernetes server version reported by the cluster (e.g.,
+            "v1.28.3"). Only available when the cluster is CONNECTED.
+          type: string
+      readOnly: true
+      title: KubernetesClusterStatus
       type: object
     error:
       description: An error
@@ -4176,6 +5637,11 @@ components:
         interactive:
           $ref: '#/components/schemas/StatementDefaults'
       title: AllStatementDefaults
+      type: object
+    PostEnvironment_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/EnvironmentMetadata'
       type: object
     EnvironmentSecretMappingMetadata:
       description: Metadata about the environment secret mapping
@@ -4333,6 +5799,79 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/Secret'
+          type: array
+      type: object
+    KubernetesClusterMetadata:
+      description: Metadata about the Kubernetes cluster.
+      properties:
+        name:
+          description: Name of the Kubernetes cluster.
+          type: string
+        creationTimestamp:
+          description: Timestamp when the cluster was registered.
+          readOnly: true
+          type: string
+        updateTimestamp:
+          description: Timestamp when the cluster was last updated.
+          readOnly: true
+          type: string
+        uid:
+          description: Unique identifier of the Kubernetes cluster.
+          readOnly: true
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          description: Labels of the Kubernetes cluster.
+          type: object
+        annotations:
+          additionalProperties:
+            type: string
+          description: Annotations of the Kubernetes cluster.
+          type: object
+      required:
+      - name
+      title: KubernetesClusterMetadata
+      type: object
+    KubernetesClusterSpec:
+      description: Specification for the Kubernetes cluster.
+      properties:
+        lifecycleState:
+          description: The desired lifecycle state of the cluster.
+          enum:
+          - ACTIVE
+          - DECOMMISSIONED
+          type: string
+      title: KubernetesClusterSpec
+      type: object
+    KubernetesCluster_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/KubernetesClusterMetadata'
+        spec:
+          $ref: '#/components/schemas/KubernetesClusterSpec'
+        status:
+          $ref: '#/components/schemas/KubernetesClusterStatus'
+      required:
+      - metadata
+      - spec
+      type: object
+    KubernetesClustersPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: KubernetesClustersPageMetadata
+      type: object
+    KubernetesClustersPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/KubernetesClustersPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/KubernetesCluster'
           type: array
       type: object
     EnvironmentsPageMetadata:
@@ -4620,6 +6159,10 @@ components:
           $ref: '#/components/schemas/StatementTraits'
         resourceSummary:
           $ref: '#/components/schemas/ResourceUsageSummary'
+        warning:
+          description: Warning message indicating the displayed status may be stale,
+            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          type: string
       required:
       - phase
       title: StatementStatus
@@ -4756,6 +6299,9 @@ components:
         creationTimestamp:
           description: Timestamp when the ComputePool was created
           type: string
+        updateTimestamp:
+          description: Timestamp when the ComputePool was last updated
+          type: string
         uid:
           description: Unique identifier of the ComputePool
           type: string
@@ -4778,6 +6324,16 @@ components:
       properties:
         type:
           description: Type of the ComputePool
+          enum:
+          - DEDICATED
+          - SHARED
+          type: string
+        state:
+          description: Desired state of the compute pool. Can only be specified for
+            shared compute pools. Defaults to RUNNING if not specified.
+          enum:
+          - RUNNING
+          - SUSPENDED
           type: string
         clusterSpec:
           description: Cluster Spec
@@ -4788,18 +6344,6 @@ components:
       - type
       title: ComputePoolSpec
       type: object
-    ComputePoolStatus:
-      description: Status for ComputePool
-      properties:
-        phase:
-          description: Phase of the ComputePool
-          type: string
-        resourceSummary:
-          $ref: '#/components/schemas/ResourceUsageSummary'
-      required:
-      - phase
-      title: ComputePoolStatus
-      type: object
     ComputePool_allOf:
       properties:
         metadata:
@@ -4807,7 +6351,36 @@ components:
         spec:
           $ref: '#/components/schemas/ComputePoolSpec'
         status:
-          $ref: '#/components/schemas/ComputePoolStatus'
+          additionalProperties: true
+          description: Status for ComputePool
+          properties:
+            phase:
+              description: Phase of the ComputePool
+              enum:
+              - DEDICATED
+              - PENDING
+              - RUNNING
+              - DELETING
+              - FAILING
+              - FAILED
+              - SUSPENDED
+              type: string
+            message:
+              description: Human-readable status message
+              type: string
+            resourceSummary:
+              $ref: '#/components/schemas/ResourceUsageSummary'
+            resources:
+              $ref: '#/components/schemas/ResourcesByStatusAndTypeSummary'
+            warning:
+              description: Warning message indicating the displayed status may be
+                stale, e.g. when the backing Kubernetes cluster is disconnected or
+                decommissioned.
+              type: string
+          required:
+          - phase
+          title: ComputePoolStatus
+          type: object
       required:
       - metadata
       - spec
@@ -4937,9 +6510,9 @@ components:
       properties:
         kafkaCluster:
           $ref: '#/components/schemas/KafkaDatabaseSpec_kafkaCluster'
-        alterEnvironments:
-          description: List of environments that have permission to alter the tables
-            of this database
+        ddlEnvironments:
+          description: List of environments that have permission to execute DDL statements
+            on the tables of this database
           items:
             type: string
           type: array
@@ -5059,6 +6632,10 @@ components:
         pendingDeletion:
           description: Whether the Savepoint is pending deletion
           type: boolean
+        warning:
+          description: Warning message indicating the displayed status may be stale,
+            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          type: string
       title: SavepointStatus
       type: object
       x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'
@@ -5105,30 +6682,45 @@ components:
           type: string
       title: SystemInformationStatus
       type: object
+    C3LicenseInformationStatus:
+      example:
+        licenseType: licenseType
+        expiration: 0
+        status: status
+      properties:
+        status:
+          description: 'License validity status: VALID, EXPIRED, or INVALID'
+          type: string
+        licenseType:
+          description: Type of the Confluent license (e.g. ENTERPRISE, TRIAL, FREE_TIER)
+          type: string
+        expiration:
+          description: License expiration as Unix epoch timestamp in milliseconds
+            (milliseconds since 1970-01-01T00:00:00Z)
+          format: int64
+          type: integer
+      title: C3LicenseInformationStatus
+      type: object
     Resources:
       description: Count of various resource types managed by CMF
       example:
-        detachedSavepoints: 9
-        computePools: 1
+        detachedSavepoints: 2
+        computePools: 6
         environments: 0
-        catalogs: 2
-        savepoints: 7
-        statements: 5
-        secrets: 5
-        applications: 6
+        catalogs: 5
+        savepoints: 5
+        secrets: 1
       properties:
         environments:
           description: Number of environments
           type: integer
         applications:
-          description: Number of applications
-          type: integer
+          $ref: '#/components/schemas/ApplicationsByStatusSummary'
         computePools:
           description: Number of compute pools
           type: integer
         statements:
-          description: Number of statements
-          type: integer
+          $ref: '#/components/schemas/StatementsByStatusSummary'
         secrets:
           description: Number of secrets
           type: integer
@@ -5141,13 +6733,15 @@ components:
         detachedSavepoints:
           description: Number of detached savepoints
           type: integer
+        kubernetesClusters:
+          $ref: '#/components/schemas/KubernetesClustersByStateSummary'
       title: Resources
       type: object
     ResourceSummary:
       description: Summary of resource usage
       example:
-        memory: 2
-        cpu: 3.616076749251911
+        memory: 9
+        cpu: 7.061401241503109
       properties:
         cpu:
           description: Total CPU units allocated
@@ -5162,17 +6756,15 @@ components:
     ResourceInformationStatus:
       example:
         resourceSummary:
-          memory: 2
-          cpu: 3.616076749251911
+          memory: 9
+          cpu: 7.061401241503109
         resources:
-          detachedSavepoints: 9
-          computePools: 1
+          detachedSavepoints: 2
+          computePools: 6
           environments: 0
-          catalogs: 2
-          savepoints: 7
-          statements: 5
-          secrets: 5
-          applications: 6
+          catalogs: 5
+          savepoints: 5
+          secrets: 1
       properties:
         resources:
           $ref: '#/components/schemas/Resources'

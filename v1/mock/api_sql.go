@@ -122,6 +122,12 @@ type MockSQLApi struct {
 	lockGetStatementsExecute sync.Mutex
 	GetStatementsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementsRequest) (github_com_confluentinc_cmf_sdk_go_v1.StatementsPage, *net_http.Response, error)
 
+	lockUpdateComputePool sync.Mutex
+	UpdateComputePoolFunc func(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest
+
+	lockUpdateComputePoolExecute sync.Mutex
+	UpdateComputePoolExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest) (github_com_confluentinc_cmf_sdk_go_v1.ComputePool, *net_http.Response, error)
+
 	lockUpdateKafkaCatalog sync.Mutex
 	UpdateKafkaCatalogFunc func(ctx context.Context, catName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateKafkaCatalogRequest
 
@@ -272,6 +278,14 @@ type MockSQLApi struct {
 		}
 		GetStatementsExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementsRequest
+		}
+		UpdateComputePool []struct {
+			Ctx             context.Context
+			EnvName         string
+			ComputePoolName string
+		}
+		UpdateComputePoolExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest
 		}
 		UpdateKafkaCatalog []struct {
 			Ctx     context.Context
@@ -1739,6 +1753,88 @@ func (m *MockSQLApi) GetStatementsExecuteCalls() []struct {
 	return m.calls.GetStatementsExecute
 }
 
+// UpdateComputePool mocks base method by wrapping the associated func.
+func (m *MockSQLApi) UpdateComputePool(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest {
+	m.lockUpdateComputePool.Lock()
+	defer m.lockUpdateComputePool.Unlock()
+
+	if m.UpdateComputePoolFunc == nil {
+		panic("mocker: MockSQLApi.UpdateComputePoolFunc is nil but MockSQLApi.UpdateComputePool was called.")
+	}
+
+	call := struct {
+		Ctx             context.Context
+		EnvName         string
+		ComputePoolName string
+	}{
+		Ctx:             ctx,
+		EnvName:         envName,
+		ComputePoolName: computePoolName,
+	}
+
+	m.calls.UpdateComputePool = append(m.calls.UpdateComputePool, call)
+
+	return m.UpdateComputePoolFunc(ctx, envName, computePoolName)
+}
+
+// UpdateComputePoolCalled returns true if UpdateComputePool was called at least once.
+func (m *MockSQLApi) UpdateComputePoolCalled() bool {
+	m.lockUpdateComputePool.Lock()
+	defer m.lockUpdateComputePool.Unlock()
+
+	return len(m.calls.UpdateComputePool) > 0
+}
+
+// UpdateComputePoolCalls returns the calls made to UpdateComputePool.
+func (m *MockSQLApi) UpdateComputePoolCalls() []struct {
+	Ctx             context.Context
+	EnvName         string
+	ComputePoolName string
+} {
+	m.lockUpdateComputePool.Lock()
+	defer m.lockUpdateComputePool.Unlock()
+
+	return m.calls.UpdateComputePool
+}
+
+// UpdateComputePoolExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) UpdateComputePoolExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest) (github_com_confluentinc_cmf_sdk_go_v1.ComputePool, *net_http.Response, error) {
+	m.lockUpdateComputePoolExecute.Lock()
+	defer m.lockUpdateComputePoolExecute.Unlock()
+
+	if m.UpdateComputePoolExecuteFunc == nil {
+		panic("mocker: MockSQLApi.UpdateComputePoolExecuteFunc is nil but MockSQLApi.UpdateComputePoolExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest
+	}{
+		R: r,
+	}
+
+	m.calls.UpdateComputePoolExecute = append(m.calls.UpdateComputePoolExecute, call)
+
+	return m.UpdateComputePoolExecuteFunc(r)
+}
+
+// UpdateComputePoolExecuteCalled returns true if UpdateComputePoolExecute was called at least once.
+func (m *MockSQLApi) UpdateComputePoolExecuteCalled() bool {
+	m.lockUpdateComputePoolExecute.Lock()
+	defer m.lockUpdateComputePoolExecute.Unlock()
+
+	return len(m.calls.UpdateComputePoolExecute) > 0
+}
+
+// UpdateComputePoolExecuteCalls returns the calls made to UpdateComputePoolExecute.
+func (m *MockSQLApi) UpdateComputePoolExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest
+} {
+	m.lockUpdateComputePoolExecute.Lock()
+	defer m.lockUpdateComputePoolExecute.Unlock()
+
+	return m.calls.UpdateComputePoolExecute
+}
+
 // UpdateKafkaCatalog mocks base method by wrapping the associated func.
 func (m *MockSQLApi) UpdateKafkaCatalog(ctx context.Context, catName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateKafkaCatalogRequest {
 	m.lockUpdateKafkaCatalog.Lock()
@@ -2092,6 +2188,12 @@ func (m *MockSQLApi) Reset() {
 	m.lockGetStatementsExecute.Lock()
 	m.calls.GetStatementsExecute = nil
 	m.lockGetStatementsExecute.Unlock()
+	m.lockUpdateComputePool.Lock()
+	m.calls.UpdateComputePool = nil
+	m.lockUpdateComputePool.Unlock()
+	m.lockUpdateComputePoolExecute.Lock()
+	m.calls.UpdateComputePoolExecute = nil
+	m.lockUpdateComputePoolExecute.Unlock()
 	m.lockUpdateKafkaCatalog.Lock()
 	m.calls.UpdateKafkaCatalog = nil
 	m.lockUpdateKafkaCatalog.Unlock()

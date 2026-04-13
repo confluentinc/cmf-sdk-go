@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **Failures** | Pointer to **int32** | The number of failures of the Savepoint | [optional] 
 **Error** | Pointer to **string** | The error message for the Savepoint | [optional] 
 **PendingDeletion** | Pointer to **bool** | Whether the Savepoint is pending deletion | [optional] 
+**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
 
 ## Methods
 
@@ -205,6 +206,31 @@ SetPendingDeletion sets PendingDeletion field to given value.
 `func (o *SavepointStatus) HasPendingDeletion() bool`
 
 HasPendingDeletion returns a boolean if a field has been set.
+
+### GetWarning
+
+`func (o *SavepointStatus) GetWarning() string`
+
+GetWarning returns the Warning field if non-nil, zero value otherwise.
+
+### GetWarningOk
+
+`func (o *SavepointStatus) GetWarningOk() (*string, bool)`
+
+GetWarningOk returns a tuple with the Warning field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWarning
+
+`func (o *SavepointStatus) SetWarning(v string)`
+
+SetWarning sets Warning field to given value.
+
+### HasWarning
+
+`func (o *SavepointStatus) HasWarning() bool`
+
+HasWarning returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

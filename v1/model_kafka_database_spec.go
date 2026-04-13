@@ -17,8 +17,8 @@ import (
 // KafkaDatabaseSpec Spec of a Kafka Database
 type KafkaDatabaseSpec struct {
 	KafkaCluster KafkaDatabaseSpecKafkaCluster `json:"kafkaCluster"`
-	// List of environments that have permission to alter the tables of this database
-	AlterEnvironments *[]string `json:"alterEnvironments,omitempty"`
+	// List of environments that have permission to execute DDL statements on the tables of this database
+	DdlEnvironments *[]string `json:"ddlEnvironments,omitempty"`
 }
 
 // NewKafkaDatabaseSpec instantiates a new KafkaDatabaseSpec object
@@ -63,36 +63,36 @@ func (o *KafkaDatabaseSpec) SetKafkaCluster(v KafkaDatabaseSpecKafkaCluster) {
 	o.KafkaCluster = v
 }
 
-// GetAlterEnvironments returns the AlterEnvironments field value if set, zero value otherwise.
-func (o *KafkaDatabaseSpec) GetAlterEnvironments() []string {
-	if o == nil || o.AlterEnvironments == nil {
+// GetDdlEnvironments returns the DdlEnvironments field value if set, zero value otherwise.
+func (o *KafkaDatabaseSpec) GetDdlEnvironments() []string {
+	if o == nil || o.DdlEnvironments == nil {
 		var ret []string
 		return ret
 	}
-	return *o.AlterEnvironments
+	return *o.DdlEnvironments
 }
 
-// GetAlterEnvironmentsOk returns a tuple with the AlterEnvironments field value if set, nil otherwise
+// GetDdlEnvironmentsOk returns a tuple with the DdlEnvironments field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *KafkaDatabaseSpec) GetAlterEnvironmentsOk() (*[]string, bool) {
-	if o == nil || o.AlterEnvironments == nil {
+func (o *KafkaDatabaseSpec) GetDdlEnvironmentsOk() (*[]string, bool) {
+	if o == nil || o.DdlEnvironments == nil {
 		return nil, false
 	}
-	return o.AlterEnvironments, true
+	return o.DdlEnvironments, true
 }
 
-// HasAlterEnvironments returns a boolean if a field has been set.
-func (o *KafkaDatabaseSpec) HasAlterEnvironments() bool {
-	if o != nil && o.AlterEnvironments != nil {
+// HasDdlEnvironments returns a boolean if a field has been set.
+func (o *KafkaDatabaseSpec) HasDdlEnvironments() bool {
+	if o != nil && o.DdlEnvironments != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetAlterEnvironments gets a reference to the given []string and assigns it to the AlterEnvironments field.
-func (o *KafkaDatabaseSpec) SetAlterEnvironments(v []string) {
-	o.AlterEnvironments = &v
+// SetDdlEnvironments gets a reference to the given []string and assigns it to the DdlEnvironments field.
+func (o *KafkaDatabaseSpec) SetDdlEnvironments(v []string) {
+	o.DdlEnvironments = &v
 }
 
 func (o KafkaDatabaseSpec) MarshalJSON() ([]byte, error) {
@@ -100,8 +100,8 @@ func (o KafkaDatabaseSpec) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["kafkaCluster"] = o.KafkaCluster
 	}
-	if o.AlterEnvironments != nil {
-		toSerialize["alterEnvironments"] = o.AlterEnvironments
+	if o.DdlEnvironments != nil {
+		toSerialize["ddlEnvironments"] = o.DdlEnvironments
 	}
 	return json.Marshal(toSerialize)
 }

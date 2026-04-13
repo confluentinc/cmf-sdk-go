@@ -22,14 +22,17 @@ type Environment struct {
 	// Status for the environment
 	Status *map[string]interface{} `json:"status,omitempty"`
 	// A unique name for the resource.
+	// Deprecated
 	Name string `json:"name"`
 	CreatedTime *time.Time `json:"created_time,omitempty"`
 	UpdatedTime *time.Time `json:"updated_time,omitempty"`
 	FlinkApplicationDefaults *map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 	KubernetesNamespace string `json:"kubernetesNamespace"`
+	KubernetesClusterName *string `json:"kubernetesClusterName,omitempty"`
 	// the defaults as YAML or JSON for ComputePools
 	ComputePoolDefaults *map[string]interface{} `json:"computePoolDefaults,omitempty"`
 	StatementDefaults *AllStatementDefaults1 `json:"statementDefaults,omitempty"`
+	Metadata *EnvironmentMetadata `json:"metadata,omitempty"`
 }
 
 // NewEnvironment instantiates a new Environment object
@@ -116,6 +119,7 @@ func (o *Environment) SetStatus(v map[string]interface{}) {
 }
 
 // GetName returns the Name field value
+// Deprecated
 func (o *Environment) GetName() string {
 	if o == nil {
 		var ret string
@@ -127,6 +131,7 @@ func (o *Environment) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
+// Deprecated
 func (o *Environment) GetNameOk() (*string, bool) {
 	if o == nil  {
 		return nil, false
@@ -135,6 +140,7 @@ func (o *Environment) GetNameOk() (*string, bool) {
 }
 
 // SetName sets field value
+// Deprecated
 func (o *Environment) SetName(v string) {
 	o.Name = v
 }
@@ -259,6 +265,38 @@ func (o *Environment) SetKubernetesNamespace(v string) {
 	o.KubernetesNamespace = v
 }
 
+// GetKubernetesClusterName returns the KubernetesClusterName field value if set, zero value otherwise.
+func (o *Environment) GetKubernetesClusterName() string {
+	if o == nil || o.KubernetesClusterName == nil {
+		var ret string
+		return ret
+	}
+	return *o.KubernetesClusterName
+}
+
+// GetKubernetesClusterNameOk returns a tuple with the KubernetesClusterName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Environment) GetKubernetesClusterNameOk() (*string, bool) {
+	if o == nil || o.KubernetesClusterName == nil {
+		return nil, false
+	}
+	return o.KubernetesClusterName, true
+}
+
+// HasKubernetesClusterName returns a boolean if a field has been set.
+func (o *Environment) HasKubernetesClusterName() bool {
+	if o != nil && o.KubernetesClusterName != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetKubernetesClusterName gets a reference to the given string and assigns it to the KubernetesClusterName field.
+func (o *Environment) SetKubernetesClusterName(v string) {
+	o.KubernetesClusterName = &v
+}
+
 // GetComputePoolDefaults returns the ComputePoolDefaults field value if set, zero value otherwise.
 func (o *Environment) GetComputePoolDefaults() map[string]interface{} {
 	if o == nil || o.ComputePoolDefaults == nil {
@@ -323,6 +361,38 @@ func (o *Environment) SetStatementDefaults(v AllStatementDefaults1) {
 	o.StatementDefaults = &v
 }
 
+// GetMetadata returns the Metadata field value if set, zero value otherwise.
+func (o *Environment) GetMetadata() EnvironmentMetadata {
+	if o == nil || o.Metadata == nil {
+		var ret EnvironmentMetadata
+		return ret
+	}
+	return *o.Metadata
+}
+
+// GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Environment) GetMetadataOk() (*EnvironmentMetadata, bool) {
+	if o == nil || o.Metadata == nil {
+		return nil, false
+	}
+	return o.Metadata, true
+}
+
+// HasMetadata returns a boolean if a field has been set.
+func (o *Environment) HasMetadata() bool {
+	if o != nil && o.Metadata != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetMetadata gets a reference to the given EnvironmentMetadata and assigns it to the Metadata field.
+func (o *Environment) SetMetadata(v EnvironmentMetadata) {
+	o.Metadata = &v
+}
+
 func (o Environment) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Secrets != nil {
@@ -346,11 +416,17 @@ func (o Environment) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["kubernetesNamespace"] = o.KubernetesNamespace
 	}
+	if o.KubernetesClusterName != nil {
+		toSerialize["kubernetesClusterName"] = o.KubernetesClusterName
+	}
 	if o.ComputePoolDefaults != nil {
 		toSerialize["computePoolDefaults"] = o.ComputePoolDefaults
 	}
 	if o.StatementDefaults != nil {
 		toSerialize["statementDefaults"] = o.StatementDefaults
+	}
+	if o.Metadata != nil {
+		toSerialize["metadata"] = o.Metadata
 	}
 	return json.Marshal(toSerialize)
 }

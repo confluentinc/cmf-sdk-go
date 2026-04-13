@@ -5,13 +5,14 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Environments** | Pointer to **int32** | Number of environments | [optional] 
-**Applications** | Pointer to **int32** | Number of applications | [optional] 
+**Applications** | Pointer to [**ApplicationsByStatusSummary**](ApplicationsByStatusSummary.md) |  | [optional] 
 **ComputePools** | Pointer to **int32** | Number of compute pools | [optional] 
-**Statements** | Pointer to **int32** | Number of statements | [optional] 
+**Statements** | Pointer to [**StatementsByStatusSummary**](StatementsByStatusSummary.md) |  | [optional] 
 **Secrets** | Pointer to **int32** | Number of secrets | [optional] 
 **Catalogs** | Pointer to **int32** | Number of catalogs | [optional] 
 **Savepoints** | Pointer to **int32** | Number of savepoints | [optional] 
 **DetachedSavepoints** | Pointer to **int32** | Number of detached savepoints | [optional] 
+**KubernetesClusters** | Pointer to [**KubernetesClustersByStateSummary**](KubernetesClustersByStateSummary.md) |  | [optional] 
 
 ## Methods
 
@@ -59,20 +60,20 @@ HasEnvironments returns a boolean if a field has been set.
 
 ### GetApplications
 
-`func (o *Resources) GetApplications() int32`
+`func (o *Resources) GetApplications() ApplicationsByStatusSummary`
 
 GetApplications returns the Applications field if non-nil, zero value otherwise.
 
 ### GetApplicationsOk
 
-`func (o *Resources) GetApplicationsOk() (*int32, bool)`
+`func (o *Resources) GetApplicationsOk() (*ApplicationsByStatusSummary, bool)`
 
 GetApplicationsOk returns a tuple with the Applications field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetApplications
 
-`func (o *Resources) SetApplications(v int32)`
+`func (o *Resources) SetApplications(v ApplicationsByStatusSummary)`
 
 SetApplications sets Applications field to given value.
 
@@ -109,20 +110,20 @@ HasComputePools returns a boolean if a field has been set.
 
 ### GetStatements
 
-`func (o *Resources) GetStatements() int32`
+`func (o *Resources) GetStatements() StatementsByStatusSummary`
 
 GetStatements returns the Statements field if non-nil, zero value otherwise.
 
 ### GetStatementsOk
 
-`func (o *Resources) GetStatementsOk() (*int32, bool)`
+`func (o *Resources) GetStatementsOk() (*StatementsByStatusSummary, bool)`
 
 GetStatementsOk returns a tuple with the Statements field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatements
 
-`func (o *Resources) SetStatements(v int32)`
+`func (o *Resources) SetStatements(v StatementsByStatusSummary)`
 
 SetStatements sets Statements field to given value.
 
@@ -231,6 +232,31 @@ SetDetachedSavepoints sets DetachedSavepoints field to given value.
 `func (o *Resources) HasDetachedSavepoints() bool`
 
 HasDetachedSavepoints returns a boolean if a field has been set.
+
+### GetKubernetesClusters
+
+`func (o *Resources) GetKubernetesClusters() KubernetesClustersByStateSummary`
+
+GetKubernetesClusters returns the KubernetesClusters field if non-nil, zero value otherwise.
+
+### GetKubernetesClustersOk
+
+`func (o *Resources) GetKubernetesClustersOk() (*KubernetesClustersByStateSummary, bool)`
+
+GetKubernetesClustersOk returns a tuple with the KubernetesClusters field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetKubernetesClusters
+
+`func (o *Resources) SetKubernetesClusters(v KubernetesClustersByStateSummary)`
+
+SetKubernetesClusters sets KubernetesClusters field to given value.
+
+### HasKubernetesClusters
+
+`func (o *Resources) HasKubernetesClusters() bool`
+
+HasKubernetesClusters returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
