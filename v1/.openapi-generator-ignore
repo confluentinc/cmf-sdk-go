@@ -23,7 +23,6 @@
 #!docs/README.md
 
 # Custom unmarshaler for ComputePool.Status (and its tests) that handles the
-# flat API response shape. Remove both entries once the OpenAPI spec uses
-# $ref to ComputePoolStatus instead of an inline definition.
+# flat API response shape.
 model_compute_pool_custom.go
 model_compute_pool_custom_test.go

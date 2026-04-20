@@ -85,8 +85,8 @@ func TestComputePoolUnmarshal_FlatStatus(t *testing.T) {
 }
 
 func TestComputePoolUnmarshal_AlreadyNestedStatus(t *testing.T) {
-	// If every value is an object, it is passed through unchanged.
-	data := makeComputePoolJSON("pool-b", `{"phase":{"value":"PENDING"}}`)
+	// Object values pass through unchanged, including extra keys (no re-wrap).
+	data := makeComputePoolJSON("pool-b", `{"phase":{"value":"PENDING","extra":"meta"}}`)
 
 	var pool ComputePool
 	if err := json.Unmarshal(data, &pool); err != nil {
@@ -98,6 +98,9 @@ func TestComputePoolUnmarshal_AlreadyNestedStatus(t *testing.T) {
 	}
 	if v != "PENDING" {
 		t.Errorf("phase.value = %v, want %q", v, "PENDING")
+	}
+	if extra := (*pool.Status)["phase"]["extra"]; extra != "meta" {
+		t.Errorf("phase.extra = %v, want %q (passthrough dropped keys)", extra, "meta")
 	}
 }
 
@@ -301,7 +304,7 @@ func TestComputePoolUnmarshal_EmptyPageItems(t *testing.T) {
 		{"null", `{"items":null}`},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-					var page ComputePoolsPage
+			var page ComputePoolsPage
 			if err := json.Unmarshal([]byte(tc.body), &page); err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
