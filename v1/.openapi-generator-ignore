@@ -21,3 +21,8 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# Custom unmarshaler for ComputePool.Status (and its tests) that handles the
+# flat API response shape.
+model_compute_pool_custom.go
+model_compute_pool_custom_test.go
