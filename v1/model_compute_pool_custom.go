@@ -6,10 +6,9 @@ import (
 	"fmt"
 )
 
-// UnmarshalJSON handles ComputePool.Status when the API returns a flat object
-// (e.g. {"phase":"RUNNING"}). The generated type *map[string]map[string]interface{}
-// cannot hold scalar values directly, so every value in the status object is
-// wrapped as {"value": v}. Non-object status shapes (array, scalar) surface a
+// UnmarshalJSON wraps every value in ComputePool.Status as {"value": v} so the
+// CMF API's flat status object (e.g. {"phase":"RUNNING"}) fits the generated
+// type *map[string]map[string]interface{}. Non-object status shapes surface a
 // decode error rather than being silently dropped.
 func (o *ComputePool) UnmarshalJSON(data []byte) error {
 	// Alias strips methods so the inner decode doesn't re-enter UnmarshalJSON.
@@ -21,7 +20,7 @@ func (o *ComputePool) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	o.Status = nil // reset for receiver reuse; repopulated below on success
+	o.Status = nil // reset for receiver reuse
 	if len(aux.Status) == 0 || bytes.Equal(aux.Status, []byte("null")) {
 		return nil
 	}

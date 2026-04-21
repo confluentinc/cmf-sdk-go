@@ -6,9 +6,8 @@ import (
 	"testing"
 )
 
-// makeComputePoolJSON builds a ComputePool JSON payload with the given status literal.
-// The status argument is inserted verbatim (no quoting), so callers pass raw JSON like
-// `"RUNNING"`, `null`, `{"phase":"X"}`, `[]`, or `42`.
+// makeComputePoolJSON builds a ComputePool payload. statusLiteral is raw JSON
+// (e.g. `"RUNNING"`, `null`, `{"phase":"X"}`), or "" to omit the status field.
 func makeComputePoolJSON(name, statusLiteral string) []byte {
 	if statusLiteral == "" {
 		return []byte(`{
@@ -27,7 +26,6 @@ func makeComputePoolJSON(name, statusLiteral string) []byte {
 	}`)
 }
 
-// wrappedValue returns status[key]["value"] and whether both keys were found.
 func wrappedValue(pool ComputePool, key string) (interface{}, bool) {
 	if pool.Status == nil {
 		return nil, false
@@ -56,7 +54,6 @@ func TestComputePoolUnmarshal_FlatStatus(t *testing.T) {
 	if pool.Status == nil {
 		t.Fatal("status is nil")
 	}
-	// Verify every flat key got wrapped, not just phase.
 	wantValues := map[string]interface{}{
 		"phase":   "RUNNING",
 		"message": nil,
@@ -73,7 +70,7 @@ func TestComputePoolUnmarshal_FlatStatus(t *testing.T) {
 			t.Errorf("status[%q] missing", k)
 			continue
 		}
-		// Literal-assert the wrapper key name to catch format drift.
+		// Literal "value" key catches format drift.
 		got, hasValue := inner["value"]
 		if !hasValue {
 			t.Errorf("status[%q] missing %q key; got %v", k, "value", inner)
@@ -98,7 +95,7 @@ func TestComputePoolUnmarshal_NullStatus(t *testing.T) {
 }
 
 func TestComputePoolUnmarshal_MissingStatus(t *testing.T) {
-	data := makeComputePoolJSON("pool-e", "") // no status field at all
+	data := makeComputePoolJSON("pool-e", "")
 
 	var pool ComputePool
 	if err := json.Unmarshal(data, &pool); err != nil {
@@ -146,9 +143,7 @@ func TestComputePoolUnmarshal_AllNullValues(t *testing.T) {
 	}
 }
 
-// Non-object status shapes (array, top-level scalar) must surface as decode
-// errors rather than be silently dropped — the backend never returns these
-// shapes, so they indicate an API regression worth flagging.
+// Non-object status shapes indicate API regressions; surface the decode error.
 func TestComputePoolUnmarshal_NonObjectStatusFails(t *testing.T) {
 	cases := []struct {
 		name   string
@@ -173,9 +168,8 @@ func TestComputePoolUnmarshal_NonObjectStatusFails(t *testing.T) {
 	}
 }
 
+// A null payload on a reused receiver must clear Status, not retain the prior value.
 func TestComputePoolUnmarshal_ReceiverReuse(t *testing.T) {
-	// Unmarshal populates Status, then unmarshal a null-status payload into the
-	// same receiver: Status must be reset to nil, not retain the previous value.
 	var pool ComputePool
 	first := makeComputePoolJSON("first", `{"phase":"RUNNING"}`)
 	if err := json.Unmarshal(first, &pool); err != nil {
@@ -193,8 +187,8 @@ func TestComputePoolUnmarshal_ReceiverReuse(t *testing.T) {
 	}
 }
 
+// ComputePoolsPage.Items must invoke our UnmarshalJSON per element.
 func TestComputePoolUnmarshal_PageResponse(t *testing.T) {
-	// ComputePoolsPage.Items should invoke our UnmarshalJSON per element.
 	data := []byte(`{
 		"items": [
 			{
@@ -236,7 +230,6 @@ func TestComputePoolUnmarshal_PageResponse(t *testing.T) {
 }
 
 func TestComputePoolUnmarshal_EmptyPageItems(t *testing.T) {
-	// Empty and missing items must both yield a zero-length slice, not an error.
 	for _, tc := range []struct {
 		name string
 		body string
@@ -258,7 +251,6 @@ func TestComputePoolUnmarshal_EmptyPageItems(t *testing.T) {
 }
 
 func TestComputePoolUnmarshal_InvalidJSON(t *testing.T) {
-	// Top-level invalid JSON must still surface an error (not silently passed).
 	var pool ComputePool
 	err := json.Unmarshal([]byte(`{not valid json`), &pool)
 	if err == nil {
