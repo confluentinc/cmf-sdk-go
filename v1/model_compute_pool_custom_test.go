@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -84,51 +85,6 @@ func TestComputePoolUnmarshal_FlatStatus(t *testing.T) {
 	}
 }
 
-func TestComputePoolUnmarshal_AlreadyNestedStatus(t *testing.T) {
-	// Object values pass through unchanged, including extra keys (no re-wrap).
-	data := makeComputePoolJSON("pool-b", `{"phase":{"value":"PENDING","extra":"meta"}}`)
-
-	var pool ComputePool
-	if err := json.Unmarshal(data, &pool); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	v, ok := wrappedValue(pool, "phase")
-	if !ok {
-		t.Fatal("phase.value missing")
-	}
-	if v != "PENDING" {
-		t.Errorf("phase.value = %v, want %q", v, "PENDING")
-	}
-	if extra := (*pool.Status)["phase"]["extra"]; extra != "meta" {
-		t.Errorf("phase.extra = %v, want %q (passthrough dropped keys)", extra, "meta")
-	}
-}
-
-func TestComputePoolUnmarshal_PartialNestedStatus(t *testing.T) {
-	// Mixed: some values are objects (already wrapped), some are scalars.
-	// The object passes through unchanged; scalars are wrapped. No double-wrapping.
-	data := makeComputePoolJSON("pool-c", `{"phase":{"value":"RUNNING"},"message":"ok"}`)
-
-	var pool ComputePool
-	if err := json.Unmarshal(data, &pool); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	phase, ok := wrappedValue(pool, "phase")
-	if !ok {
-		t.Fatal("phase.value missing")
-	}
-	if phase != "RUNNING" {
-		t.Errorf("phase.value = %v, want %q (not double-wrapped)", phase, "RUNNING")
-	}
-	message, ok := wrappedValue(pool, "message")
-	if !ok {
-		t.Fatal("message.value missing")
-	}
-	if message != "ok" {
-		t.Errorf("message.value = %v, want %q", message, "ok")
-	}
-}
-
 func TestComputePoolUnmarshal_NullStatus(t *testing.T) {
 	data := makeComputePoolJSON("pool-d", `null`)
 
@@ -190,44 +146,30 @@ func TestComputePoolUnmarshal_AllNullValues(t *testing.T) {
 	}
 }
 
-func TestComputePoolUnmarshal_ArrayStatus(t *testing.T) {
-	// Malformed status shape (array). Must NOT return an error; set Status = nil.
-	data := makeComputePoolJSON("pool-h", `[1,2,3]`)
-
-	var pool ComputePool
-	if err := json.Unmarshal(data, &pool); err != nil {
-		t.Fatalf("unexpected error: %v", err)
+// Non-object status shapes (array, top-level scalar) must surface as decode
+// errors rather than be silently dropped — the backend never returns these
+// shapes, so they indicate an API regression worth flagging.
+func TestComputePoolUnmarshal_NonObjectStatusFails(t *testing.T) {
+	cases := []struct {
+		name   string
+		status string
+	}{
+		{"array", `[1,2,3]`},
+		{"string", `"RUNNING"`},
+		{"number", `42`},
 	}
-	if pool.Status != nil {
-		t.Errorf("status = %v, want nil for non-object status", pool.Status)
-	}
-	// Other fields must still populate.
-	if pool.Metadata.Name != "pool-h" {
-		t.Errorf("metadata.name = %q, want %q", pool.Metadata.Name, "pool-h")
-	}
-}
-
-func TestComputePoolUnmarshal_ScalarStringStatus(t *testing.T) {
-	data := makeComputePoolJSON("pool-i", `"RUNNING"`)
-
-	var pool ComputePool
-	if err := json.Unmarshal(data, &pool); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if pool.Status != nil {
-		t.Errorf("status = %v, want nil for scalar status", pool.Status)
-	}
-}
-
-func TestComputePoolUnmarshal_ScalarNumberStatus(t *testing.T) {
-	data := makeComputePoolJSON("pool-j", `42`)
-
-	var pool ComputePool
-	if err := json.Unmarshal(data, &pool); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if pool.Status != nil {
-		t.Errorf("status = %v, want nil for scalar status", pool.Status)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			data := makeComputePoolJSON("pool-"+tc.name, tc.status)
+			var pool ComputePool
+			err := json.Unmarshal(data, &pool)
+			if err == nil {
+				t.Fatalf("expected error for %s status, got nil", tc.name)
+			}
+			if !strings.Contains(err.Error(), "ComputePool.Status") {
+				t.Errorf("err = %q, want it to mention ComputePool.Status", err)
+			}
+		})
 	}
 }
 
