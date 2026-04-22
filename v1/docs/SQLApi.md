@@ -22,7 +22,7 @@ Method | HTTP request | Description
 [**GetStatementExceptions**](SQLApi.md#GetStatementExceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
 [**GetStatementResult**](SQLApi.md#GetStatementResult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
 [**GetStatements**](SQLApi.md#GetStatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
-[**UpdateComputePool**](SQLApi.md#UpdateComputePool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates a Compute Pool of the given name in the given Environment.
+[**UpdateComputePool**](SQLApi.md#UpdateComputePool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates the compute pool specified using its name and environment.
 [**UpdateKafkaCatalog**](SQLApi.md#UpdateKafkaCatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
 [**UpdateKafkaDatabase**](SQLApi.md#UpdateKafkaDatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
 [**UpdateStatement**](SQLApi.md#UpdateStatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.
@@ -324,7 +324,7 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     computePoolName := "computePoolName_example" // string | Name of the ComputePool
-    force := true // bool | If true, deletes the ComputePool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment may be orphaned. Has no additional effect on dedicated compute pools, which are always metadata-only. (optional) (default to false)
+    force := true // bool | If set to `true`, the platform deletes the compute pool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment might be orphaned. This configuration has no additional effect on dedicated compute pools that are always metadata-only. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -354,7 +354,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **force** | **bool** | If true, deletes the ComputePool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment may be orphaned. Has no additional effect on dedicated compute pools, which are always metadata-only. | [default to false]
+ **force** | **bool** | If set to &#x60;true&#x60;, the platform deletes the compute pool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment might be orphaned. This configuration has no additional effect on dedicated compute pools that are always metadata-only. | [default to false]
 
 ### Return type
 
@@ -530,7 +530,7 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     stmtName := "stmtName_example" // string | Name of the Statement
-    force := true // bool | If true, deletes the Statement from CMF metadata only, without requiring Kubernetes cluster connectivity. (optional) (default to false)
+    force := true // bool | If set to `true`, the platform deletes the statement from CMF metadata only, without requiring Kubernetes cluster connectivity. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -560,7 +560,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **force** | **bool** | If true, deletes the Statement from CMF metadata only, without requiring Kubernetes cluster connectivity. | [default to false]
+ **force** | **bool** | If set to &#x60;true&#x60;, the platform deletes the statement from CMF metadata only, without requiring Kubernetes cluster connectivity. | [default to false]
 
 ### Return type
 
@@ -1261,7 +1261,7 @@ func main() {
     search := "search_example" // string | Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace (optional)
     searchScope := "searchScope_example" // string | Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING) (optional)
     fields := "fields_example" // string | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase (optional)
-    name := "name_example" // string | Wildcard filter by statement name (e.g. ?name=abc). Deprecated: use filter parameter instead. (optional)
+    name := "name_example" // string | Substring filter using statement name, for example, `?name=abc`. This field is deprecated. Use `filter` parameter instead. (optional)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -1301,7 +1301,7 @@ Name | Type | Description  | Notes
  **search** | **string** | Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace | 
  **searchScope** | **string** | Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING) | 
  **fields** | **string** | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase | 
- **name** | **string** | Wildcard filter by statement name (e.g. ?name&#x3D;abc). Deprecated: use filter parameter instead. | 
+ **name** | **string** | Substring filter using statement name, for example, &#x60;?name&#x3D;abc&#x60;. This field is deprecated. Use &#x60;filter&#x60; parameter instead. | 
 
 ### Return type
 
@@ -1325,7 +1325,7 @@ No authorization required
 
 > ComputePool UpdateComputePool(ctx, envName, computePoolName).ComputePool(computePool).Execute()
 
-Updates a Compute Pool of the given name in the given Environment.
+Updates the compute pool specified using its name and environment.
 
 ### Example
 

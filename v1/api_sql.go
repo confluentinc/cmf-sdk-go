@@ -264,7 +264,7 @@ type SQLApi interface {
 	GetStatementsExecute(r ApiGetStatementsRequest) (StatementsPage, *_nethttp.Response, error)
 
 	/*
-	UpdateComputePool Updates a Compute Pool of the given name in the given Environment.
+	UpdateComputePool Updates the compute pool specified using its name and environment.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment
@@ -945,7 +945,7 @@ type ApiDeleteComputePoolRequest struct {
 	force *bool
 }
 
-// If true, deletes the ComputePool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment may be orphaned. Has no additional effect on dedicated compute pools, which are always metadata-only.
+// If set to &#x60;true&#x60;, the platform deletes the compute pool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment might be orphaned. This configuration has no additional effect on dedicated compute pools that are always metadata-only.
 func (r ApiDeleteComputePoolRequest) Force(force bool) ApiDeleteComputePoolRequest {
 	r.force = &force
 	return r
@@ -1318,7 +1318,7 @@ type ApiDeleteStatementRequest struct {
 	force *bool
 }
 
-// If true, deletes the Statement from CMF metadata only, without requiring Kubernetes cluster connectivity.
+// If set to &#x60;true&#x60;, the platform deletes the statement from CMF metadata only, without requiring Kubernetes cluster connectivity.
 func (r ApiDeleteStatementRequest) Force(force bool) ApiDeleteStatementRequest {
 	r.force = &force
 	return r
@@ -2784,7 +2784,7 @@ func (r ApiGetStatementsRequest) Fields(fields string) ApiGetStatementsRequest {
 	r.fields = &fields
 	return r
 }
-// Wildcard filter by statement name (e.g. ?name&#x3D;abc). Deprecated: use filter parameter instead.
+// Substring filter using statement name, for example, &#x60;?name&#x3D;abc&#x60;. This field is deprecated. Use &#x60;filter&#x60; parameter instead.
 // Deprecated
 func (r ApiGetStatementsRequest) Name(name string) ApiGetStatementsRequest {
 	r.name = &name
@@ -2966,7 +2966,7 @@ func (r ApiUpdateComputePoolRequest) Execute() (ComputePool, *_nethttp.Response,
 }
 
 /*
-UpdateComputePool Updates a Compute Pool of the given name in the given Environment.
+UpdateComputePool Updates the compute pool specified using its name and environment.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment

@@ -170,7 +170,7 @@ import (
 
 func main() {
     envName := "envName_example" // string | Name of the Environment to be deleted.
-    force := true // bool | If true, deletes the Environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources (service account, secret) may be orphaned. (optional) (default to false)
+    force := true // bool | If set to `true`, the platform deletes the environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources, such as a service account or a secret, might be orphaned. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -198,7 +198,7 @@ Other parameters are passed through a pointer to a apiDeleteEnvironmentRequest s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **force** | **bool** | If true, deletes the Environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources (service account, secret) may be orphaned. | [default to false]
+ **force** | **bool** | If set to &#x60;true&#x60;, the platform deletes the environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources, such as a service account or a secret, might be orphaned. | [default to false]
 
 ### Return type
 

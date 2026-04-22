@@ -34,8 +34,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -54,20 +55,19 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -75,9 +75,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -85,17 +86,17 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -103,9 +104,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -297,9 +299,9 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Environment from CMF metadata only, without
-          requiring Kubernetes cluster connectivity. Kubernetes resources (service
-          account, secret) may be orphaned.
+      - description: If set to `true`, the platform deletes the environment from CMF
+          metadata only, without requiring Kubernetes cluster connectivity. Kubernetes
+          resources, such as a service account or a secret, might be orphaned.
         explode: true
         in: query
         name: force
@@ -404,12 +406,12 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Supported properties: name, metadata.name, creationTimestamp,
-          metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note:
-          updateTimestamp sorts by the most recent spec update time. The displayed
-          metadata.updateTimestamp may differ as it reflects the latest of spec or
-          status changes.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Supported properties: name, metadata.name, creationTimestamp, metadata.creationTimestamp,
+          updateTimestamp, metadata.updateTimestamp.
+          Note: updateTimestamp sorts by the most recent spec update time. The displayed
+          metadata.updateTimestamp may differ as it reflects the latest of spec or status changes.
         explode: true
         in: query
         name: sort
@@ -428,20 +430,19 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -449,9 +450,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -656,8 +658,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Application from CMF metadata only, without
-          requiring Kubernetes cluster connectivity.
+      - description: If set to `true`, the platform deletes the application from CMF
+          metadata only, without requiring Kubernetes cluster connectivity.
         explode: true
         in: query
         name: force
@@ -771,8 +773,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -782,20 +785,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -803,9 +805,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -813,17 +816,17 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -831,9 +834,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -1015,8 +1019,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1319,8 +1324,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1459,8 +1465,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1503,20 +1510,19 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -1524,9 +1530,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -1534,17 +1541,17 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -1552,9 +1559,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -1571,8 +1579,8 @@ paths:
           type: string
         style: simple
       - deprecated: true
-        description: 'Wildcard filter by statement name (e.g. ?name=abc). Deprecated:
-          use filter parameter instead.'
+        description: Substring filter using statement name, for example, `?name=abc`.
+          This field is deprecated. Use `filter` parameter instead.
         explode: true
         in: query
         name: name
@@ -1750,8 +1758,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Statement from CMF metadata only, without
-          requiring Kubernetes cluster connectivity.
+      - description: If set to `true`, the platform deletes the statement from CMF
+          metadata only, without requiring Kubernetes cluster connectivity.
         explode: true
         in: query
         name: force
@@ -2066,8 +2074,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -2077,20 +2086,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -2107,9 +2115,10 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -2345,10 +2354,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the ComputePool from CMF metadata only, without
-          requiring Kubernetes cluster connectivity. For shared compute pools, the
-          session cluster FlinkDeployment may be orphaned. Has no additional effect
-          on dedicated compute pools, which are always metadata-only.
+      - description: If set to `true`, the platform deletes the compute pool from
+          CMF metadata only, without requiring Kubernetes cluster connectivity. For
+          shared compute pools, the session cluster FlinkDeployment might be orphaned.
+          This configuration has no additional effect on dedicated compute pools that
+          are always metadata-only.
         explode: true
         in: query
         name: force
@@ -2513,7 +2523,8 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Compute Pool cannot be updated (e.g., statements running).
+          description: The platform cannot update the compute pool. This can happen
+            due to reasons such as statements running on it.
         "422":
           content:
             application/json:
@@ -2532,7 +2543,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Updates a Compute Pool of the given name in the given Environment.
+      summary: Updates the compute pool specified using its name and environment.
       tags:
       - SQL
   /cmf/api/v1/secrets:
@@ -2555,8 +2566,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -2566,20 +2578,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -2587,9 +2598,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -2597,17 +2609,17 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -2615,9 +2627,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -2882,8 +2895,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3178,8 +3192,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3513,8 +3528,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3524,20 +3540,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -3545,9 +3560,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -3882,8 +3898,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3893,20 +3910,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -3914,9 +3930,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4191,8 +4208,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -4202,20 +4220,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -4223,9 +4240,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4251,7 +4269,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/SavepointsPage'
-          description: Detached Savepoints found and returned. In case, there are
+          description: Detached savepoints found and returned. In case, there are
             none, an empty list is returned.
         "500":
           content:
@@ -4262,7 +4280,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Retrieve a paginated list of all Detached Savepoints.
+      summary: Retrieve a paginated list of all detached savepoints.
       tags:
       - DetachedSavepoints
       x-spring-paginated: true
@@ -4285,7 +4303,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/Savepoint'
-          description: Detached Savepoint was successfully created and returned.
+          description: Detached savepoint was successfully created and returned.
         "400":
           content:
             application/json:
@@ -4320,7 +4338,7 @@ paths:
     delete:
       operationId: deleteDetachedSavepoint
       parameters:
-      - description: Name of the Detached Savepoint
+      - description: Name of the detached savepoint
         explode: false
         in: path
         name: detachedSavepointName
@@ -4330,7 +4348,7 @@ paths:
         style: simple
       responses:
         "204":
-          description: Detached Savepoint was found and deleted.
+          description: Detached savepoint was found and deleted.
         "404":
           content:
             application/json:
@@ -4339,7 +4357,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Detached Savepoint not found.
+          description: Detached savepoint not found.
         "500":
           content:
             application/json:
@@ -4349,13 +4367,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Deletes the Detached Savepoint of the given name.
+      summary: Deletes the detached savepoint of the given name.
       tags:
       - DetachedSavepoints
     get:
       operationId: getDetachedSavepoint
       parameters:
-      - description: Name of the Detached Savepoint
+      - description: Name of the detached savepoint
         explode: false
         in: path
         name: detachedSavepointName
@@ -4372,7 +4390,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/Savepoint'
-          description: Detached Savepoint found and returned.
+          description: Detached savepoint found and returned.
         "404":
           content:
             application/json:
@@ -4381,7 +4399,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Detached Savepoint not found.
+          description: Detached savepoint not found.
         "500":
           content:
             application/json:
@@ -4391,7 +4409,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Retrieve the Detached Savepoint of the given name.
+      summary: Retrieve the detached savepoint of the given name.
       tags:
       - DetachedSavepoints
   /cmf/api/v1/kubernetes-clusters:
@@ -4414,8 +4432,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -4425,20 +4444,19 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
         explode: true
         in: query
         name: filter
@@ -4446,9 +4464,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4798,8 +4817,9 @@ components:
         type: integer
       style: form
     sortParam:
-      description: 'Sorting criteria in the format: property,(asc|desc). Default sort
-        order is ascending. Multiple sort criteria are supported.'
+      description: |-
+        Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+        Multiple sort criteria are supported.
       explode: true
       in: query
       name: sort
@@ -4855,19 +4875,19 @@ components:
         type: string
       style: form
     filterParam:
-      description: 'Filter query string with comma-separated expressions. Supports:
-        - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-        = value or labels.key != value - Label set-based: labels.key in (value1, value2)
-        or labels.key notin (value1, value2) - Label existence: labels.key (exists)
-        or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING
-        or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering
-        (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING)
-        or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS
-        or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+      description: |-
+        Filter query string with comma-separated expressions. Supports:
+        - Name filtering: name=foo*bar (wildcards allowed)
+        - Label equality: labels.key = value or labels.key != value
+        - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+        - Label existence: labels.key (exists) or !labels.key (does not exist)
+        - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+        - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+        - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
         Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
-        Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example
-        (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with
-        type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)'
+        Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+        Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+        Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
       explode: true
       in: query
       name: filter
@@ -4876,9 +4896,10 @@ components:
         type: string
       style: form
     searchParam:
-      description: 'Search term to match against fields specified in searchScope.
-        Note: Both search and searchScope must be provided together. If only one is
-        provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      description: |-
+        Search term to match against fields specified in searchScope.
+        Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+        Example: ?search=foo&searchScope=name,kubernetesNamespace
       explode: true
       in: query
       name: search
@@ -4887,17 +4908,17 @@ components:
         type: string
       style: form
     searchScopeParam:
-      description: 'Comma-separated list of fields to search in. Must be provided
-        together with the search parameter. Unsupported field names will result in
-        a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-        For Statements: supported fields are name, statement. For Events: supported
-        fields are message, flinkApplicationInstance. For Secrets: supported fields
-        are name, environments. When multiple fields are specified, the search uses
-        OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-        means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-        ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement
-        contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-        means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      description: |-
+        Comma-separated list of fields to search in. Must be provided together with the search parameter.
+        Unsupported field names will result in a 400 Bad Request.
+        For Environments: supported fields are name, kubernetesNamespace.
+        For Statements: supported fields are name, statement.
+        For Events: supported fields are message, flinkApplicationInstance.
+        For Secrets: supported fields are name, environments.
+        When multiple fields are specified, the search uses OR logic.
+        Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+        Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+        Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
       explode: true
       in: query
       name: searchScope
@@ -4906,9 +4927,10 @@ components:
         type: string
       style: form
     fieldsParam:
-      description: 'Comma-separated list of field paths to include in the response.
-        Supports nested fields using dot notation. Always includes apiVersion and
-        kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      description: |-
+        Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+        Always includes apiVersion and kind fields even if not explicitly requested.
+        Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
       explode: true
       in: query
       name: fields
@@ -5598,9 +5620,9 @@ components:
       description: Status of the Kubernetes cluster.
       properties:
         state:
-          description: The effective state of the cluster. CONNECTED when the cluster
-            is reachable, DISCONNECTED when unreachable, or DECOMMISSIONED when intentionally
-            taken offline.
+          description: |-
+            The effective state of the cluster. CONNECTED when the cluster is reachable,
+            DISCONNECTED when unreachable, or DECOMMISSIONED when intentionally taken offline.
           enum:
           - CONNECTED
           - DISCONNECTED
@@ -5822,12 +5844,20 @@ components:
         labels:
           additionalProperties:
             type: string
-          description: Labels of the Kubernetes cluster.
+          description: |
+            Labels of the Kubernetes cluster. Omit the field (or send
+            null) to leave existing labels unchanged; send an empty
+            object to clear them.
+          nullable: true
           type: object
         annotations:
           additionalProperties:
             type: string
-          description: Annotations of the Kubernetes cluster.
+          description: |
+            Annotations of the Kubernetes cluster. Omit the field (or
+            send null) to leave existing annotations unchanged; send an
+            empty object to clear them.
+          nullable: true
           type: object
       required:
       - name
@@ -6160,8 +6190,9 @@ components:
         resourceSummary:
           $ref: '#/components/schemas/ResourceUsageSummary'
         warning:
-          description: Warning message indicating the displayed status may be stale,
-            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          description: |-
+            Warning message indicating the displayed status may be stale,
+            for example, when the backing Kubernetes cluster is disconnected or decommissioned.
           type: string
       required:
       - phase
@@ -6329,8 +6360,9 @@ components:
           - SHARED
           type: string
         state:
-          description: Desired state of the compute pool. Can only be specified for
-            shared compute pools. Defaults to RUNNING if not specified.
+          description: |-
+            Desired state of the compute pool. Can only be specified for shared
+            compute pools. Defaults to RUNNING if not specified.
           enum:
           - RUNNING
           - SUSPENDED
@@ -6351,7 +6383,7 @@ components:
         spec:
           $ref: '#/components/schemas/ComputePoolSpec'
         status:
-          additionalProperties: true
+          additionalProperties: {}
           description: Status for ComputePool
           properties:
             phase:
@@ -6373,9 +6405,9 @@ components:
             resources:
               $ref: '#/components/schemas/ResourcesByStatusAndTypeSummary'
             warning:
-              description: Warning message indicating the displayed status may be
-                stale, e.g. when the backing Kubernetes cluster is disconnected or
-                decommissioned.
+              description: |-
+                Warning message indicating the displayed status may be stale,
+                for example, when the backing Kubernetes cluster is disconnected or decommissioned.
               type: string
           required:
           - phase
@@ -6633,8 +6665,9 @@ components:
           description: Whether the Savepoint is pending deletion
           type: boolean
         warning:
-          description: Warning message indicating the displayed status may be stale,
-            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          description: |-
+            Warning message indicating the displayed status may be stale,
+            for example, when the backing Kubernetes cluster is disconnected or decommissioned.
           type: string
       title: SavepointStatus
       type: object

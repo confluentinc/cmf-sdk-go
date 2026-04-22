@@ -5,9 +5,9 @@ All URIs are relative to *http://localhost:8080*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**CreateDetachedSavepoint**](DetachedSavepointsApi.md#CreateDetachedSavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
-[**DeleteDetachedSavepoint**](DetachedSavepointsApi.md#DeleteDetachedSavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the Detached Savepoint of the given name.
-[**GetDetachedSavepoint**](DetachedSavepointsApi.md#GetDetachedSavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the Detached Savepoint of the given name.
-[**ListDetachedSavepoints**](DetachedSavepointsApi.md#ListDetachedSavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all Detached Savepoints.
+[**DeleteDetachedSavepoint**](DetachedSavepointsApi.md#DeleteDetachedSavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the detached savepoint of the given name.
+[**GetDetachedSavepoint**](DetachedSavepointsApi.md#GetDetachedSavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the detached savepoint of the given name.
+[**ListDetachedSavepoints**](DetachedSavepointsApi.md#ListDetachedSavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all detached savepoints.
 
 
 
@@ -79,7 +79,7 @@ No authorization required
 
 > DeleteDetachedSavepoint(ctx, detachedSavepointName).Execute()
 
-Deletes the Detached Savepoint of the given name.
+Deletes the detached savepoint of the given name.
 
 ### Example
 
@@ -94,7 +94,7 @@ import (
 )
 
 func main() {
-    detachedSavepointName := "detachedSavepointName_example" // string | Name of the Detached Savepoint
+    detachedSavepointName := "detachedSavepointName_example" // string | Name of the detached savepoint
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -112,7 +112,7 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**detachedSavepointName** | **string** | Name of the Detached Savepoint | 
+**detachedSavepointName** | **string** | Name of the detached savepoint | 
 
 ### Other Parameters
 
@@ -145,7 +145,7 @@ No authorization required
 
 > Savepoint GetDetachedSavepoint(ctx, detachedSavepointName).Execute()
 
-Retrieve the Detached Savepoint of the given name.
+Retrieve the detached savepoint of the given name.
 
 ### Example
 
@@ -160,7 +160,7 @@ import (
 )
 
 func main() {
-    detachedSavepointName := "detachedSavepointName_example" // string | Name of the Detached Savepoint
+    detachedSavepointName := "detachedSavepointName_example" // string | Name of the detached savepoint
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -180,7 +180,7 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**detachedSavepointName** | **string** | Name of the Detached Savepoint | 
+**detachedSavepointName** | **string** | Name of the detached savepoint | 
 
 ### Other Parameters
 
@@ -213,7 +213,7 @@ No authorization required
 
 > SavepointsPage ListDetachedSavepoints(ctx).Page(page).Size(size).Sort(sort).Filter(filter).Fields(fields).Name(name).Execute()
 
-Retrieve a paginated list of all Detached Savepoints.
+Retrieve a paginated list of all detached savepoints.
 
 ### Example
 

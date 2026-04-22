@@ -436,7 +436,7 @@ type ApiDeleteEnvironmentRequest struct {
 	force *bool
 }
 
-// If true, deletes the Environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources (service account, secret) may be orphaned.
+// If set to &#x60;true&#x60;, the platform deletes the environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources, such as a service account or a secret, might be orphaned.
 func (r ApiDeleteEnvironmentRequest) Force(force bool) ApiDeleteEnvironmentRequest {
 	r.force = &force
 	return r

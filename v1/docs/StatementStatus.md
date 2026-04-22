@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **Detail** | Pointer to **string** | Details about the execution status of the statement | [optional] 
 **Traits** | Pointer to [**StatementTraits**](StatementTraits.md) |  | [optional] 
 **ResourceSummary** | Pointer to [**ResourceUsageSummary**](ResourceUsageSummary.md) |  | [optional] 
-**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
+**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
 
 ## Methods
 

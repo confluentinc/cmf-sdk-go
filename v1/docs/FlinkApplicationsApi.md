@@ -107,7 +107,7 @@ import (
 func main() {
     envName := "envName_example" // string | Name of the Environment
     appName := "appName_example" // string | Name of the Application
-    force := true // bool | If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity. (optional) (default to false)
+    force := true // bool | If set to `true`, the platform deletes the application from CMF metadata only, without requiring Kubernetes cluster connectivity. (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     api_client := openapiclient.NewAPIClient(configuration)
@@ -137,7 +137,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **force** | **bool** | If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity. | [default to false]
+ **force** | **bool** | If set to &#x60;true&#x60;, the platform deletes the application from CMF metadata only, without requiring Kubernetes cluster connectivity. | [default to false]
 
 ### Return type
 
