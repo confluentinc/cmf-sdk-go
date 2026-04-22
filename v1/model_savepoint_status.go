@@ -30,7 +30,7 @@ type SavepointStatus struct {
 	Error *string `json:"error,omitempty"`
 	// Whether the Savepoint is pending deletion
 	PendingDeletion *bool `json:"pendingDeletion,omitempty"`
-	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	// Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned.
 	Warning *string `json:"warning,omitempty"`
 }
 

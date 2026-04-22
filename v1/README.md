@@ -82,9 +82,9 @@ Class | Method | HTTP request | Description
 *CMFInformationApi* | [**GetResourceInformation**](docs/CMFInformationApi.md#getresourceinformation) | **Get** /cmf/api/v1/resource-information | Retrieve resource information about the CMF deployment.
 *CMFInformationApi* | [**GetSystemInformation**](docs/CMFInformationApi.md#getsysteminformation) | **Get** /cmf/api/v1/system-information | Retrieve system information about the CMF deployment.
 *DetachedSavepointsApi* | [**CreateDetachedSavepoint**](docs/DetachedSavepointsApi.md#createdetachedsavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
-*DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the Detached Savepoint of the given name.
-*DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the Detached Savepoint of the given name.
-*DetachedSavepointsApi* | [**ListDetachedSavepoints**](docs/DetachedSavepointsApi.md#listdetachedsavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all Detached Savepoints.
+*DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the detached savepoint of the given name.
+*DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the detached savepoint of the given name.
+*DetachedSavepointsApi* | [**ListDetachedSavepoints**](docs/DetachedSavepointsApi.md#listdetachedsavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all detached savepoints.
 *EnvironmentsApi* | [**CreateEnvironmentSecretMapping**](docs/EnvironmentsApi.md#createenvironmentsecretmapping) | **Post** /cmf/api/v1/environments/{envName}/secret-mappings | Creates the Environment Secret Mapping for the given Environment.
 *EnvironmentsApi* | [**CreateOrUpdateEnvironment**](docs/EnvironmentsApi.md#createorupdateenvironment) | **Post** /cmf/api/v1/environments | Create or update an Environment
 *EnvironmentsApi* | [**DeleteEnvironment**](docs/EnvironmentsApi.md#deleteenvironment) | **Delete** /cmf/api/v1/environments/{envName} | 
@@ -124,7 +124,7 @@ Class | Method | HTTP request | Description
 *SQLApi* | [**GetStatementExceptions**](docs/SQLApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatementResult**](docs/SQLApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatements**](docs/SQLApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
-*SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates a Compute Pool of the given name in the given Environment.
+*SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates the compute pool specified using its name and environment.
 *SQLApi* | [**UpdateKafkaCatalog**](docs/SQLApi.md#updatekafkacatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
 *SQLApi* | [**UpdateKafkaDatabase**](docs/SQLApi.md#updatekafkadatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
 *SQLApi* | [**UpdateStatement**](docs/SQLApi.md#updatestatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.

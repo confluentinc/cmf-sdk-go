@@ -22,7 +22,7 @@ type StatementStatus struct {
 	Detail *string `json:"detail,omitempty"`
 	Traits *StatementTraits `json:"traits,omitempty"`
 	ResourceSummary *ResourceUsageSummary `json:"resourceSummary,omitempty"`
-	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	// Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned.
 	Warning *string `json:"warning,omitempty"`
 }
 

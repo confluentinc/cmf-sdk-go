@@ -306,7 +306,7 @@ type ApiDeleteApplicationRequest struct {
 	force *bool
 }
 
-// If true, deletes the Application from CMF metadata only, without requiring Kubernetes cluster connectivity.
+// If set to &#x60;true&#x60;, the platform deletes the application from CMF metadata only, without requiring Kubernetes cluster connectivity.
 func (r ApiDeleteApplicationRequest) Force(force bool) ApiDeleteApplicationRequest {
 	r.force = &force
 	return r

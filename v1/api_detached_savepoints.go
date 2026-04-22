@@ -40,10 +40,10 @@ type DetachedSavepointsApi interface {
 	CreateDetachedSavepointExecute(r ApiCreateDetachedSavepointRequest) (Savepoint, *_nethttp.Response, error)
 
 	/*
-	DeleteDetachedSavepoint Deletes the Detached Savepoint of the given name.
+	DeleteDetachedSavepoint Deletes the detached savepoint of the given name.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	 @param detachedSavepointName Name of the Detached Savepoint
+	 @param detachedSavepointName Name of the detached savepoint
 	 @return ApiDeleteDetachedSavepointRequest
 	*/
 	DeleteDetachedSavepoint(ctx _context.Context, detachedSavepointName string) ApiDeleteDetachedSavepointRequest
@@ -52,10 +52,10 @@ type DetachedSavepointsApi interface {
 	DeleteDetachedSavepointExecute(r ApiDeleteDetachedSavepointRequest) (*_nethttp.Response, error)
 
 	/*
-	GetDetachedSavepoint Retrieve the Detached Savepoint of the given name.
+	GetDetachedSavepoint Retrieve the detached savepoint of the given name.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	 @param detachedSavepointName Name of the Detached Savepoint
+	 @param detachedSavepointName Name of the detached savepoint
 	 @return ApiGetDetachedSavepointRequest
 	*/
 	GetDetachedSavepoint(ctx _context.Context, detachedSavepointName string) ApiGetDetachedSavepointRequest
@@ -65,7 +65,7 @@ type DetachedSavepointsApi interface {
 	GetDetachedSavepointExecute(r ApiGetDetachedSavepointRequest) (Savepoint, *_nethttp.Response, error)
 
 	/*
-	ListDetachedSavepoints Retrieve a paginated list of all Detached Savepoints.
+	ListDetachedSavepoints Retrieve a paginated list of all detached savepoints.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @return ApiListDetachedSavepointsRequest
@@ -228,10 +228,10 @@ func (r ApiDeleteDetachedSavepointRequest) Execute() (*_nethttp.Response, error)
 }
 
 /*
-DeleteDetachedSavepoint Deletes the Detached Savepoint of the given name.
+DeleteDetachedSavepoint Deletes the detached savepoint of the given name.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param detachedSavepointName Name of the Detached Savepoint
+ @param detachedSavepointName Name of the detached savepoint
  @return ApiDeleteDetachedSavepointRequest
 */
 func (a *DetachedSavepointsApiService) DeleteDetachedSavepoint(ctx _context.Context, detachedSavepointName string) ApiDeleteDetachedSavepointRequest {
@@ -340,10 +340,10 @@ func (r ApiGetDetachedSavepointRequest) Execute() (Savepoint, *_nethttp.Response
 }
 
 /*
-GetDetachedSavepoint Retrieve the Detached Savepoint of the given name.
+GetDetachedSavepoint Retrieve the detached savepoint of the given name.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param detachedSavepointName Name of the Detached Savepoint
+ @param detachedSavepointName Name of the detached savepoint
  @return ApiGetDetachedSavepointRequest
 */
 func (a *DetachedSavepointsApiService) GetDetachedSavepoint(ctx _context.Context, detachedSavepointName string) ApiGetDetachedSavepointRequest {
@@ -499,7 +499,7 @@ func (r ApiListDetachedSavepointsRequest) Execute() (SavepointsPage, *_nethttp.R
 }
 
 /*
-ListDetachedSavepoints Retrieve a paginated list of all Detached Savepoints.
+ListDetachedSavepoints Retrieve a paginated list of all detached savepoints.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiListDetachedSavepointsRequest

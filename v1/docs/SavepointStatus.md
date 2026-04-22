@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **Failures** | Pointer to **int32** | The number of failures of the Savepoint | [optional] 
 **Error** | Pointer to **string** | The error message for the Savepoint | [optional] 
 **PendingDeletion** | Pointer to **bool** | Whether the Savepoint is pending deletion | [optional] 
-**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
+**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
 
 ## Methods
 
