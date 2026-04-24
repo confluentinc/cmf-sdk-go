@@ -8,8 +8,8 @@ Name | Type | Description | Notes
 **CreationTimestamp** | Pointer to **string** | Timestamp when the cluster was registered. | [optional] [readonly] 
 **UpdateTimestamp** | Pointer to **string** | Timestamp when the cluster was last updated. | [optional] [readonly] 
 **Uid** | Pointer to **string** | Unique identifier of the Kubernetes cluster. | [optional] [readonly] 
-**Labels** | Pointer to **map[string]string** | Labels of the Kubernetes cluster. | [optional] 
-**Annotations** | Pointer to **map[string]string** | Annotations of the Kubernetes cluster. | [optional] 
+**Labels** | Pointer to **map[string]string** | Labels of the Kubernetes cluster. Omit the field (or send null) to leave existing labels unchanged; send an empty object to clear them.  | [optional] 
+**Annotations** | Pointer to **map[string]string** | Annotations of the Kubernetes cluster. Omit the field (or send null) to leave existing annotations unchanged; send an empty object to clear them.  | [optional] 
 
 ## Methods
 
@@ -150,6 +150,16 @@ SetLabels sets Labels field to given value.
 
 HasLabels returns a boolean if a field has been set.
 
+### SetLabelsNil
+
+`func (o *KubernetesClusterMetadata) SetLabelsNil(b bool)`
+
+ SetLabelsNil sets the value for Labels to be an explicit nil
+
+### UnsetLabels
+`func (o *KubernetesClusterMetadata) UnsetLabels()`
+
+UnsetLabels ensures that no value is present for Labels, not even an explicit nil
 ### GetAnnotations
 
 `func (o *KubernetesClusterMetadata) GetAnnotations() map[string]string`
@@ -175,6 +185,16 @@ SetAnnotations sets Annotations field to given value.
 
 HasAnnotations returns a boolean if a field has been set.
 
+### SetAnnotationsNil
+
+`func (o *KubernetesClusterMetadata) SetAnnotationsNil(b bool)`
+
+ SetAnnotationsNil sets the value for Annotations to be an explicit nil
+
+### UnsetAnnotations
+`func (o *KubernetesClusterMetadata) UnsetAnnotations()`
+
+UnsetAnnotations ensures that no value is present for Annotations, not even an explicit nil
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
