@@ -5822,12 +5822,20 @@ components:
         labels:
           additionalProperties:
             type: string
-          description: Labels of the Kubernetes cluster.
+          description: |
+            Labels of the Kubernetes cluster. Omit the field (or send
+            null) to leave existing labels unchanged; send an empty
+            object to clear them.
+          nullable: true
           type: object
         annotations:
           additionalProperties:
             type: string
-          description: Annotations of the Kubernetes cluster.
+          description: |
+            Annotations of the Kubernetes cluster. Omit the field (or
+            send null) to leave existing annotations unchanged; send an
+            empty object to clear them.
+          nullable: true
           type: object
       required:
       - name
@@ -6351,7 +6359,7 @@ components:
         spec:
           $ref: '#/components/schemas/ComputePoolSpec'
         status:
-          additionalProperties: true
+          additionalProperties: {}
           description: Status for ComputePool
           properties:
             phase:
