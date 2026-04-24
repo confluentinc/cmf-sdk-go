@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **Kind** | **string** | Kind of resource - set to resource type | 
 **Metadata** | [**ComputePoolMetadata**](ComputePoolMetadata.md) |  | 
 **Spec** | [**ComputePoolSpec**](ComputePoolSpec.md) |  | 
-**Status** | Pointer to **map[string]map[string]interface{}** | Status for ComputePool | [optional] 
+**Status** | Pointer to **map[string]interface{}** | Status for ComputePool | [optional] 
 
 ## Methods
 
@@ -111,20 +111,20 @@ SetSpec sets Spec field to given value.
 
 ### GetStatus
 
-`func (o *ComputePool) GetStatus() map[string]map[string]interface{}`
+`func (o *ComputePool) GetStatus() map[string]interface{}`
 
 GetStatus returns the Status field if non-nil, zero value otherwise.
 
 ### GetStatusOk
 
-`func (o *ComputePool) GetStatusOk() (*map[string]map[string]interface{}, bool)`
+`func (o *ComputePool) GetStatusOk() (*map[string]interface{}, bool)`
 
 GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatus
 
-`func (o *ComputePool) SetStatus(v map[string]map[string]interface{})`
+`func (o *ComputePool) SetStatus(v map[string]interface{})`
 
 SetStatus sets Status field to given value.
 
