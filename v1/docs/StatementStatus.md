@@ -8,7 +8,8 @@ Name | Type | Description | Notes
 **Detail** | Pointer to **string** | Details about the execution status of the statement | [optional] 
 **Traits** | Pointer to [**StatementTraits**](StatementTraits.md) |  | [optional] 
 **ResourceSummary** | Pointer to [**ResourceUsageSummary**](ResourceUsageSummary.md) |  | [optional] 
-**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
+**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
+**SavepointSchedule** | Pointer to [**SavepointScheduleStatus**](SavepointScheduleStatus.md) |  | [optional] 
 
 ## Methods
 
@@ -148,6 +149,31 @@ SetWarning sets Warning field to given value.
 `func (o *StatementStatus) HasWarning() bool`
 
 HasWarning returns a boolean if a field has been set.
+
+### GetSavepointSchedule
+
+`func (o *StatementStatus) GetSavepointSchedule() SavepointScheduleStatus`
+
+GetSavepointSchedule returns the SavepointSchedule field if non-nil, zero value otherwise.
+
+### GetSavepointScheduleOk
+
+`func (o *StatementStatus) GetSavepointScheduleOk() (*SavepointScheduleStatus, bool)`
+
+GetSavepointScheduleOk returns a tuple with the SavepointSchedule field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSavepointSchedule
+
+`func (o *StatementStatus) SetSavepointSchedule(v SavepointScheduleStatus)`
+
+SetSavepointSchedule sets SavepointSchedule field to given value.
+
+### HasSavepointSchedule
+
+`func (o *StatementStatus) HasSavepointSchedule() bool`
+
+HasSavepointSchedule returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

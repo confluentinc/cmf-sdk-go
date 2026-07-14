@@ -14,6 +14,18 @@ import (
 
 // MockSavepointsApi is a mock of SavepointsApi interface
 type MockSavepointsApi struct {
+	lockBulkDeleteSavepointsForFlinkApplication sync.Mutex
+	BulkDeleteSavepointsForFlinkApplicationFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest
+
+	lockBulkDeleteSavepointsForFlinkApplicationExecute sync.Mutex
+	BulkDeleteSavepointsForFlinkApplicationExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest) (github_com_confluentinc_cmf_sdk_go_v1.SavepointsBulkDeleteResult, *net_http.Response, error)
+
+	lockBulkDeleteSavepointsForFlinkStatement sync.Mutex
+	BulkDeleteSavepointsForFlinkStatementFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest
+
+	lockBulkDeleteSavepointsForFlinkStatementExecute sync.Mutex
+	BulkDeleteSavepointsForFlinkStatementExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.SavepointsBulkDeleteResult, *net_http.Response, error)
+
 	lockCreateSavepointForFlinkApplication sync.Mutex
 	CreateSavepointForFlinkApplicationFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiCreateSavepointForFlinkApplicationRequest
 
@@ -68,7 +80,35 @@ type MockSavepointsApi struct {
 	lockGetSavepointsForFlinkStatementExecute sync.Mutex
 	GetSavepointsForFlinkStatementExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetSavepointsForFlinkStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.SavepointsPage, *net_http.Response, error)
 
+	lockUpdateSavepointForFlinkApplication sync.Mutex
+	UpdateSavepointForFlinkApplicationFunc func(ctx context.Context, envName, appName, savepointName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest
+
+	lockUpdateSavepointForFlinkApplicationExecute sync.Mutex
+	UpdateSavepointForFlinkApplicationExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest) (github_com_confluentinc_cmf_sdk_go_v1.Savepoint, *net_http.Response, error)
+
+	lockUpdateSavepointForFlinkStatement sync.Mutex
+	UpdateSavepointForFlinkStatementFunc func(ctx context.Context, envName, stmtName, savepointName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest
+
+	lockUpdateSavepointForFlinkStatementExecute sync.Mutex
+	UpdateSavepointForFlinkStatementExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.Savepoint, *net_http.Response, error)
+
 	calls struct {
+		BulkDeleteSavepointsForFlinkApplication []struct {
+			Ctx     context.Context
+			EnvName string
+			AppName string
+		}
+		BulkDeleteSavepointsForFlinkApplicationExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest
+		}
+		BulkDeleteSavepointsForFlinkStatement []struct {
+			Ctx      context.Context
+			EnvName  string
+			StmtName string
+		}
+		BulkDeleteSavepointsForFlinkStatementExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest
+		}
 		CreateSavepointForFlinkApplication []struct {
 			Ctx     context.Context
 			EnvName string
@@ -146,7 +186,189 @@ type MockSavepointsApi struct {
 		GetSavepointsForFlinkStatementExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetSavepointsForFlinkStatementRequest
 		}
+		UpdateSavepointForFlinkApplication []struct {
+			Ctx           context.Context
+			EnvName       string
+			AppName       string
+			SavepointName string
+		}
+		UpdateSavepointForFlinkApplicationExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest
+		}
+		UpdateSavepointForFlinkStatement []struct {
+			Ctx           context.Context
+			EnvName       string
+			StmtName      string
+			SavepointName string
+		}
+		UpdateSavepointForFlinkStatementExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest
+		}
 	}
+}
+
+// BulkDeleteSavepointsForFlinkApplication mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplication(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	m.lockBulkDeleteSavepointsForFlinkApplication.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplication.Unlock()
+
+	if m.BulkDeleteSavepointsForFlinkApplicationFunc == nil {
+		panic("mocker: MockSavepointsApi.BulkDeleteSavepointsForFlinkApplicationFunc is nil but MockSavepointsApi.BulkDeleteSavepointsForFlinkApplication was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+		AppName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+		AppName: appName,
+	}
+
+	m.calls.BulkDeleteSavepointsForFlinkApplication = append(m.calls.BulkDeleteSavepointsForFlinkApplication, call)
+
+	return m.BulkDeleteSavepointsForFlinkApplicationFunc(ctx, envName, appName)
+}
+
+// BulkDeleteSavepointsForFlinkApplicationCalled returns true if BulkDeleteSavepointsForFlinkApplication was called at least once.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplicationCalled() bool {
+	m.lockBulkDeleteSavepointsForFlinkApplication.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplication.Unlock()
+
+	return len(m.calls.BulkDeleteSavepointsForFlinkApplication) > 0
+}
+
+// BulkDeleteSavepointsForFlinkApplicationCalls returns the calls made to BulkDeleteSavepointsForFlinkApplication.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplicationCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+	AppName string
+} {
+	m.lockBulkDeleteSavepointsForFlinkApplication.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplication.Unlock()
+
+	return m.calls.BulkDeleteSavepointsForFlinkApplication
+}
+
+// BulkDeleteSavepointsForFlinkApplicationExecute mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplicationExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest) (github_com_confluentinc_cmf_sdk_go_v1.SavepointsBulkDeleteResult, *net_http.Response, error) {
+	m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Unlock()
+
+	if m.BulkDeleteSavepointsForFlinkApplicationExecuteFunc == nil {
+		panic("mocker: MockSavepointsApi.BulkDeleteSavepointsForFlinkApplicationExecuteFunc is nil but MockSavepointsApi.BulkDeleteSavepointsForFlinkApplicationExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest
+	}{
+		R: r,
+	}
+
+	m.calls.BulkDeleteSavepointsForFlinkApplicationExecute = append(m.calls.BulkDeleteSavepointsForFlinkApplicationExecute, call)
+
+	return m.BulkDeleteSavepointsForFlinkApplicationExecuteFunc(r)
+}
+
+// BulkDeleteSavepointsForFlinkApplicationExecuteCalled returns true if BulkDeleteSavepointsForFlinkApplicationExecute was called at least once.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplicationExecuteCalled() bool {
+	m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Unlock()
+
+	return len(m.calls.BulkDeleteSavepointsForFlinkApplicationExecute) > 0
+}
+
+// BulkDeleteSavepointsForFlinkApplicationExecuteCalls returns the calls made to BulkDeleteSavepointsForFlinkApplicationExecute.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkApplicationExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkApplicationRequest
+} {
+	m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Unlock()
+
+	return m.calls.BulkDeleteSavepointsForFlinkApplicationExecute
+}
+
+// BulkDeleteSavepointsForFlinkStatement mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatement(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	m.lockBulkDeleteSavepointsForFlinkStatement.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatement.Unlock()
+
+	if m.BulkDeleteSavepointsForFlinkStatementFunc == nil {
+		panic("mocker: MockSavepointsApi.BulkDeleteSavepointsForFlinkStatementFunc is nil but MockSavepointsApi.BulkDeleteSavepointsForFlinkStatement was called.")
+	}
+
+	call := struct {
+		Ctx      context.Context
+		EnvName  string
+		StmtName string
+	}{
+		Ctx:      ctx,
+		EnvName:  envName,
+		StmtName: stmtName,
+	}
+
+	m.calls.BulkDeleteSavepointsForFlinkStatement = append(m.calls.BulkDeleteSavepointsForFlinkStatement, call)
+
+	return m.BulkDeleteSavepointsForFlinkStatementFunc(ctx, envName, stmtName)
+}
+
+// BulkDeleteSavepointsForFlinkStatementCalled returns true if BulkDeleteSavepointsForFlinkStatement was called at least once.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatementCalled() bool {
+	m.lockBulkDeleteSavepointsForFlinkStatement.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatement.Unlock()
+
+	return len(m.calls.BulkDeleteSavepointsForFlinkStatement) > 0
+}
+
+// BulkDeleteSavepointsForFlinkStatementCalls returns the calls made to BulkDeleteSavepointsForFlinkStatement.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatementCalls() []struct {
+	Ctx      context.Context
+	EnvName  string
+	StmtName string
+} {
+	m.lockBulkDeleteSavepointsForFlinkStatement.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatement.Unlock()
+
+	return m.calls.BulkDeleteSavepointsForFlinkStatement
+}
+
+// BulkDeleteSavepointsForFlinkStatementExecute mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatementExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.SavepointsBulkDeleteResult, *net_http.Response, error) {
+	m.lockBulkDeleteSavepointsForFlinkStatementExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatementExecute.Unlock()
+
+	if m.BulkDeleteSavepointsForFlinkStatementExecuteFunc == nil {
+		panic("mocker: MockSavepointsApi.BulkDeleteSavepointsForFlinkStatementExecuteFunc is nil but MockSavepointsApi.BulkDeleteSavepointsForFlinkStatementExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest
+	}{
+		R: r,
+	}
+
+	m.calls.BulkDeleteSavepointsForFlinkStatementExecute = append(m.calls.BulkDeleteSavepointsForFlinkStatementExecute, call)
+
+	return m.BulkDeleteSavepointsForFlinkStatementExecuteFunc(r)
+}
+
+// BulkDeleteSavepointsForFlinkStatementExecuteCalled returns true if BulkDeleteSavepointsForFlinkStatementExecute was called at least once.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatementExecuteCalled() bool {
+	m.lockBulkDeleteSavepointsForFlinkStatementExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatementExecute.Unlock()
+
+	return len(m.calls.BulkDeleteSavepointsForFlinkStatementExecute) > 0
+}
+
+// BulkDeleteSavepointsForFlinkStatementExecuteCalls returns the calls made to BulkDeleteSavepointsForFlinkStatementExecute.
+func (m *MockSavepointsApi) BulkDeleteSavepointsForFlinkStatementExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiBulkDeleteSavepointsForFlinkStatementRequest
+} {
+	m.lockBulkDeleteSavepointsForFlinkStatementExecute.Lock()
+	defer m.lockBulkDeleteSavepointsForFlinkStatementExecute.Unlock()
+
+	return m.calls.BulkDeleteSavepointsForFlinkStatementExecute
 }
 
 // CreateSavepointForFlinkApplication mocks base method by wrapping the associated func.
@@ -902,8 +1124,190 @@ func (m *MockSavepointsApi) GetSavepointsForFlinkStatementExecuteCalls() []struc
 	return m.calls.GetSavepointsForFlinkStatementExecute
 }
 
+// UpdateSavepointForFlinkApplication mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplication(ctx context.Context, envName, appName, savepointName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest {
+	m.lockUpdateSavepointForFlinkApplication.Lock()
+	defer m.lockUpdateSavepointForFlinkApplication.Unlock()
+
+	if m.UpdateSavepointForFlinkApplicationFunc == nil {
+		panic("mocker: MockSavepointsApi.UpdateSavepointForFlinkApplicationFunc is nil but MockSavepointsApi.UpdateSavepointForFlinkApplication was called.")
+	}
+
+	call := struct {
+		Ctx           context.Context
+		EnvName       string
+		AppName       string
+		SavepointName string
+	}{
+		Ctx:           ctx,
+		EnvName:       envName,
+		AppName:       appName,
+		SavepointName: savepointName,
+	}
+
+	m.calls.UpdateSavepointForFlinkApplication = append(m.calls.UpdateSavepointForFlinkApplication, call)
+
+	return m.UpdateSavepointForFlinkApplicationFunc(ctx, envName, appName, savepointName)
+}
+
+// UpdateSavepointForFlinkApplicationCalled returns true if UpdateSavepointForFlinkApplication was called at least once.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplicationCalled() bool {
+	m.lockUpdateSavepointForFlinkApplication.Lock()
+	defer m.lockUpdateSavepointForFlinkApplication.Unlock()
+
+	return len(m.calls.UpdateSavepointForFlinkApplication) > 0
+}
+
+// UpdateSavepointForFlinkApplicationCalls returns the calls made to UpdateSavepointForFlinkApplication.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplicationCalls() []struct {
+	Ctx           context.Context
+	EnvName       string
+	AppName       string
+	SavepointName string
+} {
+	m.lockUpdateSavepointForFlinkApplication.Lock()
+	defer m.lockUpdateSavepointForFlinkApplication.Unlock()
+
+	return m.calls.UpdateSavepointForFlinkApplication
+}
+
+// UpdateSavepointForFlinkApplicationExecute mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplicationExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest) (github_com_confluentinc_cmf_sdk_go_v1.Savepoint, *net_http.Response, error) {
+	m.lockUpdateSavepointForFlinkApplicationExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkApplicationExecute.Unlock()
+
+	if m.UpdateSavepointForFlinkApplicationExecuteFunc == nil {
+		panic("mocker: MockSavepointsApi.UpdateSavepointForFlinkApplicationExecuteFunc is nil but MockSavepointsApi.UpdateSavepointForFlinkApplicationExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest
+	}{
+		R: r,
+	}
+
+	m.calls.UpdateSavepointForFlinkApplicationExecute = append(m.calls.UpdateSavepointForFlinkApplicationExecute, call)
+
+	return m.UpdateSavepointForFlinkApplicationExecuteFunc(r)
+}
+
+// UpdateSavepointForFlinkApplicationExecuteCalled returns true if UpdateSavepointForFlinkApplicationExecute was called at least once.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplicationExecuteCalled() bool {
+	m.lockUpdateSavepointForFlinkApplicationExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkApplicationExecute.Unlock()
+
+	return len(m.calls.UpdateSavepointForFlinkApplicationExecute) > 0
+}
+
+// UpdateSavepointForFlinkApplicationExecuteCalls returns the calls made to UpdateSavepointForFlinkApplicationExecute.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkApplicationExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkApplicationRequest
+} {
+	m.lockUpdateSavepointForFlinkApplicationExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkApplicationExecute.Unlock()
+
+	return m.calls.UpdateSavepointForFlinkApplicationExecute
+}
+
+// UpdateSavepointForFlinkStatement mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatement(ctx context.Context, envName, stmtName, savepointName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest {
+	m.lockUpdateSavepointForFlinkStatement.Lock()
+	defer m.lockUpdateSavepointForFlinkStatement.Unlock()
+
+	if m.UpdateSavepointForFlinkStatementFunc == nil {
+		panic("mocker: MockSavepointsApi.UpdateSavepointForFlinkStatementFunc is nil but MockSavepointsApi.UpdateSavepointForFlinkStatement was called.")
+	}
+
+	call := struct {
+		Ctx           context.Context
+		EnvName       string
+		StmtName      string
+		SavepointName string
+	}{
+		Ctx:           ctx,
+		EnvName:       envName,
+		StmtName:      stmtName,
+		SavepointName: savepointName,
+	}
+
+	m.calls.UpdateSavepointForFlinkStatement = append(m.calls.UpdateSavepointForFlinkStatement, call)
+
+	return m.UpdateSavepointForFlinkStatementFunc(ctx, envName, stmtName, savepointName)
+}
+
+// UpdateSavepointForFlinkStatementCalled returns true if UpdateSavepointForFlinkStatement was called at least once.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatementCalled() bool {
+	m.lockUpdateSavepointForFlinkStatement.Lock()
+	defer m.lockUpdateSavepointForFlinkStatement.Unlock()
+
+	return len(m.calls.UpdateSavepointForFlinkStatement) > 0
+}
+
+// UpdateSavepointForFlinkStatementCalls returns the calls made to UpdateSavepointForFlinkStatement.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatementCalls() []struct {
+	Ctx           context.Context
+	EnvName       string
+	StmtName      string
+	SavepointName string
+} {
+	m.lockUpdateSavepointForFlinkStatement.Lock()
+	defer m.lockUpdateSavepointForFlinkStatement.Unlock()
+
+	return m.calls.UpdateSavepointForFlinkStatement
+}
+
+// UpdateSavepointForFlinkStatementExecute mocks base method by wrapping the associated func.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatementExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.Savepoint, *net_http.Response, error) {
+	m.lockUpdateSavepointForFlinkStatementExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkStatementExecute.Unlock()
+
+	if m.UpdateSavepointForFlinkStatementExecuteFunc == nil {
+		panic("mocker: MockSavepointsApi.UpdateSavepointForFlinkStatementExecuteFunc is nil but MockSavepointsApi.UpdateSavepointForFlinkStatementExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest
+	}{
+		R: r,
+	}
+
+	m.calls.UpdateSavepointForFlinkStatementExecute = append(m.calls.UpdateSavepointForFlinkStatementExecute, call)
+
+	return m.UpdateSavepointForFlinkStatementExecuteFunc(r)
+}
+
+// UpdateSavepointForFlinkStatementExecuteCalled returns true if UpdateSavepointForFlinkStatementExecute was called at least once.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatementExecuteCalled() bool {
+	m.lockUpdateSavepointForFlinkStatementExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkStatementExecute.Unlock()
+
+	return len(m.calls.UpdateSavepointForFlinkStatementExecute) > 0
+}
+
+// UpdateSavepointForFlinkStatementExecuteCalls returns the calls made to UpdateSavepointForFlinkStatementExecute.
+func (m *MockSavepointsApi) UpdateSavepointForFlinkStatementExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateSavepointForFlinkStatementRequest
+} {
+	m.lockUpdateSavepointForFlinkStatementExecute.Lock()
+	defer m.lockUpdateSavepointForFlinkStatementExecute.Unlock()
+
+	return m.calls.UpdateSavepointForFlinkStatementExecute
+}
+
 // Reset resets the calls made to the mocked methods.
 func (m *MockSavepointsApi) Reset() {
+	m.lockBulkDeleteSavepointsForFlinkApplication.Lock()
+	m.calls.BulkDeleteSavepointsForFlinkApplication = nil
+	m.lockBulkDeleteSavepointsForFlinkApplication.Unlock()
+	m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Lock()
+	m.calls.BulkDeleteSavepointsForFlinkApplicationExecute = nil
+	m.lockBulkDeleteSavepointsForFlinkApplicationExecute.Unlock()
+	m.lockBulkDeleteSavepointsForFlinkStatement.Lock()
+	m.calls.BulkDeleteSavepointsForFlinkStatement = nil
+	m.lockBulkDeleteSavepointsForFlinkStatement.Unlock()
+	m.lockBulkDeleteSavepointsForFlinkStatementExecute.Lock()
+	m.calls.BulkDeleteSavepointsForFlinkStatementExecute = nil
+	m.lockBulkDeleteSavepointsForFlinkStatementExecute.Unlock()
 	m.lockCreateSavepointForFlinkApplication.Lock()
 	m.calls.CreateSavepointForFlinkApplication = nil
 	m.lockCreateSavepointForFlinkApplication.Unlock()
@@ -958,4 +1362,16 @@ func (m *MockSavepointsApi) Reset() {
 	m.lockGetSavepointsForFlinkStatementExecute.Lock()
 	m.calls.GetSavepointsForFlinkStatementExecute = nil
 	m.lockGetSavepointsForFlinkStatementExecute.Unlock()
+	m.lockUpdateSavepointForFlinkApplication.Lock()
+	m.calls.UpdateSavepointForFlinkApplication = nil
+	m.lockUpdateSavepointForFlinkApplication.Unlock()
+	m.lockUpdateSavepointForFlinkApplicationExecute.Lock()
+	m.calls.UpdateSavepointForFlinkApplicationExecute = nil
+	m.lockUpdateSavepointForFlinkApplicationExecute.Unlock()
+	m.lockUpdateSavepointForFlinkStatement.Lock()
+	m.calls.UpdateSavepointForFlinkStatement = nil
+	m.lockUpdateSavepointForFlinkStatement.Unlock()
+	m.lockUpdateSavepointForFlinkStatementExecute.Lock()
+	m.calls.UpdateSavepointForFlinkStatementExecute = nil
+	m.lockUpdateSavepointForFlinkStatementExecute.Unlock()
 }

@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **Parallelism** | Pointer to **int32** | Parallelism of the statement | [optional] 
 **Stopped** | Pointer to **bool** | Whether the statement is stopped | [optional] 
 **StartFromSavepoint** | Pointer to [**StatementStartFromSavepoint**](StatementStartFromSavepoint.md) |  | [optional] 
+**SavepointSchedule** | Pointer to [**SavepointScheduleConfig**](SavepointScheduleConfig.md) |  | [optional] 
 
 ## Methods
 
@@ -195,6 +196,31 @@ SetStartFromSavepoint sets StartFromSavepoint field to given value.
 `func (o *StatementSpec) HasStartFromSavepoint() bool`
 
 HasStartFromSavepoint returns a boolean if a field has been set.
+
+### GetSavepointSchedule
+
+`func (o *StatementSpec) GetSavepointSchedule() SavepointScheduleConfig`
+
+GetSavepointSchedule returns the SavepointSchedule field if non-nil, zero value otherwise.
+
+### GetSavepointScheduleOk
+
+`func (o *StatementSpec) GetSavepointScheduleOk() (*SavepointScheduleConfig, bool)`
+
+GetSavepointScheduleOk returns a tuple with the SavepointSchedule field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSavepointSchedule
+
+`func (o *StatementSpec) SetSavepointSchedule(v SavepointScheduleConfig)`
+
+SetSavepointSchedule sets SavepointSchedule field to given value.
+
+### HasSavepointSchedule
+
+`func (o *StatementSpec) HasSavepointSchedule() bool`
+
+HasSavepointSchedule returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

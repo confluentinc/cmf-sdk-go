@@ -17,15 +17,16 @@ import (
 // KubernetesClusterSpec Specification for the Kubernetes cluster.
 type KubernetesClusterSpec struct {
 	// The desired lifecycle state of the cluster.
-	LifecycleState *string `json:"lifecycleState,omitempty"`
+	LifecycleState string `json:"lifecycleState"`
 }
 
 // NewKubernetesClusterSpec instantiates a new KubernetesClusterSpec object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewKubernetesClusterSpec() *KubernetesClusterSpec {
+func NewKubernetesClusterSpec(lifecycleState string) *KubernetesClusterSpec {
 	this := KubernetesClusterSpec{}
+	this.LifecycleState = lifecycleState
 	return &this
 }
 
@@ -37,41 +38,33 @@ func NewKubernetesClusterSpecWithDefaults() *KubernetesClusterSpec {
 	return &this
 }
 
-// GetLifecycleState returns the LifecycleState field value if set, zero value otherwise.
+// GetLifecycleState returns the LifecycleState field value
 func (o *KubernetesClusterSpec) GetLifecycleState() string {
-	if o == nil || o.LifecycleState == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.LifecycleState
+
+	return o.LifecycleState
 }
 
-// GetLifecycleStateOk returns a tuple with the LifecycleState field value if set, nil otherwise
+// GetLifecycleStateOk returns a tuple with the LifecycleState field value
 // and a boolean to check if the value has been set.
 func (o *KubernetesClusterSpec) GetLifecycleStateOk() (*string, bool) {
-	if o == nil || o.LifecycleState == nil {
+	if o == nil  {
 		return nil, false
 	}
-	return o.LifecycleState, true
+	return &o.LifecycleState, true
 }
 
-// HasLifecycleState returns a boolean if a field has been set.
-func (o *KubernetesClusterSpec) HasLifecycleState() bool {
-	if o != nil && o.LifecycleState != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetLifecycleState gets a reference to the given string and assigns it to the LifecycleState field.
+// SetLifecycleState sets field value
 func (o *KubernetesClusterSpec) SetLifecycleState(v string) {
-	o.LifecycleState = &v
+	o.LifecycleState = v
 }
 
 func (o KubernetesClusterSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.LifecycleState != nil {
+	if true {
 		toSerialize["lifecycleState"] = o.LifecycleState
 	}
 	return json.Marshal(toSerialize)

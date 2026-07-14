@@ -16,6 +16,7 @@ import (
 
 // KubernetesClusterName struct for KubernetesClusterName
 type KubernetesClusterName struct {
+	// Immutable after creation. Cannot be changed via update. Defaults to \"default-k8s-cluster\" if not provided on creation.
 	KubernetesClusterName *string `json:"kubernetesClusterName,omitempty"`
 }
 

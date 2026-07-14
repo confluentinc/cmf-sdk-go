@@ -18,6 +18,7 @@ import (
 type StatementDefaults struct {
 	// default Flink configuration for Statements
 	FlinkConfiguration *map[string]string `json:"flinkConfiguration,omitempty"`
+	SavepointSchedule *SavepointScheduleConfig `json:"savepointSchedule,omitempty"`
 }
 
 // NewStatementDefaults instantiates a new StatementDefaults object
@@ -69,10 +70,45 @@ func (o *StatementDefaults) SetFlinkConfiguration(v map[string]string) {
 	o.FlinkConfiguration = &v
 }
 
+// GetSavepointSchedule returns the SavepointSchedule field value if set, zero value otherwise.
+func (o *StatementDefaults) GetSavepointSchedule() SavepointScheduleConfig {
+	if o == nil || o.SavepointSchedule == nil {
+		var ret SavepointScheduleConfig
+		return ret
+	}
+	return *o.SavepointSchedule
+}
+
+// GetSavepointScheduleOk returns a tuple with the SavepointSchedule field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementDefaults) GetSavepointScheduleOk() (*SavepointScheduleConfig, bool) {
+	if o == nil || o.SavepointSchedule == nil {
+		return nil, false
+	}
+	return o.SavepointSchedule, true
+}
+
+// HasSavepointSchedule returns a boolean if a field has been set.
+func (o *StatementDefaults) HasSavepointSchedule() bool {
+	if o != nil && o.SavepointSchedule != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSavepointSchedule gets a reference to the given SavepointScheduleConfig and assigns it to the SavepointSchedule field.
+func (o *StatementDefaults) SetSavepointSchedule(v SavepointScheduleConfig) {
+	o.SavepointSchedule = &v
+}
+
 func (o StatementDefaults) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.FlinkConfiguration != nil {
 		toSerialize["flinkConfiguration"] = o.FlinkConfiguration
+	}
+	if o.SavepointSchedule != nil {
+		toSerialize["savepointSchedule"] = o.SavepointSchedule
 	}
 	return json.Marshal(toSerialize)
 }

@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**KubernetesNamespace** | Pointer to **string** |  | [optional] 
+**KubernetesNamespace** | Pointer to **string** | Immutable after creation. Cannot be changed via update. | [optional] 
 
 ## Methods
 

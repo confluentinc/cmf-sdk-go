@@ -17,7 +17,9 @@ import (
 // FlinkApplicationAllOf struct for FlinkApplicationAllOf
 type FlinkApplicationAllOf struct {
 	Metadata map[string]interface{} `json:"metadata"`
+	// Application spec as YAML or JSON, following the Flink Kubernetes Operator FlinkDeployment spec. May additionally include a top-level \"savepointSchedule\" field (see SavepointScheduleConfig) to configure periodic savepoints for the application. An environment-wide default can be set at flinkApplicationDefaults.spec.savepointSchedule on the Environment; env-level fields take precedence field by field over any value set here.
 	Spec map[string]interface{} `json:"spec"`
+	// Application status as YAML or JSON. May include a \"warning\" string field indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. May include a \"savepointSchedule\" field (see SavepointScheduleStatus) with the runtime status of the application's periodic savepoint schedule.
 	Status *map[string]interface{} `json:"status,omitempty"`
 }
 

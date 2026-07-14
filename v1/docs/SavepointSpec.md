@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Path** | Pointer to **string** | Path of the Savepoint | [optional] 
 **BackoffLimit** | Pointer to **int32** | Backoff limit for the Savepoint | [optional] [default to -1]
 **FormatType** | Pointer to **string** | Format type of the Savepoint | [optional] [default to "CANONICAL"]
+**Pinned** | Pointer to **bool** | When true, this Savepoint is exempt from automatic retention cleanup and must be deleted explicitly.  | [optional] [default to false]
 
 ## Methods
 
@@ -101,6 +102,31 @@ SetFormatType sets FormatType field to given value.
 `func (o *SavepointSpec) HasFormatType() bool`
 
 HasFormatType returns a boolean if a field has been set.
+
+### GetPinned
+
+`func (o *SavepointSpec) GetPinned() bool`
+
+GetPinned returns the Pinned field if non-nil, zero value otherwise.
+
+### GetPinnedOk
+
+`func (o *SavepointSpec) GetPinnedOk() (*bool, bool)`
+
+GetPinnedOk returns a tuple with the Pinned field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPinned
+
+`func (o *SavepointSpec) SetPinned(v bool)`
+
+SetPinned sets Pinned field to given value.
+
+### HasPinned
+
+`func (o *SavepointSpec) HasPinned() bool`
+
+HasPinned returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

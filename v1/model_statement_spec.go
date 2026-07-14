@@ -29,6 +29,7 @@ type StatementSpec struct {
 	// Whether the statement is stopped
 	Stopped *bool `json:"stopped,omitempty"`
 	StartFromSavepoint *StatementStartFromSavepoint `json:"startFromSavepoint,omitempty"`
+	SavepointSchedule *SavepointScheduleConfig `json:"savepointSchedule,omitempty"`
 }
 
 // NewStatementSpec instantiates a new StatementSpec object
@@ -258,6 +259,38 @@ func (o *StatementSpec) SetStartFromSavepoint(v StatementStartFromSavepoint) {
 	o.StartFromSavepoint = &v
 }
 
+// GetSavepointSchedule returns the SavepointSchedule field value if set, zero value otherwise.
+func (o *StatementSpec) GetSavepointSchedule() SavepointScheduleConfig {
+	if o == nil || o.SavepointSchedule == nil {
+		var ret SavepointScheduleConfig
+		return ret
+	}
+	return *o.SavepointSchedule
+}
+
+// GetSavepointScheduleOk returns a tuple with the SavepointSchedule field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementSpec) GetSavepointScheduleOk() (*SavepointScheduleConfig, bool) {
+	if o == nil || o.SavepointSchedule == nil {
+		return nil, false
+	}
+	return o.SavepointSchedule, true
+}
+
+// HasSavepointSchedule returns a boolean if a field has been set.
+func (o *StatementSpec) HasSavepointSchedule() bool {
+	if o != nil && o.SavepointSchedule != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSavepointSchedule gets a reference to the given SavepointScheduleConfig and assigns it to the SavepointSchedule field.
+func (o *StatementSpec) SetSavepointSchedule(v SavepointScheduleConfig) {
+	o.SavepointSchedule = &v
+}
+
 func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -280,6 +313,9 @@ func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	}
 	if o.StartFromSavepoint != nil {
 		toSerialize["startFromSavepoint"] = o.StartFromSavepoint
+	}
+	if o.SavepointSchedule != nil {
+		toSerialize["savepointSchedule"] = o.SavepointSchedule
 	}
 	return json.Marshal(toSerialize)
 }

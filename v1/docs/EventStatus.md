@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Message** | Pointer to **string** | Human readable status message. | [optional] 
 **Type** | Pointer to **string** | Type of the event | [optional] 
+**Count** | Pointer to **int32** | Number of times this event has occurred. 1 for events that are not aggregated (e.g. status events). | [optional] 
 **Data** | Pointer to [**EventData**](EventData.md) |  | [optional] 
 
 ## Methods
@@ -76,6 +77,31 @@ SetType sets Type field to given value.
 `func (o *EventStatus) HasType() bool`
 
 HasType returns a boolean if a field has been set.
+
+### GetCount
+
+`func (o *EventStatus) GetCount() int32`
+
+GetCount returns the Count field if non-nil, zero value otherwise.
+
+### GetCountOk
+
+`func (o *EventStatus) GetCountOk() (*int32, bool)`
+
+GetCountOk returns a tuple with the Count field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCount
+
+`func (o *EventStatus) SetCount(v int32)`
+
+SetCount sets Count field to given value.
+
+### HasCount
+
+`func (o *EventStatus) HasCount() bool`
+
+HasCount returns a boolean if a field has been set.
 
 ### GetData
 
