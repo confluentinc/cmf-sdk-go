@@ -24,10 +24,10 @@ type KubernetesClusterMetadata struct {
 	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
 	// Unique identifier of the Kubernetes cluster.
 	Uid *string `json:"uid,omitempty"`
-	// Labels of the Kubernetes cluster.
-	Labels *map[string]string `json:"labels,omitempty"`
-	// Annotations of the Kubernetes cluster.
-	Annotations *map[string]string `json:"annotations,omitempty"`
+	// Labels of the Kubernetes cluster. Omit the field (or send null) to leave existing labels unchanged; send an empty object to clear them. 
+	Labels map[string]string `json:"labels,omitempty"`
+	// Annotations of the Kubernetes cluster. Omit the field (or send null) to leave existing annotations unchanged; send an empty object to clear them. 
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
 // NewKubernetesClusterMetadata instantiates a new KubernetesClusterMetadata object
@@ -168,22 +168,23 @@ func (o *KubernetesClusterMetadata) SetUid(v string) {
 	o.Uid = &v
 }
 
-// GetLabels returns the Labels field value if set, zero value otherwise.
+// GetLabels returns the Labels field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *KubernetesClusterMetadata) GetLabels() map[string]string {
-	if o == nil || o.Labels == nil {
+	if o == nil  {
 		var ret map[string]string
 		return ret
 	}
-	return *o.Labels
+	return o.Labels
 }
 
 // GetLabelsOk returns a tuple with the Labels field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *KubernetesClusterMetadata) GetLabelsOk() (*map[string]string, bool) {
 	if o == nil || o.Labels == nil {
 		return nil, false
 	}
-	return o.Labels, true
+	return &o.Labels, true
 }
 
 // HasLabels returns a boolean if a field has been set.
@@ -197,25 +198,26 @@ func (o *KubernetesClusterMetadata) HasLabels() bool {
 
 // SetLabels gets a reference to the given map[string]string and assigns it to the Labels field.
 func (o *KubernetesClusterMetadata) SetLabels(v map[string]string) {
-	o.Labels = &v
+	o.Labels = v
 }
 
-// GetAnnotations returns the Annotations field value if set, zero value otherwise.
+// GetAnnotations returns the Annotations field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *KubernetesClusterMetadata) GetAnnotations() map[string]string {
-	if o == nil || o.Annotations == nil {
+	if o == nil  {
 		var ret map[string]string
 		return ret
 	}
-	return *o.Annotations
+	return o.Annotations
 }
 
 // GetAnnotationsOk returns a tuple with the Annotations field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *KubernetesClusterMetadata) GetAnnotationsOk() (*map[string]string, bool) {
 	if o == nil || o.Annotations == nil {
 		return nil, false
 	}
-	return o.Annotations, true
+	return &o.Annotations, true
 }
 
 // HasAnnotations returns a boolean if a field has been set.
@@ -229,7 +231,7 @@ func (o *KubernetesClusterMetadata) HasAnnotations() bool {
 
 // SetAnnotations gets a reference to the given map[string]string and assigns it to the Annotations field.
 func (o *KubernetesClusterMetadata) SetAnnotations(v map[string]string) {
-	o.Annotations = &v
+	o.Annotations = v
 }
 
 func (o KubernetesClusterMetadata) MarshalJSON() ([]byte, error) {

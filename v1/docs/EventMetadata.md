@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Name** | Pointer to **string** | Name of the Event | [optional] 
 **Uid** | Pointer to **string** | Unique identifier of the Event. Identical to name. | [optional] 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the Event was created | [optional] 
+**UpdateTimestamp** | Pointer to **time.Time** | Timestamp of the most recent occurrence of this event | [optional] 
 **FlinkApplicationInstance** | Pointer to **string** | Name of the FlinkApplicationInstance which this event is related to | [optional] 
 **Labels** | Pointer to **map[string]string** | Labels of the Event | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the Event | [optional] 
@@ -104,6 +105,31 @@ SetCreationTimestamp sets CreationTimestamp field to given value.
 `func (o *EventMetadata) HasCreationTimestamp() bool`
 
 HasCreationTimestamp returns a boolean if a field has been set.
+
+### GetUpdateTimestamp
+
+`func (o *EventMetadata) GetUpdateTimestamp() time.Time`
+
+GetUpdateTimestamp returns the UpdateTimestamp field if non-nil, zero value otherwise.
+
+### GetUpdateTimestampOk
+
+`func (o *EventMetadata) GetUpdateTimestampOk() (*time.Time, bool)`
+
+GetUpdateTimestampOk returns a tuple with the UpdateTimestamp field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpdateTimestamp
+
+`func (o *EventMetadata) SetUpdateTimestamp(v time.Time)`
+
+SetUpdateTimestamp sets UpdateTimestamp field to given value.
+
+### HasUpdateTimestamp
+
+`func (o *EventMetadata) HasUpdateTimestamp() bool`
+
+HasUpdateTimestamp returns a boolean if a field has been set.
 
 ### GetFlinkApplicationInstance
 

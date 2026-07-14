@@ -49,6 +49,8 @@ type APIClient struct {
 
 	// API Services
 
+	ArtifactsApi ArtifactsApi
+
 	C3Api C3Api
 
 	CMFInformationApi CMFInformationApi
@@ -84,6 +86,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.ArtifactsApi = (*ArtifactsApiService)(&c.common)
 	c.C3Api = (*C3ApiService)(&c.common)
 	c.CMFInformationApi = (*CMFInformationApiService)(&c.common)
 	c.DetachedSavepointsApi = (*DetachedSavepointsApiService)(&c.common)

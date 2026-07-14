@@ -7,8 +7,8 @@ Name | Type | Description | Notes
 **ApiVersion** | **string** | API version for spec | 
 **Kind** | **string** | Kind of resource - set to resource type | 
 **Metadata** | **map[string]interface{}** |  | 
-**Spec** | **map[string]interface{}** |  | 
-**Status** | Pointer to **map[string]interface{}** |  | [optional] 
+**Spec** | **map[string]interface{}** | Application spec as YAML or JSON, following the Flink Kubernetes Operator FlinkDeployment spec. May additionally include a top-level \&quot;savepointSchedule\&quot; field (see SavepointScheduleConfig) to configure periodic savepoints for the application. An environment-wide default can be set at flinkApplicationDefaults.spec.savepointSchedule on the Environment; env-level fields take precedence field by field over any value set here. | 
+**Status** | Pointer to **map[string]interface{}** | Application status as YAML or JSON. May include a \&quot;warning\&quot; string field indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. May include a \&quot;savepointSchedule\&quot; field (see SavepointScheduleStatus) with the runtime status of the application&#39;s periodic savepoint schedule. | [optional] 
 
 ## Methods
 

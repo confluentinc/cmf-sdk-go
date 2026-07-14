@@ -20,6 +20,8 @@ type EventStatus struct {
 	Message *string `json:"message,omitempty"`
 	// Type of the event
 	Type *string `json:"type,omitempty"`
+	// Number of times this event has occurred. 1 for events that are not aggregated (e.g. status events).
+	Count *int32 `json:"count,omitempty"`
 	Data *EventData `json:"data,omitempty"`
 }
 
@@ -104,6 +106,38 @@ func (o *EventStatus) SetType(v string) {
 	o.Type = &v
 }
 
+// GetCount returns the Count field value if set, zero value otherwise.
+func (o *EventStatus) GetCount() int32 {
+	if o == nil || o.Count == nil {
+		var ret int32
+		return ret
+	}
+	return *o.Count
+}
+
+// GetCountOk returns a tuple with the Count field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EventStatus) GetCountOk() (*int32, bool) {
+	if o == nil || o.Count == nil {
+		return nil, false
+	}
+	return o.Count, true
+}
+
+// HasCount returns a boolean if a field has been set.
+func (o *EventStatus) HasCount() bool {
+	if o != nil && o.Count != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCount gets a reference to the given int32 and assigns it to the Count field.
+func (o *EventStatus) SetCount(v int32) {
+	o.Count = &v
+}
+
 // GetData returns the Data field value if set, zero value otherwise.
 func (o *EventStatus) GetData() EventData {
 	if o == nil || o.Data == nil {
@@ -143,6 +177,9 @@ func (o EventStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.Type != nil {
 		toSerialize["type"] = o.Type
+	}
+	if o.Count != nil {
+		toSerialize["count"] = o.Count
 	}
 	if o.Data != nil {
 		toSerialize["data"] = o.Data

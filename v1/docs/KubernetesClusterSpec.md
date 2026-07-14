@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**LifecycleState** | Pointer to **string** | The desired lifecycle state of the cluster. | [optional] 
+**LifecycleState** | **string** | The desired lifecycle state of the cluster. | 
 
 ## Methods
 
 ### NewKubernetesClusterSpec
 
-`func NewKubernetesClusterSpec() *KubernetesClusterSpec`
+`func NewKubernetesClusterSpec(lifecycleState string, ) *KubernetesClusterSpec`
 
 NewKubernetesClusterSpec instantiates a new KubernetesClusterSpec object
 This constructor will assign default values to properties that have it defined,
@@ -44,11 +44,6 @@ and a boolean to check if the value has been set.
 
 SetLifecycleState sets LifecycleState field to given value.
 
-### HasLifecycleState
-
-`func (o *KubernetesClusterSpec) HasLifecycleState() bool`
-
-HasLifecycleState returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**KubernetesClusterName** | Pointer to **string** |  | [optional] 
+**KubernetesClusterName** | Pointer to **string** | Immutable after creation. Cannot be changed via update. Defaults to \&quot;default-k8s-cluster\&quot; if not provided on creation. | [optional] 
 
 ## Methods
 

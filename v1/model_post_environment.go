@@ -19,8 +19,11 @@ type PostEnvironment struct {
 	// A unique name for the resource.
 	// Deprecated
 	Name *string `json:"name,omitempty"`
+	// Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \"spec\" object here whose fields are merged into every application spec at deploy time. May include a \"savepointSchedule\" inside \"spec\" (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself. 
 	FlinkApplicationDefaults *map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
+	// Immutable after creation. Cannot be changed via update.
 	KubernetesNamespace *string `json:"kubernetesNamespace,omitempty"`
+	// Immutable after creation. Cannot be changed via update. Defaults to \"default-k8s-cluster\" if not provided on creation.
 	KubernetesClusterName *string `json:"kubernetesClusterName,omitempty"`
 	// the defaults as YAML or JSON for ComputePools
 	ComputePoolDefaults *map[string]interface{} `json:"computePoolDefaults,omitempty"`

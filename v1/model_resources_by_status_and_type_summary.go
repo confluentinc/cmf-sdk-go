@@ -17,6 +17,7 @@ import (
 // ResourcesByStatusAndTypeSummary Summary of resources by status and type
 type ResourcesByStatusAndTypeSummary struct {
 	Applications *ApplicationsByStatusSummary `json:"applications,omitempty"`
+	ComputePools *ComputePoolsByStatusSummary `json:"computePools,omitempty"`
 	Statements *StatementsByStatusSummary `json:"statements,omitempty"`
 }
 
@@ -69,6 +70,38 @@ func (o *ResourcesByStatusAndTypeSummary) SetApplications(v ApplicationsByStatus
 	o.Applications = &v
 }
 
+// GetComputePools returns the ComputePools field value if set, zero value otherwise.
+func (o *ResourcesByStatusAndTypeSummary) GetComputePools() ComputePoolsByStatusSummary {
+	if o == nil || o.ComputePools == nil {
+		var ret ComputePoolsByStatusSummary
+		return ret
+	}
+	return *o.ComputePools
+}
+
+// GetComputePoolsOk returns a tuple with the ComputePools field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ResourcesByStatusAndTypeSummary) GetComputePoolsOk() (*ComputePoolsByStatusSummary, bool) {
+	if o == nil || o.ComputePools == nil {
+		return nil, false
+	}
+	return o.ComputePools, true
+}
+
+// HasComputePools returns a boolean if a field has been set.
+func (o *ResourcesByStatusAndTypeSummary) HasComputePools() bool {
+	if o != nil && o.ComputePools != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetComputePools gets a reference to the given ComputePoolsByStatusSummary and assigns it to the ComputePools field.
+func (o *ResourcesByStatusAndTypeSummary) SetComputePools(v ComputePoolsByStatusSummary) {
+	o.ComputePools = &v
+}
+
 // GetStatements returns the Statements field value if set, zero value otherwise.
 func (o *ResourcesByStatusAndTypeSummary) GetStatements() StatementsByStatusSummary {
 	if o == nil || o.Statements == nil {
@@ -105,6 +138,9 @@ func (o ResourcesByStatusAndTypeSummary) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Applications != nil {
 		toSerialize["applications"] = o.Applications
+	}
+	if o.ComputePools != nil {
+		toSerialize["computePools"] = o.ComputePools
 	}
 	if o.Statements != nil {
 		toSerialize["statements"] = o.Statements
