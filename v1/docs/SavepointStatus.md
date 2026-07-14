@@ -5,13 +5,14 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **State** | Pointer to **string** | State of the Savepoint | [optional] 
+**Source** | Pointer to **string** | How this Savepoint was created. MANUAL means user-initiated; UPGRADE means adopted from a Flink Kubernetes Operator upgrade snapshot; SCHEDULE means created by the CMF periodic scheduling engine or adopted from an FKO periodic snapshot.  | [optional] [readonly] 
 **Path** | Pointer to **string** | Path of the Savepoint | [optional] 
 **TriggerTimestamp** | Pointer to **string** | Timestamp when the Savepoint was triggered | [optional] 
 **ResultTimestamp** | Pointer to **string** | Timestamp when the Savepoint result was received | [optional] 
 **Failures** | Pointer to **int32** | The number of failures of the Savepoint | [optional] 
 **Error** | Pointer to **string** | The error message for the Savepoint | [optional] 
 **PendingDeletion** | Pointer to **bool** | Whether the Savepoint is pending deletion | [optional] 
-**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
+**Warning** | Pointer to **string** | Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned. | [optional] 
 
 ## Methods
 
@@ -56,6 +57,31 @@ SetState sets State field to given value.
 `func (o *SavepointStatus) HasState() bool`
 
 HasState returns a boolean if a field has been set.
+
+### GetSource
+
+`func (o *SavepointStatus) GetSource() string`
+
+GetSource returns the Source field if non-nil, zero value otherwise.
+
+### GetSourceOk
+
+`func (o *SavepointStatus) GetSourceOk() (*string, bool)`
+
+GetSourceOk returns a tuple with the Source field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSource
+
+`func (o *SavepointStatus) SetSource(v string)`
+
+SetSource sets Source field to given value.
+
+### HasSource
+
+`func (o *SavepointStatus) HasSource() bool`
+
+HasSource returns a boolean if a field has been set.
 
 ### GetPath
 

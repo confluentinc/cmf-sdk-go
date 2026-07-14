@@ -9,6 +9,8 @@ Name | Type | Description | Notes
 **IsAppendOnly** | Pointer to **bool** | Whether the result of the statement is append only | [optional] 
 **UpsertColumns** | Pointer to **[]int32** | The column indexes that are updated by the statement | [optional] 
 **Schema** | Pointer to [**ResultSchema**](ResultSchema.md) |  | [optional] 
+**UdfJarUris** | Pointer to **[]string** | UDF JAR URIs (pre-resolution, e.g. &#x60;cmf://&#x60;, &#x60;s3://&#x60;) that this statement references via the environment catalog. Empty or absent when the statement uses no env-catalog UDFs. Surfaced so callers can see which JARs the statement loads at runtime. | [optional] 
+**ConnectorJarUris** | Pointer to **[]string** | Connector and format artifact JAR URIs (e.g. &#x60;s3://&#x60;) that this statement&#39;s referenced tables require, one entry per connector or format actually used. Empty or absent when the statement uses only built-in connectors and formats. Surfaced so callers can see which artifact JARs the statement loads at runtime. | [optional] 
 
 ## Methods
 
@@ -153,6 +155,56 @@ SetSchema sets Schema field to given value.
 `func (o *StatementTraits) HasSchema() bool`
 
 HasSchema returns a boolean if a field has been set.
+
+### GetUdfJarUris
+
+`func (o *StatementTraits) GetUdfJarUris() []string`
+
+GetUdfJarUris returns the UdfJarUris field if non-nil, zero value otherwise.
+
+### GetUdfJarUrisOk
+
+`func (o *StatementTraits) GetUdfJarUrisOk() (*[]string, bool)`
+
+GetUdfJarUrisOk returns a tuple with the UdfJarUris field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUdfJarUris
+
+`func (o *StatementTraits) SetUdfJarUris(v []string)`
+
+SetUdfJarUris sets UdfJarUris field to given value.
+
+### HasUdfJarUris
+
+`func (o *StatementTraits) HasUdfJarUris() bool`
+
+HasUdfJarUris returns a boolean if a field has been set.
+
+### GetConnectorJarUris
+
+`func (o *StatementTraits) GetConnectorJarUris() []string`
+
+GetConnectorJarUris returns the ConnectorJarUris field if non-nil, zero value otherwise.
+
+### GetConnectorJarUrisOk
+
+`func (o *StatementTraits) GetConnectorJarUrisOk() (*[]string, bool)`
+
+GetConnectorJarUrisOk returns a tuple with the ConnectorJarUris field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetConnectorJarUris
+
+`func (o *StatementTraits) SetConnectorJarUris(v []string)`
+
+SetConnectorJarUris sets ConnectorJarUris field to given value.
+
+### HasConnectorJarUris
+
+`func (o *StatementTraits) HasConnectorJarUris() bool`
+
+HasConnectorJarUris returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

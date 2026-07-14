@@ -16,6 +16,7 @@ import (
 
 // KubernetesNamespace struct for KubernetesNamespace
 type KubernetesNamespace struct {
+	// Immutable after creation. Cannot be changed via update.
 	KubernetesNamespace *string `json:"kubernetesNamespace,omitempty"`
 }
 

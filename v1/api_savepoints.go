@@ -28,6 +28,34 @@ var (
 type SavepointsApi interface {
 
 	/*
+	BulkDeleteSavepointsForFlinkApplication Bulk-delete Savepoints for the given Application filtered by source and age.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName
+	 @param appName
+	 @return ApiBulkDeleteSavepointsForFlinkApplicationRequest
+	*/
+	BulkDeleteSavepointsForFlinkApplication(ctx _context.Context, envName string, appName string) ApiBulkDeleteSavepointsForFlinkApplicationRequest
+
+	// BulkDeleteSavepointsForFlinkApplicationExecute executes the request
+	//  @return SavepointsBulkDeleteResult
+	BulkDeleteSavepointsForFlinkApplicationExecute(r ApiBulkDeleteSavepointsForFlinkApplicationRequest) (SavepointsBulkDeleteResult, *_nethttp.Response, error)
+
+	/*
+	BulkDeleteSavepointsForFlinkStatement Bulk-delete Savepoints for the given Statement filtered by source and age.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName
+	 @param stmtName
+	 @return ApiBulkDeleteSavepointsForFlinkStatementRequest
+	*/
+	BulkDeleteSavepointsForFlinkStatement(ctx _context.Context, envName string, stmtName string) ApiBulkDeleteSavepointsForFlinkStatementRequest
+
+	// BulkDeleteSavepointsForFlinkStatementExecute executes the request
+	//  @return SavepointsBulkDeleteResult
+	BulkDeleteSavepointsForFlinkStatementExecute(r ApiBulkDeleteSavepointsForFlinkStatementRequest) (SavepointsBulkDeleteResult, *_nethttp.Response, error)
+
+	/*
 	CreateSavepointForFlinkApplication Creates a new Savepoint for the given Application in the given Environment.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -155,10 +183,408 @@ type SavepointsApi interface {
 	// GetSavepointsForFlinkStatementExecute executes the request
 	//  @return SavepointsPage
 	GetSavepointsForFlinkStatementExecute(r ApiGetSavepointsForFlinkStatementRequest) (SavepointsPage, *_nethttp.Response, error)
+
+	/*
+	UpdateSavepointForFlinkApplication Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName
+	 @param appName
+	 @param savepointName
+	 @return ApiUpdateSavepointForFlinkApplicationRequest
+	*/
+	UpdateSavepointForFlinkApplication(ctx _context.Context, envName string, appName string, savepointName string) ApiUpdateSavepointForFlinkApplicationRequest
+
+	// UpdateSavepointForFlinkApplicationExecute executes the request
+	//  @return Savepoint
+	UpdateSavepointForFlinkApplicationExecute(r ApiUpdateSavepointForFlinkApplicationRequest) (Savepoint, *_nethttp.Response, error)
+
+	/*
+	UpdateSavepointForFlinkStatement Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName
+	 @param stmtName
+	 @param savepointName
+	 @return ApiUpdateSavepointForFlinkStatementRequest
+	*/
+	UpdateSavepointForFlinkStatement(ctx _context.Context, envName string, stmtName string, savepointName string) ApiUpdateSavepointForFlinkStatementRequest
+
+	// UpdateSavepointForFlinkStatementExecute executes the request
+	//  @return Savepoint
+	UpdateSavepointForFlinkStatementExecute(r ApiUpdateSavepointForFlinkStatementRequest) (Savepoint, *_nethttp.Response, error)
 }
 
 // SavepointsApiService SavepointsApi service
 type SavepointsApiService service
+
+type ApiBulkDeleteSavepointsForFlinkApplicationRequest struct {
+	ctx _context.Context
+	ApiService SavepointsApi
+	envName string
+	appName string
+	source *string
+	olderThanDays *int32
+	olderThanHours *int32
+	force *bool
+}
+
+// Required. Only Savepoints with this source are deleted.
+func (r ApiBulkDeleteSavepointsForFlinkApplicationRequest) Source(source string) ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	r.source = &source
+	return r
+}
+// Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours.
+func (r ApiBulkDeleteSavepointsForFlinkApplicationRequest) OlderThanDays(olderThanDays int32) ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	r.olderThanDays = &olderThanDays
+	return r
+}
+// Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays.
+func (r ApiBulkDeleteSavepointsForFlinkApplicationRequest) OlderThanHours(olderThanHours int32) ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	r.olderThanHours = &olderThanHours
+	return r
+}
+// Force-delete even if the backing Kubernetes cluster is unavailable.
+func (r ApiBulkDeleteSavepointsForFlinkApplicationRequest) Force(force bool) ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	r.force = &force
+	return r
+}
+
+func (r ApiBulkDeleteSavepointsForFlinkApplicationRequest) Execute() (SavepointsBulkDeleteResult, *_nethttp.Response, error) {
+	return r.ApiService.BulkDeleteSavepointsForFlinkApplicationExecute(r)
+}
+
+/*
+BulkDeleteSavepointsForFlinkApplication Bulk-delete Savepoints for the given Application filtered by source and age.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName
+ @param appName
+ @return ApiBulkDeleteSavepointsForFlinkApplicationRequest
+*/
+func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkApplication(ctx _context.Context, envName string, appName string) ApiBulkDeleteSavepointsForFlinkApplicationRequest {
+	return ApiBulkDeleteSavepointsForFlinkApplicationRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		appName: appName,
+	}
+}
+
+// Execute executes the request
+//  @return SavepointsBulkDeleteResult
+func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkApplicationExecute(r ApiBulkDeleteSavepointsForFlinkApplicationRequest) (SavepointsBulkDeleteResult, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  SavepointsBulkDeleteResult
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SavepointsApiService.BulkDeleteSavepointsForFlinkApplication")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/applications/{appName}/savepoints"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(r.appName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.source == nil {
+		return localVarReturnValue, nil, reportError("source is required and must be specified")
+	}
+
+	localVarQueryParams.Add("source", parameterToString(*r.source, ""))
+	if r.olderThanDays != nil {
+		localVarQueryParams.Add("olderThanDays", parameterToString(*r.olderThanDays, ""))
+	}
+	if r.olderThanHours != nil {
+		localVarQueryParams.Add("olderThanHours", parameterToString(*r.olderThanHours, ""))
+	}
+	if r.force != nil {
+		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiBulkDeleteSavepointsForFlinkStatementRequest struct {
+	ctx _context.Context
+	ApiService SavepointsApi
+	envName string
+	stmtName string
+	source *string
+	olderThanDays *int32
+	olderThanHours *int32
+	force *bool
+}
+
+// Required. Only Savepoints with this source are deleted.
+func (r ApiBulkDeleteSavepointsForFlinkStatementRequest) Source(source string) ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	r.source = &source
+	return r
+}
+// Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours.
+func (r ApiBulkDeleteSavepointsForFlinkStatementRequest) OlderThanDays(olderThanDays int32) ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	r.olderThanDays = &olderThanDays
+	return r
+}
+// Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays.
+func (r ApiBulkDeleteSavepointsForFlinkStatementRequest) OlderThanHours(olderThanHours int32) ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	r.olderThanHours = &olderThanHours
+	return r
+}
+// Force-delete even if the backing Kubernetes cluster is unavailable.
+func (r ApiBulkDeleteSavepointsForFlinkStatementRequest) Force(force bool) ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	r.force = &force
+	return r
+}
+
+func (r ApiBulkDeleteSavepointsForFlinkStatementRequest) Execute() (SavepointsBulkDeleteResult, *_nethttp.Response, error) {
+	return r.ApiService.BulkDeleteSavepointsForFlinkStatementExecute(r)
+}
+
+/*
+BulkDeleteSavepointsForFlinkStatement Bulk-delete Savepoints for the given Statement filtered by source and age.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName
+ @param stmtName
+ @return ApiBulkDeleteSavepointsForFlinkStatementRequest
+*/
+func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkStatement(ctx _context.Context, envName string, stmtName string) ApiBulkDeleteSavepointsForFlinkStatementRequest {
+	return ApiBulkDeleteSavepointsForFlinkStatementRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		stmtName: stmtName,
+	}
+}
+
+// Execute executes the request
+//  @return SavepointsBulkDeleteResult
+func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkStatementExecute(r ApiBulkDeleteSavepointsForFlinkStatementRequest) (SavepointsBulkDeleteResult, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  SavepointsBulkDeleteResult
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SavepointsApiService.BulkDeleteSavepointsForFlinkStatement")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"stmtName"+"}", _neturl.PathEscape(parameterToString(r.stmtName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.source == nil {
+		return localVarReturnValue, nil, reportError("source is required and must be specified")
+	}
+
+	localVarQueryParams.Add("source", parameterToString(*r.source, ""))
+	if r.olderThanDays != nil {
+		localVarQueryParams.Add("olderThanDays", parameterToString(*r.olderThanDays, ""))
+	}
+	if r.olderThanHours != nil {
+		localVarQueryParams.Add("olderThanHours", parameterToString(*r.olderThanHours, ""))
+	}
+	if r.force != nil {
+		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
 
 type ApiCreateSavepointForFlinkApplicationRequest struct {
 	ctx _context.Context
@@ -1146,7 +1572,7 @@ func (r ApiGetSavepointsForFlinkApplicationRequest) Sort(sort []string) ApiGetSa
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetSavepointsForFlinkApplicationRequest) Filter(filter string) ApiGetSavepointsForFlinkApplicationRequest {
 	r.filter = &filter
 	return r
@@ -1326,7 +1752,7 @@ func (r ApiGetSavepointsForFlinkStatementRequest) Sort(sort []string) ApiGetSave
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS)
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetSavepointsForFlinkStatementRequest) Filter(filter string) ApiGetSavepointsForFlinkStatementRequest {
 	r.filter = &filter
 	return r
@@ -1444,6 +1870,302 @@ func (a *SavepointsApiService) GetSavepointsForFlinkStatementExecute(r ApiGetSav
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateSavepointForFlinkApplicationRequest struct {
+	ctx _context.Context
+	ApiService SavepointsApi
+	envName string
+	appName string
+	savepointName string
+	savepoint *Savepoint
+}
+
+func (r ApiUpdateSavepointForFlinkApplicationRequest) Savepoint(savepoint Savepoint) ApiUpdateSavepointForFlinkApplicationRequest {
+	r.savepoint = &savepoint
+	return r
+}
+
+func (r ApiUpdateSavepointForFlinkApplicationRequest) Execute() (Savepoint, *_nethttp.Response, error) {
+	return r.ApiService.UpdateSavepointForFlinkApplicationExecute(r)
+}
+
+/*
+UpdateSavepointForFlinkApplication Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName
+ @param appName
+ @param savepointName
+ @return ApiUpdateSavepointForFlinkApplicationRequest
+*/
+func (a *SavepointsApiService) UpdateSavepointForFlinkApplication(ctx _context.Context, envName string, appName string, savepointName string) ApiUpdateSavepointForFlinkApplicationRequest {
+	return ApiUpdateSavepointForFlinkApplicationRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		appName: appName,
+		savepointName: savepointName,
+	}
+}
+
+// Execute executes the request
+//  @return Savepoint
+func (a *SavepointsApiService) UpdateSavepointForFlinkApplicationExecute(r ApiUpdateSavepointForFlinkApplicationRequest) (Savepoint, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Savepoint
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SavepointsApiService.UpdateSavepointForFlinkApplication")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"appName"+"}", _neturl.PathEscape(parameterToString(r.appName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"savepointName"+"}", _neturl.PathEscape(parameterToString(r.savepointName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "application/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.savepoint
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateSavepointForFlinkStatementRequest struct {
+	ctx _context.Context
+	ApiService SavepointsApi
+	envName string
+	stmtName string
+	savepointName string
+	savepoint *Savepoint
+}
+
+func (r ApiUpdateSavepointForFlinkStatementRequest) Savepoint(savepoint Savepoint) ApiUpdateSavepointForFlinkStatementRequest {
+	r.savepoint = &savepoint
+	return r
+}
+
+func (r ApiUpdateSavepointForFlinkStatementRequest) Execute() (Savepoint, *_nethttp.Response, error) {
+	return r.ApiService.UpdateSavepointForFlinkStatementExecute(r)
+}
+
+/*
+UpdateSavepointForFlinkStatement Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName
+ @param stmtName
+ @param savepointName
+ @return ApiUpdateSavepointForFlinkStatementRequest
+*/
+func (a *SavepointsApiService) UpdateSavepointForFlinkStatement(ctx _context.Context, envName string, stmtName string, savepointName string) ApiUpdateSavepointForFlinkStatementRequest {
+	return ApiUpdateSavepointForFlinkStatementRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		stmtName: stmtName,
+		savepointName: savepointName,
+	}
+}
+
+// Execute executes the request
+//  @return Savepoint
+func (a *SavepointsApiService) UpdateSavepointForFlinkStatementExecute(r ApiUpdateSavepointForFlinkStatementRequest) (Savepoint, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Savepoint
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SavepointsApiService.UpdateSavepointForFlinkStatement")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"stmtName"+"}", _neturl.PathEscape(parameterToString(r.stmtName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"savepointName"+"}", _neturl.PathEscape(parameterToString(r.savepointName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "application/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.savepoint
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
 			var v RestError

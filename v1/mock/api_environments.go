@@ -44,6 +44,12 @@ type MockEnvironmentsApi struct {
 	lockGetEnvironmentExecute sync.Mutex
 	GetEnvironmentExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentRequest) (github_com_confluentinc_cmf_sdk_go_v1.Environment, *net_http.Response, error)
 
+	lockGetEnvironmentCatalog sync.Mutex
+	GetEnvironmentCatalogFunc func(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest
+
+	lockGetEnvironmentCatalogExecute sync.Mutex
+	GetEnvironmentCatalogExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentCatalog, *net_http.Response, error)
+
 	lockGetEnvironmentSecretMapping sync.Mutex
 	GetEnvironmentSecretMappingFunc func(ctx context.Context, envName, name string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentSecretMappingRequest
 
@@ -103,6 +109,13 @@ type MockEnvironmentsApi struct {
 		}
 		GetEnvironmentExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentRequest
+		}
+		GetEnvironmentCatalog []struct {
+			Ctx     context.Context
+			EnvName string
+		}
+		GetEnvironmentCatalogExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest
 		}
 		GetEnvironmentSecretMapping []struct {
 			Ctx     context.Context
@@ -531,6 +544,85 @@ func (m *MockEnvironmentsApi) GetEnvironmentExecuteCalls() []struct {
 	return m.calls.GetEnvironmentExecute
 }
 
+// GetEnvironmentCatalog mocks base method by wrapping the associated func.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalog(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest {
+	m.lockGetEnvironmentCatalog.Lock()
+	defer m.lockGetEnvironmentCatalog.Unlock()
+
+	if m.GetEnvironmentCatalogFunc == nil {
+		panic("mocker: MockEnvironmentsApi.GetEnvironmentCatalogFunc is nil but MockEnvironmentsApi.GetEnvironmentCatalog was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+	}
+
+	m.calls.GetEnvironmentCatalog = append(m.calls.GetEnvironmentCatalog, call)
+
+	return m.GetEnvironmentCatalogFunc(ctx, envName)
+}
+
+// GetEnvironmentCatalogCalled returns true if GetEnvironmentCatalog was called at least once.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalogCalled() bool {
+	m.lockGetEnvironmentCatalog.Lock()
+	defer m.lockGetEnvironmentCatalog.Unlock()
+
+	return len(m.calls.GetEnvironmentCatalog) > 0
+}
+
+// GetEnvironmentCatalogCalls returns the calls made to GetEnvironmentCatalog.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalogCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+} {
+	m.lockGetEnvironmentCatalog.Lock()
+	defer m.lockGetEnvironmentCatalog.Unlock()
+
+	return m.calls.GetEnvironmentCatalog
+}
+
+// GetEnvironmentCatalogExecute mocks base method by wrapping the associated func.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalogExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentCatalog, *net_http.Response, error) {
+	m.lockGetEnvironmentCatalogExecute.Lock()
+	defer m.lockGetEnvironmentCatalogExecute.Unlock()
+
+	if m.GetEnvironmentCatalogExecuteFunc == nil {
+		panic("mocker: MockEnvironmentsApi.GetEnvironmentCatalogExecuteFunc is nil but MockEnvironmentsApi.GetEnvironmentCatalogExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetEnvironmentCatalogExecute = append(m.calls.GetEnvironmentCatalogExecute, call)
+
+	return m.GetEnvironmentCatalogExecuteFunc(r)
+}
+
+// GetEnvironmentCatalogExecuteCalled returns true if GetEnvironmentCatalogExecute was called at least once.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalogExecuteCalled() bool {
+	m.lockGetEnvironmentCatalogExecute.Lock()
+	defer m.lockGetEnvironmentCatalogExecute.Unlock()
+
+	return len(m.calls.GetEnvironmentCatalogExecute) > 0
+}
+
+// GetEnvironmentCatalogExecuteCalls returns the calls made to GetEnvironmentCatalogExecute.
+func (m *MockEnvironmentsApi) GetEnvironmentCatalogExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentCatalogRequest
+} {
+	m.lockGetEnvironmentCatalogExecute.Lock()
+	defer m.lockGetEnvironmentCatalogExecute.Unlock()
+
+	return m.calls.GetEnvironmentCatalogExecute
+}
+
 // GetEnvironmentSecretMapping mocks base method by wrapping the associated func.
 func (m *MockEnvironmentsApi) GetEnvironmentSecretMapping(ctx context.Context, envName, name string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetEnvironmentSecretMappingRequest {
 	m.lockGetEnvironmentSecretMapping.Lock()
@@ -882,6 +974,12 @@ func (m *MockEnvironmentsApi) Reset() {
 	m.lockGetEnvironmentExecute.Lock()
 	m.calls.GetEnvironmentExecute = nil
 	m.lockGetEnvironmentExecute.Unlock()
+	m.lockGetEnvironmentCatalog.Lock()
+	m.calls.GetEnvironmentCatalog = nil
+	m.lockGetEnvironmentCatalog.Unlock()
+	m.lockGetEnvironmentCatalogExecute.Lock()
+	m.calls.GetEnvironmentCatalogExecute = nil
+	m.lockGetEnvironmentCatalogExecute.Unlock()
 	m.lockGetEnvironmentSecretMapping.Lock()
 	m.calls.GetEnvironmentSecretMapping = nil
 	m.lockGetEnvironmentSecretMapping.Unlock()

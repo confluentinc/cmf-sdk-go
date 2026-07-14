@@ -22,8 +22,9 @@ type StatementStatus struct {
 	Detail *string `json:"detail,omitempty"`
 	Traits *StatementTraits `json:"traits,omitempty"`
 	ResourceSummary *ResourceUsageSummary `json:"resourceSummary,omitempty"`
-	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	// Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned.
 	Warning *string `json:"warning,omitempty"`
+	SavepointSchedule *SavepointScheduleStatus `json:"savepointSchedule,omitempty"`
 }
 
 // NewStatementStatus instantiates a new StatementStatus object
@@ -196,6 +197,38 @@ func (o *StatementStatus) SetWarning(v string) {
 	o.Warning = &v
 }
 
+// GetSavepointSchedule returns the SavepointSchedule field value if set, zero value otherwise.
+func (o *StatementStatus) GetSavepointSchedule() SavepointScheduleStatus {
+	if o == nil || o.SavepointSchedule == nil {
+		var ret SavepointScheduleStatus
+		return ret
+	}
+	return *o.SavepointSchedule
+}
+
+// GetSavepointScheduleOk returns a tuple with the SavepointSchedule field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementStatus) GetSavepointScheduleOk() (*SavepointScheduleStatus, bool) {
+	if o == nil || o.SavepointSchedule == nil {
+		return nil, false
+	}
+	return o.SavepointSchedule, true
+}
+
+// HasSavepointSchedule returns a boolean if a field has been set.
+func (o *StatementStatus) HasSavepointSchedule() bool {
+	if o != nil && o.SavepointSchedule != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSavepointSchedule gets a reference to the given SavepointScheduleStatus and assigns it to the SavepointSchedule field.
+func (o *StatementStatus) SetSavepointSchedule(v SavepointScheduleStatus) {
+	o.SavepointSchedule = &v
+}
+
 func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -212,6 +245,9 @@ func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.Warning != nil {
 		toSerialize["warning"] = o.Warning
+	}
+	if o.SavepointSchedule != nil {
+		toSerialize["savepointSchedule"] = o.SavepointSchedule
 	}
 	return json.Marshal(toSerialize)
 }

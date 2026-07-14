@@ -9,6 +9,7 @@ tags:
 - name: C3
 - name: Environments
 - name: FlinkApplications
+- name: Artifacts
 - name: Secrets
 - name: SQL
 - name: Savepoints
@@ -34,8 +35,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -54,20 +56,23 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -75,9 +80,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -85,17 +91,18 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          For Kafka Catalogs: supported fields are name.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -103,9 +110,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -267,12 +275,47 @@ paths:
                     - message: Environment's kubernetesNamespace 'fl' does not exist.
                     - message: Environment's kubernetesClusterName 'nonexistent' does
                         not exist.
+                immutable-field:
+                  summary: Immutable field change rejected
+                  value:
+                    errors:
+                    - message: Environment's kubernetesClusterName cannot be changed
+                        from default-k8s-cluster to azure-k8s-cluster because the
+                        field is immutable.
               schema:
                 $ref: '#/components/schemas/RestError'
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Bad request.
+          description: Bad request. Validation failed. On update, kubernetesNamespace
+            and kubernetesClusterName cannot be changed (immutable after creation).
+        "503":
+          content:
+            application/json:
+              examples:
+                cluster-disconnected:
+                  summary: Cluster is disconnected
+                  value:
+                    errors:
+                    - message: Kubernetes cluster 'azure-k8s-cluster' is currently
+                        DISCONNECTED. Check cluster connectivity and retry. If the
+                        cluster has been permanently removed, decommission it and
+                        redeploy your resources on another cluster.
+                cluster-decommissioned:
+                  summary: Cluster is decommissioned
+                  value:
+                    errors:
+                    - message: Kubernetes cluster 'azure-k8s-cluster' is DECOMMISSIONED
+                        and cannot accept workloads. Recommission the cluster to restore
+                        operations, or create a new environment on an active cluster.
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Service unavailable. On creation, the referenced kubernetesClusterName
+            must be in an operational state. Returned when the cluster is DISCONNECTED
+            or DECOMMISSIONED.
         "500":
           content:
             application/json:
@@ -297,9 +340,9 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Environment from CMF metadata only, without
-          requiring Kubernetes cluster connectivity. Kubernetes resources (service
-          account, secret) may be orphaned.
+      - description: If set to `true`, the platform deletes the environment from CMF
+          metadata only, without requiring Kubernetes cluster connectivity. Kubernetes
+          resources, such as a service account or a secret, might be orphaned.
         explode: true
         in: query
         name: force
@@ -404,12 +447,12 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Supported properties: name, metadata.name, creationTimestamp,
-          metadata.creationTimestamp, updateTimestamp, metadata.updateTimestamp. Note:
-          updateTimestamp sorts by the most recent spec update time. The displayed
-          metadata.updateTimestamp may differ as it reflects the latest of spec or
-          status changes.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Supported properties: name, metadata.name, creationTimestamp, metadata.creationTimestamp,
+          updateTimestamp, metadata.updateTimestamp.
+          Note: updateTimestamp sorts by the most recent spec update time. The displayed
+          metadata.updateTimestamp may differ as it reflects the latest of spec or status changes.
         explode: true
         in: query
         name: sort
@@ -428,20 +471,23 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -449,9 +495,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -509,6 +556,12 @@ paths:
       - FlinkApplications
       x-spring-paginated: true
     post:
+      description: |-
+        When artifact management is enabled, a raw `spec.job.jarURI` (for example `s3://`, `gs://`
+        or `abfs://`) that resolves into the configured artifact storage location is rejected with
+        HTTP 400. Reference managed artifacts through the `cmf://{environment}/{name}[?version=N]`
+        scheme so the artifact `Use` authorization check is applied; raw URIs that point elsewhere
+        are unaffected.
       operationId: createOrUpdateApplication
       parameters:
       - description: Name of the Environment
@@ -656,8 +709,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Application from CMF metadata only, without
-          requiring Kubernetes cluster connectivity.
+      - description: If set to `true`, the platform deletes the application from CMF
+          metadata only, without requiring Kubernetes cluster connectivity.
         explode: true
         in: query
         name: force
@@ -771,8 +824,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -782,20 +836,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -803,9 +860,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -813,17 +871,18 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          For Kafka Catalogs: supported fields are name.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -831,9 +890,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -1015,8 +1075,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1319,8 +1380,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1439,6 +1501,53 @@ paths:
       summary: Creates the Environment Secret Mapping for the given Environment.
       tags:
       - Environments
+  /cmf/api/v1/environments/{envName}/catalog:
+    get:
+      description: Every environment has its own default Flink SQL catalog, used to
+        register custom connectors and UDFs for Flink SQL statements. This endpoint
+        is read-only; the catalog cannot be created, updated, or deleted through the
+        API, only directly via SQL Statements.
+      operationId: getEnvironmentCatalog
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentCatalog'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentCatalog'
+          description: The environment catalog was found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment not found, or its default catalog is not enabled.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieves the environment's default Flink SQL catalog and its databases.
+      tags:
+      - Environments
   /cmf/api/v1/environments/{envName}/statements:
     get:
       operationId: getStatements
@@ -1459,8 +1568,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -1503,20 +1613,23 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -1524,9 +1637,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -1534,17 +1648,18 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          For Kafka Catalogs: supported fields are name.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -1552,9 +1667,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -1571,8 +1687,8 @@ paths:
           type: string
         style: simple
       - deprecated: true
-        description: 'Wildcard filter by statement name (e.g. ?name=abc). Deprecated:
-          use filter parameter instead.'
+        description: Substring filter using statement name, for example, `?name=abc`.
+          This field is deprecated. Use `filter` parameter instead.
         explode: true
         in: query
         name: name
@@ -1750,8 +1866,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the Statement from CMF metadata only, without
-          requiring Kubernetes cluster connectivity.
+      - description: If set to `true`, the platform deletes the statement from CMF
+          metadata only, without requiring Kubernetes cluster connectivity.
         explode: true
         in: query
         name: force
@@ -2066,8 +2182,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -2077,20 +2194,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -2107,9 +2227,10 @@ paths:
           default: false
           type: boolean
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -2345,10 +2466,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: If true, deletes the ComputePool from CMF metadata only, without
-          requiring Kubernetes cluster connectivity. For shared compute pools, the
-          session cluster FlinkDeployment may be orphaned. Has no additional effect
-          on dedicated compute pools, which are always metadata-only.
+      - description: If set to `true`, the platform deletes the compute pool from
+          CMF metadata only, without requiring Kubernetes cluster connectivity. For
+          shared compute pools, the session cluster FlinkDeployment might be orphaned.
+          This configuration has no additional effect on dedicated compute pools that
+          are always metadata-only.
         explode: true
         in: query
         name: force
@@ -2513,7 +2635,8 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Compute Pool cannot be updated (e.g., statements running).
+          description: The platform cannot update the compute pool. This can happen
+            due to reasons such as statements running on it.
         "422":
           content:
             application/json:
@@ -2532,9 +2655,662 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Updates a Compute Pool of the given name in the given Environment.
+      summary: Updates the compute pool specified using its name and environment.
       tags:
       - SQL
+  /cmf/api/v1/environments/{envName}/artifacts:
+    get:
+      description: |-
+        Returns the latest version of each Artifact in the environment. The `filter`
+        parameter supports name filtering (`name=foo*bar`) and the label expressions
+        (equality, set-based, existence) described on the parameter.
+      operationId: listArtifacts
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ArtifactsPage'
+          description: Artifacts found and returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of all Artifacts in the given Environment.
+      tags:
+      - Artifacts
+      x-spring-paginated: true
+    post:
+      description: |-
+        Creates a new Artifact (version 1) with the supplied metadata and file content.
+        The request is `multipart/form-data` with two parts:
+
+          - `artifact`: JSON or YAML payload carrying the Artifact's `kind`, `apiVersion`, and
+            `metadata`. Server-managed fields (`status.*`, `metadata.uid`,
+            `metadata.creationTimestamp`, `metadata.updateTimestamp`) are ignored if present.
+          - `file`: binary content. Size is capped by `cmf.artifacts.max-upload-size`.
+
+        Returns `409 Conflict` if an Artifact with the same `metadata.name` already exists in
+        the Environment. To upload a new version of an existing Artifact, use `PUT` instead.
+      operationId: createArtifact
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                artifact:
+                  $ref: '#/components/schemas/Artifact'
+                file:
+                  description: Binary content of the Artifact.
+                  format: binary
+                  type: string
+              required:
+              - artifact
+              - file
+              type: object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+          description: The Artifact was created. Returns the resource with populated
+            `status`.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment not found.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: An Artifact with the given name already exists in this Environment.
+        "413":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Uploaded file exceeds `cmf.artifacts.max-upload-size`.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Upload a new Artifact to an Environment.
+      tags:
+      - Artifacts
+  /cmf/api/v1/environments/{envName}/artifacts/{artifactName}:
+    delete:
+      description: |-
+        If `version=N`, deletes only that version (the Artifact is fully removed when its last
+        version is deleted). If `version` is omitted or set to `all`, every version and the parent
+        record are deleted.
+      operationId: deleteArtifact
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Artifact
+        explode: false
+        in: path
+        name: artifactName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Specific version number to delete, or `all`. Defaults to `all`.
+        explode: true
+        in: query
+        name: version
+        required: false
+        schema:
+          default: all
+          pattern: ^([1-9][0-9]*|all)$
+          type: string
+        style: form
+      responses:
+        "204":
+          description: Artifact (or specified version) deleted.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Artifact (or requested version) not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Deletes the Artifact of the given name in the given Environment.
+      tags:
+      - Artifacts
+    get:
+      operationId: getArtifact
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Artifact
+        explode: false
+        in: path
+        name: artifactName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Specific version number to retrieve, or `latest`. Defaults to
+          `latest`.
+        explode: true
+        in: query
+        name: version
+        required: false
+        schema:
+          default: latest
+          pattern: ^([1-9][0-9]*|latest)$
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+          description: Artifact found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Artifact (or requested version) not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve an Artifact of the given name in the given Environment.
+      tags:
+      - Artifacts
+    put:
+      description: |-
+        `multipart/form-data` request. The `artifact` part (required) carries updated
+        `metadata.labels` and/or `metadata.annotations`. The `file` part is optional:
+
+          - With `file`: a new version is created from the uploaded content; the returned
+            resource reflects the new latest version.
+          - Without `file`: only `metadata.labels` and `metadata.annotations` are updated;
+            no new version is created.
+
+        Server-managed fields (`metadata.uid`, `metadata.creationTimestamp`,
+        `metadata.updateTimestamp`, `status.*`) are ignored if present in the request body.
+        `metadata.name` in the request body must equal `{artifactName}` from the path.
+      operationId: updateArtifact
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Artifact
+        explode: false
+        in: path
+        name: artifactName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_1'
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                artifact:
+                  $ref: '#/components/schemas/Artifact'
+                file:
+                  description: Optional new binary content. When present, a new version
+                    is created.
+                  format: binary
+                  type: string
+              required:
+              - artifact
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+          description: |-
+            Update succeeded without creating a new version. Either no `file` part was sent
+            (metadata-only update), or the uploaded content was byte-identical to the latest
+            version (deduplicated). Returns the resource with the current latest version's `status`.
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+          description: |-
+            A new version was created: the request included a `file` part whose content differed
+            from the latest version. Returns the resource with the newly-created version's `status`.
+            (Identical content is deduplicated and returns `200` instead.)
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Artifact not found.
+        "413":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Uploaded file exceeds `cmf.artifacts.max-upload-size`.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Update an Artifact's labels and annotations, and/or upload a new version.
+      tags:
+      - Artifacts
+  /cmf/api/v1/environments/{envName}/artifacts/{artifactName}/versions:
+    get:
+      description: |-
+        Returns one `Artifact` resource per version, each populated with the version-specific
+        `status` (path, size, checksum, phase). The `filter` parameter supports the same name
+        and label expressions as the Artifact list endpoint, evaluated against the Artifact's
+        `metadata` -- which every version shares. A matching filter therefore returns all
+        versions and a non-matching one returns an empty page.
+      operationId: listArtifactVersions
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Artifact
+        explode: false
+        in: path
+        name: artifactName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactsPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ArtifactsPage'
+          description: Versions retrieved.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Artifact not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve a paginated list of all versions of an Artifact, ordered newest-first.
+      tags:
+      - Artifacts
+      x-spring-paginated: true
+  /cmf/api/v1/environments/{envName}/artifacts/{artifactName}/content:
+    get:
+      description: |-
+        Returns the binary content of the requested version. The response includes a
+        `Content-Disposition: attachment; filename="<name>-v<version>[.<ext>]"` header,
+        where the downloaded version number is inserted ahead of the Artifact name's file
+        extension (for example `my-udf.jar` version 3 downloads as `my-udf-v3.jar`, and the
+        extension-less name `my-udf` downloads as `my-udf-v3`).
+      operationId: downloadArtifactContent
+      parameters:
+      - description: Name of the Environment
+        explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Name of the Artifact
+        explode: false
+        in: path
+        name: artifactName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Specific version number to download, or `latest`. Defaults to
+          `latest`.
+        explode: true
+        in: query
+        name: version
+        required: false
+        schema:
+          default: latest
+          pattern: ^([1-9][0-9]*|latest)$
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                format: binary
+                type: string
+          description: Binary content of the Artifact version.
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="<name>-v<version>[.<ext>]"`'
+              explode: false
+              required: true
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Artifact, or requested version not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Download the binary content of an Artifact.
+      tags:
+      - Artifacts
   /cmf/api/v1/secrets:
     get:
       operationId: getSecrets
@@ -2555,8 +3331,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -2566,20 +3343,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -2587,9 +3367,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Search term to match against fields specified in searchScope.
-          Note: Both search and searchScope must be provided together. If only one
-          is provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
         explode: true
         in: query
         name: search
@@ -2597,17 +3378,18 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of fields to search in. Must be provided
-          together with the search parameter. Unsupported field names will result
-          in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-          For Statements: supported fields are name, statement. For Events: supported
-          fields are message, flinkApplicationInstance. For Secrets: supported fields
-          are name, environments. When multiple fields are specified, the search uses
-          OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-          means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-          ?search=SELECT&searchScope=name,statement means (name contains SELECT OR
-          statement contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-          means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          For Kafka Catalogs: supported fields are name.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
         explode: true
         in: query
         name: searchScope
@@ -2615,9 +3397,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -2882,8 +3665,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -2892,6 +3676,60 @@ paths:
           items:
             type: string
           type: array
+        style: form
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Search term to match against fields specified in searchScope.
+          Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+          Example: ?search=foo&searchScope=name,kubernetesNamespace
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Comma-separated list of fields to search in. Must be provided together with the search parameter.
+          Unsupported field names will result in a 400 Bad Request.
+          For Environments: supported fields are name, kubernetesNamespace.
+          For Statements: supported fields are name, statement.
+          For Events: supported fields are message, flinkApplicationInstance.
+          For Secrets: supported fields are name, environments.
+          For Kafka Catalogs: supported fields are name.
+          When multiple fields are specified, the search uses OR logic.
+          Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+          Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+          Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+        explode: true
+        in: query
+        name: searchScope
+        required: false
+        schema:
+          type: string
         style: form
       responses:
         "200":
@@ -2903,6 +3741,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/KafkaCatalogsPage'
           description: Kafka Catalogs found and returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
         "500":
           content:
             application/json:
@@ -3178,8 +4025,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3188,6 +4036,30 @@ paths:
           items:
             type: string
           type: array
+        style: form
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
         style: form
       - description: Name of the Catalog
         explode: false
@@ -3207,6 +4079,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/KafkaDatabasesPage'
           description: Kafka Databases found and returned.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kafka Catalog not found.
         "500":
           content:
             application/json:
@@ -3494,6 +4375,121 @@ paths:
       tags:
       - SQL
   /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints:
+    delete:
+      operationId: bulkDeleteSavepointsForFlinkApplication
+      parameters:
+      - explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Required. Only Savepoints with this source are deleted.
+        explode: true
+        in: query
+        name: source
+        required: true
+        schema:
+          enum:
+          - MANUAL
+          - UPGRADE
+          - SCHEDULE
+          type: string
+        style: form
+      - description: Only delete Savepoints older than this many days. Mutually exclusive
+          with olderThanHours.
+        explode: true
+        in: query
+        name: olderThanDays
+        required: false
+        schema:
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - description: Only delete Savepoints older than this many hours. Mutually exclusive
+          with olderThanDays.
+        explode: true
+        in: query
+        name: olderThanHours
+        required: false
+        schema:
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - description: Force-delete even if the backing Kubernetes cluster is unavailable.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavepointsBulkDeleteResult'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SavepointsBulkDeleteResult'
+          description: |
+            Bulk delete completed. Returned when zero Savepoints matched the filter
+            (deletedCount=0), and on partial failure (deletedCount>0 with a non-empty failures
+            list). Pinned Savepoints are never deleted by bulk delete; they are excluded from the
+            candidate set and appear in neither deletedCount nor failures. Only an all-failed
+            outcome maps to an error status (409 when the cluster is not ready, 500 otherwise).
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Application not found.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kubernetes cluster is not ready and force was not set.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Bulk-delete Savepoints for the given Application filtered by source
+        and age.
+      tags:
+      - Savepoints
     get:
       operationId: getSavepointsForFlinkApplication
       parameters:
@@ -3513,8 +4509,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3524,20 +4521,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -3545,9 +4545,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -3802,6 +4803,81 @@ paths:
         in the given Environment.
       tags:
       - Savepoints
+    put:
+      operationId: updateSavepointForFlinkApplication
+      parameters:
+      - explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: appName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint updated and returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Application or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: |
+        Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other
+        fields in the request body are ignored. metadata.name in the request body, when present,
+        must match the resource name in the URL path.
+      tags:
+      - Savepoints
   /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}/detach:
     post:
       operationId: detachSavepointFromFlinkApplication
@@ -3863,6 +4939,121 @@ paths:
       tags:
       - Savepoints
   /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints:
+    delete:
+      operationId: bulkDeleteSavepointsForFlinkStatement
+      parameters:
+      - explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Required. Only Savepoints with this source are deleted.
+        explode: true
+        in: query
+        name: source
+        required: true
+        schema:
+          enum:
+          - MANUAL
+          - UPGRADE
+          - SCHEDULE
+          type: string
+        style: form
+      - description: Only delete Savepoints older than this many days. Mutually exclusive
+          with olderThanHours.
+        explode: true
+        in: query
+        name: olderThanDays
+        required: false
+        schema:
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - description: Only delete Savepoints older than this many hours. Mutually exclusive
+          with olderThanDays.
+        explode: true
+        in: query
+        name: olderThanHours
+        required: false
+        schema:
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      - description: Force-delete even if the backing Kubernetes cluster is unavailable.
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavepointsBulkDeleteResult'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/SavepointsBulkDeleteResult'
+          description: |
+            Bulk delete completed. Returned when zero Savepoints matched the filter
+            (deletedCount=0), and on partial failure (deletedCount>0 with a non-empty failures
+            list). Pinned Savepoints are never deleted by bulk delete; they are excluded from the
+            candidate set and appear in neither deletedCount nor failures. Only an all-failed
+            outcome maps to an error status (409 when the cluster is not ready, 500 otherwise).
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment or Statement not found.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Kubernetes cluster is not ready and force was not set.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Bulk-delete Savepoints for the given Statement filtered by source and
+        age.
+      tags:
+      - Savepoints
     get:
       operationId: getSavepointsForFlinkStatement
       parameters:
@@ -3882,8 +5073,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -3893,20 +5085,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -3914,9 +5109,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4171,6 +5367,81 @@ paths:
         the given Environment.
       tags:
       - Savepoints
+    put:
+      operationId: updateSavepointForFlinkStatement
+      parameters:
+      - explode: false
+        in: path
+        name: envName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: stmtName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: savepointName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Savepoint'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Savepoint'
+          description: Savepoint updated and returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad request.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Environment, Statement or Savepoint not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: |
+        Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other
+        fields in the request body are ignored. metadata.name in the request body, when present,
+        must match the resource name in the URL path.
+      tags:
+      - Savepoints
   /cmf/api/v1/detached-savepoints:
     get:
       operationId: listDetachedSavepoints
@@ -4191,8 +5462,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -4202,20 +5474,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -4223,9 +5498,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4251,7 +5527,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/SavepointsPage'
-          description: Detached Savepoints found and returned. In case, there are
+          description: Detached savepoints found and returned. In case, there are
             none, an empty list is returned.
         "500":
           content:
@@ -4262,7 +5538,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Retrieve a paginated list of all Detached Savepoints.
+      summary: Retrieve a paginated list of all detached savepoints.
       tags:
       - DetachedSavepoints
       x-spring-paginated: true
@@ -4285,7 +5561,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/Savepoint'
-          description: Detached Savepoint was successfully created and returned.
+          description: Detached savepoint was successfully created and returned.
         "400":
           content:
             application/json:
@@ -4320,7 +5596,7 @@ paths:
     delete:
       operationId: deleteDetachedSavepoint
       parameters:
-      - description: Name of the Detached Savepoint
+      - description: Name of the detached savepoint
         explode: false
         in: path
         name: detachedSavepointName
@@ -4330,7 +5606,7 @@ paths:
         style: simple
       responses:
         "204":
-          description: Detached Savepoint was found and deleted.
+          description: Detached savepoint was found and deleted.
         "404":
           content:
             application/json:
@@ -4339,7 +5615,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Detached Savepoint not found.
+          description: Detached savepoint not found.
         "500":
           content:
             application/json:
@@ -4349,13 +5625,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Deletes the Detached Savepoint of the given name.
+      summary: Deletes the detached savepoint of the given name.
       tags:
       - DetachedSavepoints
     get:
       operationId: getDetachedSavepoint
       parameters:
-      - description: Name of the Detached Savepoint
+      - description: Name of the detached savepoint
         explode: false
         in: path
         name: detachedSavepointName
@@ -4372,7 +5648,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/Savepoint'
-          description: Detached Savepoint found and returned.
+          description: Detached savepoint found and returned.
         "404":
           content:
             application/json:
@@ -4381,7 +5657,7 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Detached Savepoint not found.
+          description: Detached savepoint not found.
         "500":
           content:
             application/json:
@@ -4391,7 +5667,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
-      summary: Retrieve the Detached Savepoint of the given name.
+      summary: Retrieve the detached savepoint of the given name.
       tags:
       - DetachedSavepoints
   /cmf/api/v1/kubernetes-clusters:
@@ -4414,8 +5690,9 @@ paths:
         schema:
           type: integer
         style: form
-      - description: 'Sorting criteria in the format: property,(asc|desc). Default
-          sort order is ascending. Multiple sort criteria are supported.'
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
         explode: true
         in: query
         name: sort
@@ -4425,20 +5702,23 @@ paths:
             type: string
           type: array
         style: form
-      - description: 'Filter query string with comma-separated expressions. Supports:
-          - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-          = value or labels.key != value - Label set-based: labels.key in (value1,
-          value2) or labels.key notin (value1, value2) - Label existence: labels.key
-          (exists) or !labels.key (does not exist) - State filtering (Applications
-          only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING,
-          FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or
-          phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering
-          (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type
-          notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment
-          in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state
-          in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in
-          (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type
-          in (CMF_STATUS, JOB_STATUS)'
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
         explode: true
         in: query
         name: filter
@@ -4446,9 +5726,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: 'Comma-separated list of field paths to include in the response.
-          Supports nested fields using dot notation. Always includes apiVersion and
-          kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
         explode: true
         in: query
         name: fields
@@ -4667,20 +5948,13 @@ paths:
         "400":
           content:
             application/json:
-              examples:
-                environments-exist:
-                  summary: Cluster has active environments
-                  value:
-                    errors:
-                    - message: 'Cannot decommission cluster ''azure-k8s-cluster'':
-                        referenced by environments [prod-azure, staging-azure]'
               schema:
                 $ref: '#/components/schemas/RestError'
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Bad request. Validation failed (e.g., cannot decommission cluster
-            because it is in use by environments).
+          description: Bad request. Validation failed (e.g., spec.lifecycleState is
+            missing or invalid).
         "404":
           content:
             application/json:
@@ -4690,6 +5964,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Kubernetes cluster not found.
+        "409":
+          content:
+            application/json:
+              examples:
+                environments-exist:
+                  summary: Cluster has active environments
+                  value:
+                    errors:
+                    - message: 'Kubernetes cluster ''azure-k8s-cluster'' cannot be
+                        decommissioned because it is referenced by environments: [prod-azure,
+                        staging-azure]. Delete these environments first.'
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Conflict. The cluster cannot be decommissioned because it is
+            still referenced by environments.
         "500":
           content:
             application/json:
@@ -4725,6 +6017,46 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: Server error.
       summary: Retrieve license information for C3 integration.
+      tags:
+      - C3
+  /cmf/api/v1/c3/configuration:
+    get:
+      description: Returns the effective configuration of the running CMF instance.
+      operationId: getC3Configuration
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/C3Configuration'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/C3Configuration'
+          description: Configuration retrieved successfully.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: |
+            The effective-configuration view is disabled
+            (`cmf.ui.effective-configuration.enabled=false`). The response
+            body's error message starts with `Effective-configuration view
+            is disabled` so clients can distinguish this case from a
+            generic routing 404.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Retrieve the effective CMF runtime configuration.
       tags:
       - C3
   /cmf/api/v1/system-information:
@@ -4777,6 +6109,67 @@ paths:
       summary: Retrieve resource information about the CMF deployment.
       tags:
       - CMFInformation
+  /cmf/api/v1/c3/auth-config:
+    get:
+      description: |-
+        Returns the auth configuration the cmf-ui single-page app needs to decide
+        whether and how to log in. This endpoint is intentionally unauthenticated so
+        the SPA can read it before it holds a token.
+      operationId: getAuthConfig
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthConfig'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/AuthConfig'
+          description: Auth configuration retrieved successfully.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Discover the CMF authentication/authorization configuration.
+      tags:
+      - C3
+  /cmf/api/v1/c3/whoami:
+    get:
+      description: |-
+        Returns the principal CMF authenticated the current request as -- the JWT/OIDC/Basic
+        subject or, for mTLS, the client-certificate subject mapped to a principal. Lets the
+        cmf-ui SPA label the signed-in user even when there is no token to decode (mTLS), where
+        the principal exists only server-side. Requires authentication when authentication is
+        enabled; when authentication is disabled the endpoint is still reachable and returns a
+        null principal.
+      operationId: getWhoami
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhoAmi'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/WhoAmi'
+          description: Current principal returned successfully.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: Return the authenticated principal's identity.
+      tags:
+      - C3
 components:
   parameters:
     pageParam:
@@ -4798,8 +6191,9 @@ components:
         type: integer
       style: form
     sortParam:
-      description: 'Sorting criteria in the format: property,(asc|desc). Default sort
-        order is ascending. Multiple sort criteria are supported.'
+      description: |-
+        Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+        Multiple sort criteria are supported.
       explode: true
       in: query
       name: sort
@@ -4855,19 +6249,23 @@ components:
         type: string
       style: form
     filterParam:
-      description: 'Filter query string with comma-separated expressions. Supports:
-        - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key
-        = value or labels.key != value - Label set-based: labels.key in (value1, value2)
-        or labels.key notin (value1, value2) - Label existence: labels.key (exists)
-        or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING
-        or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering
-        (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING)
-        or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS
-        or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+      description: |-
+        Filter query string with comma-separated expressions. Supports:
+        - Name filtering: name=foo*bar (wildcards allowed)
+        - Label equality: labels.key = value or labels.key != value
+        - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+        - Label existence: labels.key (exists) or !labels.key (does not exist)
+        - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+        - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+        - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+        - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+        - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
         Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
-        Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example
-        (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with
-        type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)'
+        Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+        Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+        Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+        Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+        Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
       explode: true
       in: query
       name: filter
@@ -4876,9 +6274,10 @@ components:
         type: string
       style: form
     searchParam:
-      description: 'Search term to match against fields specified in searchScope.
-        Note: Both search and searchScope must be provided together. If only one is
-        provided, the request will be rejected. Example: ?search=foo&searchScope=name,kubernetesNamespace'
+      description: |-
+        Search term to match against fields specified in searchScope.
+        Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected.
+        Example: ?search=foo&searchScope=name,kubernetesNamespace
       explode: true
       in: query
       name: search
@@ -4887,17 +6286,18 @@ components:
         type: string
       style: form
     searchScopeParam:
-      description: 'Comma-separated list of fields to search in. Must be provided
-        together with the search parameter. Unsupported field names will result in
-        a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace.
-        For Statements: supported fields are name, statement. For Events: supported
-        fields are message, flinkApplicationInstance. For Secrets: supported fields
-        are name, environments. When multiple fields are specified, the search uses
-        OR logic. Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace
-        means (name contains foo OR kubernetesNamespace contains foo) Example (Statements):
-        ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement
-        contains SELECT) Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance
-        means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)'
+      description: |-
+        Comma-separated list of fields to search in. Must be provided together with the search parameter.
+        Unsupported field names will result in a 400 Bad Request.
+        For Environments: supported fields are name, kubernetesNamespace.
+        For Statements: supported fields are name, statement.
+        For Events: supported fields are message, flinkApplicationInstance.
+        For Secrets: supported fields are name, environments.
+        For Kafka Catalogs: supported fields are name.
+        When multiple fields are specified, the search uses OR logic.
+        Example (Environments): ?search=foo&searchScope=name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo)
+        Example (Statements): ?search=SELECT&searchScope=name,statement means (name contains SELECT OR statement contains SELECT)
+        Example (Events): ?search=RUNNING&searchScope=message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
       explode: true
       in: query
       name: searchScope
@@ -4906,9 +6306,10 @@ components:
         type: string
       style: form
     fieldsParam:
-      description: 'Comma-separated list of field paths to include in the response.
-        Supports nested fields using dot notation. Always includes apiVersion and
-        kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase'
+      description: |-
+        Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+        Always includes apiVersion and kind fields even if not explicitly requested.
+        Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
       explode: true
       in: query
       name: fields
@@ -4916,6 +6317,19 @@ components:
       schema:
         type: string
       style: form
+  requestBodies:
+    inline_object_1:
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/inline_object_1'
+      required: true
+    inline_object:
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
   responses:
     InternalServerError:
       content:
@@ -5033,6 +6447,7 @@ components:
     KubernetesNamespace:
       properties:
         kubernetesNamespace:
+          description: Immutable after creation. Cannot be changed via update.
           maxLength: 253
           minLength: 1
           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -5043,6 +6458,8 @@ components:
     KubernetesClusterName:
       properties:
         kubernetesClusterName:
+          description: Immutable after creation. Cannot be changed via update. Defaults
+            to "default-k8s-cluster" if not provided on creation.
           maxLength: 253
           minLength: 1
           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -5053,6 +6470,13 @@ components:
     ResourceWithFlinkApplicationDefaults:
       properties:
         flinkApplicationDefaults:
+          description: |
+            Environment-level defaults for FlinkApplication specs. The structure mirrors a
+            FlinkApplication itself: place a "spec" object here whose fields are merged into
+            every application spec at deploy time. May include a "savepointSchedule" inside
+            "spec" (see SavepointScheduleConfig) to set the default periodic savepoint schedule
+            for every application in the environment; env-level schedule fields take precedence
+            over any value set on the resource itself.
           format: yamlorjson
           title: the defaults as YAML or JSON for FlinkApplications
           type: object
@@ -5072,11 +6496,169 @@ components:
             type: string
           description: default Flink configuration for Statements
           type: object
+        savepointSchedule:
+          $ref: '#/components/schemas/SavepointScheduleConfig'
       type: object
     AllStatementDefaults:
       properties:
         statementDefaults:
           $ref: '#/components/schemas/AllStatementDefaults_1'
+      type: object
+    SavepointScheduleConfig:
+      description: Cron-based periodic savepoint trigger and retention configuration.
+      properties:
+        cronExpression:
+          description: |
+            Six-field cron expression with seconds resolution, in the order: second, minute, hour,
+            day-of-month, month, day-of-week. Minimum interval between triggers is 5 minutes.
+          type: string
+        timezone:
+          description: |
+            IANA time zone ID used to evaluate the cron expression. When omitted, UTC is used.
+            No schema-level default is declared on purpose: environment-level defaults are merged
+            over resource-level settings field by field, so a materialized default here would
+            silently override the resource's explicit value.
+          type: string
+        paused:
+          description: |
+            When true, the schedule is registered but no new savepoints are triggered. When
+            omitted, the schedule is not paused.
+          type: boolean
+        catchUpOnRestart:
+          description: |
+            When true, if CMF restarts after missing at least one scheduled trigger, fire exactly
+            one catch-up trigger immediately on startup. When omitted, no catch-up is performed.
+          type: boolean
+        jitterSeconds:
+          description: |
+            Upper bound (in seconds) for the random offset added to each trigger time. Null or 0
+            means the service auto-computes a bound based on the cron interval; a positive value
+            sets the bound explicitly.
+          format: int32
+          minimum: 0
+          type: integer
+        blackoutWindows:
+          description: |
+            Time ranges during which periodic savepoint triggers are suppressed. Missed triggers
+            during blackouts are skipped, not retried.
+          items:
+            $ref: '#/components/schemas/BlackoutWindow'
+          type: array
+        freshnessThresholdHours:
+          description: |
+            Maximum acceptable gap in hours between successful periodic savepoints. CMF logs a
+            SAVEPOINT_SLA_VIOLATION warning (visible in the CMF server log, not via the API) when
+            the threshold is exceeded. When omitted or 0, the check is disabled.
+          format: int32
+          minimum: 0
+          type: integer
+        formatType:
+          description: |
+            Savepoint format (see the Flink savepoint documentation) used for every scheduled
+            savepoint this schedule triggers. No schema-level default is declared on purpose:
+            environment-level defaults are merged over resource-level settings field by field, so
+            a materialized default here would silently override the resource's explicit value. A
+            null value is treated as CANONICAL when the savepoint is triggered.
+          enum:
+          - CANONICAL
+          - NATIVE
+          - UNKNOWN
+          type: string
+        retention:
+          $ref: '#/components/schemas/SavepointRetention'
+      title: SavepointScheduleConfig
+      type: object
+    BlackoutWindow:
+      description: A recurring time range during which scheduled savepoints are not
+        triggered.
+      properties:
+        cronExpression:
+          description: |
+            Six-field cron expression with seconds resolution (second, minute, hour, day-of-month,
+            month, day-of-week) whose firing times mark the START of each blackout window.
+          type: string
+        durationMinutes:
+          default: 60
+          description: Duration of the blackout in minutes starting from the cron
+            fire time.
+          format: int32
+          minimum: 1
+          type: integer
+        timezone:
+          description: |
+            IANA time zone for evaluating this window's cron expression. Defaults to the parent
+            schedule's timezone when omitted.
+          type: string
+      required:
+      - cronExpression
+      title: BlackoutWindow
+      type: object
+    SavepointScheduleStatus:
+      description: Read-only runtime status for a savepoint schedule.
+      properties:
+        state:
+          description: Lifecycle state of the schedule.
+          enum:
+          - ACTIVE
+          - PAUSED
+          - FKO_MANAGED
+          - DISABLED
+          readOnly: true
+          type: string
+        lastTriggerTime:
+          description: |
+            Time at which the trigger task last attempted to create a savepoint, i.e. the last fire
+            that passed the blackout, resource-ready and in-flight guards. Skipped fires do not
+            update this field, and it reflects the attempt regardless of whether the savepoint
+            request succeeded. Use lastCompletedTime to know when a savepoint last completed.
+          format: date-time
+          readOnly: true
+          type: string
+        nextTriggerTime:
+          description: Next time at which the schedule will be evaluated for a trigger.
+          format: date-time
+          readOnly: true
+          type: string
+        lastCompletedTime:
+          description: |
+            Time at which the most recent savepoint for this resource completed successfully,
+            across all sources (scheduled, manual, or adopted), or null if none has completed yet.
+            This is the freshness signal the schedule's SLA check is measured against.
+          format: date-time
+          readOnly: true
+          type: string
+        lastErrorMessage:
+          description: Last failure observed by the trigger task, or null if healthy.
+          readOnly: true
+          type: string
+      title: SavepointScheduleStatus
+      type: object
+    SavepointsBulkDeleteResult:
+      description: Result body for the bulk delete savepoints endpoint.
+      example:
+        failedCount: 6
+        failures:
+        - reason: reason
+          name: name
+        - reason: reason
+          name: name
+        deletedCount: 0
+      properties:
+        deletedCount:
+          description: Number of savepoints that were successfully deleted.
+          format: int32
+          type: integer
+        failedCount:
+          description: Number of savepoints that failed to delete.
+          format: int32
+          type: integer
+        failures:
+          description: Per-savepoint failure details for each savepoint that could
+            not be deleted.
+          items:
+            $ref: '#/components/schemas/SavepointsBulkDeleteResult_failures'
+          type: array
+      title: SavepointsBulkDeleteResult
       type: object
     PostEnvironment:
       allOf:
@@ -5129,6 +6711,46 @@ components:
       - kubernetesNamespace
       - name
       title: Environment
+      type: object
+    EnvironmentCatalog:
+      description: The environment's own default Flink SQL catalog, used to register
+        custom connectors and UDFs for Flink SQL statements.
+      example:
+        databases:
+        - name: name
+          creationTimestamp: creationTimestamp
+        - name: name
+          creationTimestamp: creationTimestamp
+        name: name
+      properties:
+        name:
+          description: Name of the default catalog.
+          type: string
+        databases:
+          description: Databases currently registered in the default catalog.
+          items:
+            $ref: '#/components/schemas/EnvironmentCatalogDatabase'
+          type: array
+      required:
+      - databases
+      - name
+      title: EnvironmentCatalog
+      type: object
+    EnvironmentCatalogDatabase:
+      description: A database registered in an environment's default catalog.
+      example:
+        name: name
+        creationTimestamp: creationTimestamp
+      properties:
+        name:
+          description: Name of the database.
+          type: string
+        creationTimestamp:
+          description: Timestamp when the database was created.
+          type: string
+      required:
+      - name
+      title: EnvironmentCatalogDatabase
       type: object
     EnvironmentSecretMapping:
       description: The secrets mapping for the environment. The name shows the name
@@ -5241,10 +6863,22 @@ components:
           description: The full exception string from the Flink job
           type: string
       type: object
+    EventDataReasonMessage:
+      properties:
+        reason:
+          description: The FKO event reason (e.g., ValidationError, CrashLoopBackOff,
+            Missing, ScalingReport, AutoscalerError). The event category is conveyed
+            by status.type.
+          type: string
+        message:
+          description: The full raw K8s event message content
+          type: string
+      type: object
     EventData:
       oneOf:
       - $ref: '#/components/schemas/EventDataNewStatus'
       - $ref: '#/components/schemas/EventDataJobException'
+      - $ref: '#/components/schemas/EventDataReasonMessage'
     EventsPage:
       allOf:
       - $ref: '#/components/schemas/PaginationResponse'
@@ -5403,6 +7037,68 @@ components:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/KafkaCatalogsPage_allOf'
       type: object
+    ArtifactMetadata:
+      description: Metadata about the Artifact
+      properties:
+        name:
+          description: |
+            Unique identifier of the Artifact within the Environment. Lowercase alphanumeric
+            characters and hyphens, starting with a letter and ending with a letter or digit,
+            optionally followed by a single `.` file extension (for example `my-udf` or
+            `my-udf.jar`). Maximum 45 characters. The extension is reflected in the stored
+            object's path; an Artifact referenced as a SQL UDF must be named with a `.jar`
+            extension.
+          maxLength: 45
+          minLength: 1
+          pattern: ^[a-z]([-a-z\d]*[a-z\d])?(\.[a-z\d]+)?$
+          type: string
+        uid:
+          description: Unique identifier of the Artifact
+          readOnly: true
+          type: string
+        creationTimestamp:
+          description: Timestamp when the Artifact was first uploaded
+          readOnly: true
+          type: string
+        updateTimestamp:
+          description: Timestamp when the Artifact was last updated
+          readOnly: true
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          description: |
+            Labels of the Artifact. Omit the field (or send
+            null) to leave existing labels unchanged; send an empty
+            object to clear them.
+          nullable: true
+          type: object
+        annotations:
+          additionalProperties:
+            type: string
+          description: |
+            Annotations of the Artifact. Omit the field (or
+            send null) to leave existing annotations unchanged; send an
+            empty object to clear them.
+          nullable: true
+          type: object
+      required:
+      - name
+      title: ArtifactMetadata
+      type: object
+    Artifact:
+      allOf:
+      - $ref: '#/components/schemas/ResourceBaseV2'
+      - $ref: '#/components/schemas/Artifact_allOf'
+      description: A binary artifact (JAR, ZIP, Python file, etc.) stored in CMF's
+        artifact storage.
+      title: Artifact
+      type: object
+    ArtifactsPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/ArtifactsPage_allOf'
+      type: object
     DatabaseMetadata:
       description: Metadata about the Database
       properties:
@@ -5522,6 +7218,74 @@ components:
           $ref: '#/components/schemas/SystemInformationStatus'
       title: SystemInformation
       type: object
+    AuthConfig:
+      description: |-
+        Authentication/authorization configuration advertised to the cmf-ui SPA so it
+        can decide whether and how to log in before it holds a token.
+      example:
+        ssoEnabled: true
+        tokenMaxLifeSeconds: 0
+        authnEnabled: true
+        basicAuthEnabled: true
+        authzEnabled: true
+      properties:
+        authnEnabled:
+          description: Whether incoming requests are authenticated by CMF.
+          type: boolean
+        authzEnabled:
+          description: Whether CMF enforces fine-grained Flink authorization (RBAC).
+          type: boolean
+        ssoEnabled:
+          description: |-
+            Whether an OIDC/SSO login flow is available, advertised so the SPA shows the
+            SSO login affordance. Set via cmf.ui.auth.sso-enabled; only meaningful when
+            authnEnabled is true.
+          type: boolean
+        basicAuthEnabled:
+          description: |-
+            Whether a Basic username/password login flow is available, advertised so the
+            SPA shows the username/password form. Set via cmf.ui.auth.basic-auth-enabled;
+            only meaningful when authnEnabled is true.
+          type: boolean
+        tokenMaxLifeSeconds:
+          description: |-
+            Maximum lifetime, in seconds, of a token issued by the login flow, used to
+            schedule client-side refresh. Sourced from cmf.ui.auth.token-max-life-seconds;
+            null until then.
+          format: int64
+          type: integer
+      title: AuthConfig
+      type: object
+    WhoAmi:
+      description: |-
+        The principal CMF authenticated the current request as, for the cmf-ui SPA to display
+        (e.g. in the top-bar user menu).
+      example:
+        principal: principal
+        authMethod: certificate
+      properties:
+        principal:
+          description: |-
+            The authenticated principal name -- the JWT subject for token/OIDC/Basic logins, or
+            the mTLS client-certificate subject mapped to a principal. Null when the request is
+            not authenticated (authentication disabled).
+          nullable: true
+          type: string
+        authMethod:
+          description: |-
+            How the request was authenticated: "certificate" when the identity came from the
+            TLS client certificate, "token" when it came from an HTTP credential (a bearer
+            token, a session cookie, or basic credentials). Null when the request is not
+            authenticated. In deployments that combine mTLS with token authentication, a
+            request carrying a token authenticates as the token's principal and reports
+            "token"; the client certificate then only secures the transport.
+          enum:
+          - certificate
+          - token
+          nullable: true
+          type: string
+      title: WhoAmi
+      type: object
     C3LicenseInformation:
       description: License information for C3 integration
       example:
@@ -5536,6 +7300,70 @@ components:
         status:
           $ref: '#/components/schemas/C3LicenseInformationStatus'
       title: C3LicenseInformation
+      type: object
+    C3Configuration:
+      description: Effective runtime configuration of the CMF instance.
+      example:
+        kind: kind
+        status:
+          configurationProperties:
+          - originType: CONFIG_FILE
+            origin: origin
+            sensitive: true
+            value: value
+            key: key
+          - originType: CONFIG_FILE
+            origin: origin
+            sensitive: true
+            value: value
+            key: key
+      properties:
+        kind:
+          type: string
+        status:
+          $ref: '#/components/schemas/C3ConfigurationStatus'
+      title: C3Configuration
+      type: object
+    C3ConfigurationProperty:
+      description: A single effective configuration entry.
+      example:
+        originType: CONFIG_FILE
+        origin: origin
+        sensitive: true
+        value: value
+        key: key
+      properties:
+        key:
+          description: Property key in dotted form (e.g. cmf.k8s.enabled).
+          type: string
+        value:
+          description: |
+            Effective value as a string. `null` when the property has no
+            resolvable value. Sensitive values are replaced with `******`.
+          nullable: true
+          type: string
+        origin:
+          description: |
+            Best-effort, human-readable source detail for display (e.g. a config file with line:column, or `default` when unset). Formats may change between releases; use `originType` for logic.
+          type: string
+        originType:
+          description: Coarse, stable category of `origin` (how the value was supplied),
+            for grouping or filtering.
+          enum:
+          - CONFIG_FILE
+          - ENVIRONMENT_VARIABLE
+          - COMMAND_LINE
+          - BUILT_IN_DEFAULT
+          - OTHER
+          type: string
+        sensitive:
+          description: |
+            True if the value was masked because it looks like a credential.
+            Use this flag rather than comparing the value to `******`, so a
+            value that legitimately equals `******` is not mistaken for a
+            masked one.
+          type: boolean
+      title: C3ConfigurationProperty
       type: object
     ResourceInformation:
       description: Represents resource information and usage statistics for the CMF
@@ -5571,6 +7399,8 @@ components:
       properties:
         applications:
           $ref: '#/components/schemas/ApplicationsByStatusSummary'
+        computePools:
+          $ref: '#/components/schemas/ComputePoolsByStatusSummary'
         statements:
           $ref: '#/components/schemas/StatementsByStatusSummary'
       title: ResourcesByStatusAndTypeSummary
@@ -5580,6 +7410,12 @@ components:
         type: integer
       description: Summary of applications by status
       title: ApplicationsByStatusSummary
+      type: object
+    ComputePoolsByStatusSummary:
+      additionalProperties:
+        type: integer
+      description: Summary of compute pools by status
+      title: ComputePoolsByStatusSummary
       type: object
     StatementsByStatusSummary:
       additionalProperties:
@@ -5598,9 +7434,9 @@ components:
       description: Status of the Kubernetes cluster.
       properties:
         state:
-          description: The effective state of the cluster. CONNECTED when the cluster
-            is reachable, DISCONNECTED when unreachable, or DECOMMISSIONED when intentionally
-            taken offline.
+          description: |-
+            The effective state of the cluster. CONNECTED when the cluster is reachable,
+            DISCONNECTED when unreachable, or DECOMMISSIONED when intentionally taken offline.
           enum:
           - CONNECTED
           - DISCONNECTED
@@ -5618,8 +7454,39 @@ components:
           description: The Kubernetes server version reported by the cluster (e.g.,
             "v1.28.3"). Only available when the cluster is CONNECTED.
           type: string
+        environments:
+          description: |-
+            Names of environments that reference this cluster via spec.kubernetesClusterName.
+            Always empty in Environment.status.kubernetesCluster.
+          items:
+            type: string
+          type: array
       readOnly: true
       title: KubernetesClusterStatus
+      type: object
+    inline_object:
+      properties:
+        artifact:
+          $ref: '#/components/schemas/Artifact'
+        file:
+          description: Binary content of the Artifact.
+          format: binary
+          type: string
+      required:
+      - artifact
+      - file
+      type: object
+    inline_object_1:
+      properties:
+        artifact:
+          $ref: '#/components/schemas/Artifact'
+        file:
+          description: Optional new binary content. When present, a new version is
+            created.
+          format: binary
+          type: string
+      required:
+      - artifact
       type: object
     error:
       description: An error
@@ -5637,6 +7504,66 @@ components:
         interactive:
           $ref: '#/components/schemas/StatementDefaults'
       title: AllStatementDefaults
+      type: object
+    SavepointRetention:
+      description: |
+        GFS-style retention. A savepoint survives cleanup if any configured rule keeps it.
+        keepLast and keepWithin are absolute floors; the other fields are sliding
+        calendar-aligned windows in the schedule's timezone.
+      properties:
+        keepLast:
+          description: Keep the N most recently completed periodic savepoints.
+          format: int32
+          minimum: 1
+          type: integer
+        keepWithin:
+          description: |
+            ISO-8601 duration; keep every completed periodic savepoint taken within this
+            duration of now. Examples: "PT24H", "P7D".
+          type: string
+        keepHourly:
+          description: Keep the latest periodic savepoint per calendar hour for the
+            most recent N hours.
+          format: int32
+          minimum: 1
+          type: integer
+        keepDaily:
+          description: Keep the latest periodic savepoint per calendar day for the
+            most recent N days.
+          format: int32
+          minimum: 1
+          type: integer
+        keepWeekly:
+          description: Keep the latest periodic savepoint per ISO week for the most
+            recent N weeks.
+          format: int32
+          minimum: 1
+          type: integer
+        keepMonthly:
+          description: Keep the latest periodic savepoint per calendar month for the
+            most recent N months.
+          format: int32
+          minimum: 1
+          type: integer
+        keepYearly:
+          description: Keep the latest periodic savepoint per calendar year for the
+            most recent N years.
+          format: int32
+          minimum: 1
+          type: integer
+      title: SavepointRetention
+      type: object
+    SavepointsBulkDeleteResult_failures:
+      example:
+        reason: reason
+        name: name
+      properties:
+        name:
+          description: Name of the savepoint that failed to delete.
+          type: string
+        reason:
+          description: Human-readable reason the deletion failed.
+          type: string
       type: object
     PostEnvironment_allOf:
       properties:
@@ -5850,6 +7777,8 @@ components:
           - ACTIVE
           - DECOMMISSIONED
           type: string
+      required:
+      - lifecycleState
       title: KubernetesClusterSpec
       type: object
     KubernetesCluster_allOf:
@@ -5908,10 +7837,21 @@ components:
           title: Metadata about the application
           type: object
         spec:
+          description: Application spec as YAML or JSON, following the Flink Kubernetes
+            Operator FlinkDeployment spec. May additionally include a top-level "savepointSchedule"
+            field (see SavepointScheduleConfig) to configure periodic savepoints for
+            the application. An environment-wide default can be set at flinkApplicationDefaults.spec.savepointSchedule
+            on the Environment; env-level fields take precedence field by field over
+            any value set here.
           format: yamlorjson
           title: Spec for Flink Application
           type: object
         status:
+          description: Application status as YAML or JSON. May include a "warning"
+            string field indicating the displayed status may be stale, e.g. when the
+            backing Kubernetes cluster is disconnected or decommissioned. May include
+            a "savepointSchedule" field (see SavepointScheduleStatus) with the runtime
+            status of the application's periodic savepoint schedule.
           format: yamlorjson
           title: Status for Flink Application
           type: object
@@ -5949,6 +7889,10 @@ components:
         creationTimestamp:
           description: Timestamp when the Event was created
           type: string
+        updateTimestamp:
+          description: Timestamp of the most recent occurrence of this event
+          format: date-time
+          type: string
         flinkApplicationInstance:
           description: Name of the FlinkApplicationInstance which this event is related
             to
@@ -5974,6 +7918,11 @@ components:
           description: Type of the event
           title: EventType
           type: string
+        count:
+          description: Number of times this event has occurred. 1 for events that
+            are not aggregated (e.g. status events).
+          format: int32
+          type: integer
         data:
           $ref: '#/components/schemas/EventData'
       title: EventStatus
@@ -6029,7 +7978,12 @@ components:
           description: Flink job id inside the Flink cluster
           type: string
         state:
-          description: Tracks the final Flink JobStatus of the instance
+          description: The most recently observed state of the Flink job for this
+            instance, such as RUNNING, FINISHED, FAILED, CANCELED, or RECONCILING.
+            For instances that are no longer deployed this is the last state observed
+            before the instance was superseded; for the currently deployed instance
+            it continues to update, and it may be UNKNOWN when the job state cannot
+            be determined.
           type: string
       type: object
     ApplicationInstanceStatus:
@@ -6127,6 +8081,8 @@ components:
           type: boolean
         startFromSavepoint:
           $ref: '#/components/schemas/StatementStartFromSavepoint'
+        savepointSchedule:
+          $ref: '#/components/schemas/SavepointScheduleConfig'
       required:
       - computePoolName
       - statement
@@ -6152,6 +8108,25 @@ components:
           type: array
         schema:
           $ref: '#/components/schemas/ResultSchema'
+        udfJarUris:
+          description: |-
+            UDF JAR URIs (pre-resolution, e.g. `cmf://`, `s3://`) that this
+            statement references via the environment catalog. Empty or absent
+            when the statement uses no env-catalog UDFs. Surfaced so callers
+            can see which JARs the statement loads at runtime.
+          items:
+            type: string
+          type: array
+        connectorJarUris:
+          description: |-
+            Connector and format artifact JAR URIs (e.g. `s3://`) that this
+            statement's referenced tables require, one entry per connector or
+            format actually used. Empty or absent when the statement uses only
+            built-in connectors and formats. Surfaced so callers can see which
+            artifact JARs the statement loads at runtime.
+          items:
+            type: string
+          type: array
       title: StatementTraits
       type: object
     StatementStatus:
@@ -6168,9 +8143,12 @@ components:
         resourceSummary:
           $ref: '#/components/schemas/ResourceUsageSummary'
         warning:
-          description: Warning message indicating the displayed status may be stale,
-            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          description: |-
+            Warning message indicating the displayed status may be stale,
+            for example, when the backing Kubernetes cluster is disconnected or decommissioned.
           type: string
+        savepointSchedule:
+          $ref: '#/components/schemas/SavepointScheduleStatus'
       required:
       - phase
       title: StatementStatus
@@ -6337,8 +8315,9 @@ components:
           - SHARED
           type: string
         state:
-          description: Desired state of the compute pool. Can only be specified for
-            shared compute pools. Defaults to RUNNING if not specified.
+          description: |-
+            Desired state of the compute pool. Can only be specified for shared
+            compute pools. Defaults to RUNNING if not specified.
           enum:
           - RUNNING
           - SUSPENDED
@@ -6381,9 +8360,9 @@ components:
             resources:
               $ref: '#/components/schemas/ResourcesByStatusAndTypeSummary'
             warning:
-              description: Warning message indicating the displayed status may be
-                stale, e.g. when the backing Kubernetes cluster is disconnected or
-                decommissioned.
+              description: |-
+                Warning message indicating the displayed status may be stale,
+                for example, when the backing Kubernetes cluster is disconnected or decommissioned.
               type: string
           required:
           - phase
@@ -6496,6 +8475,82 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/KafkaCatalog'
+          type: array
+      type: object
+    ArtifactStatus:
+      description: Server-managed status for a specific version of the Artifact.
+      properties:
+        version:
+          description: Version number (starts at 1, auto-incremented on each new binary
+            upload).
+          format: int32
+          type: integer
+        creationTimestamp:
+          description: Timestamp when this version was created (when its binary was
+            uploaded). For version 1 this equals the Artifact's `metadata.creationTimestamp`;
+            later versions each carry their own upload time.
+          readOnly: true
+          type: string
+        path:
+          description: Full path to the artifact in blob storage.
+          type: string
+        size:
+          description: File size in bytes. Omitted from the response while the version
+            is in `UPLOADING` phase.
+          format: int64
+          type: integer
+        checksum:
+          description: SHA-256 checksum of the artifact content (e.g. `sha256:abc...`).
+            Omitted from the response while the version is in `UPLOADING` phase.
+          type: string
+        phase:
+          description: 'Lifecycle phase of this version. `UPLOADING`: content is still
+            being uploaded. `READY`: content is uploaded and available. `FILE_MISSING`:
+            the backing file is absent from storage. `STORE_UNREACHABLE`: artifact
+            storage could not be reached, so the file''s presence could not be verified.'
+          enum:
+          - UPLOADING
+          - READY
+          - FILE_MISSING
+          - STORE_UNREACHABLE
+          type: string
+        message:
+          description: Human-readable status message, populated on error states such
+            as `FILE_MISSING` and `STORE_UNREACHABLE`.
+          type: string
+      title: ArtifactStatus
+      type: object
+    Artifact_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ArtifactMetadata'
+        spec:
+          additionalProperties: false
+          description: Spec of an Artifact (reserved for future use; empty in V1).
+          title: ArtifactSpec
+          type: object
+        status:
+          $ref: '#/components/schemas/ArtifactStatus'
+      required:
+      - metadata
+      - spec
+      type: object
+    ArtifactPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: ArtifactPageMetadata
+      type: object
+    ArtifactsPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ArtifactPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/Artifact'
           type: array
       type: object
     KafkaDatabaseSpec_kafkaCluster:
@@ -6612,6 +8667,12 @@ components:
           - NATIVE
           - UNKNOWN
           type: string
+        pinned:
+          default: false
+          description: |
+            When true, this Savepoint is exempt from automatic retention cleanup and must
+            be deleted explicitly.
+          type: boolean
       title: SavepointSpec
       type: object
       x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'
@@ -6620,6 +8681,18 @@ components:
       properties:
         state:
           description: State of the Savepoint
+          type: string
+        source:
+          description: |
+            How this Savepoint was created. MANUAL means user-initiated; UPGRADE means
+            adopted from a Flink Kubernetes Operator upgrade snapshot; SCHEDULE means
+            created by the CMF periodic scheduling engine or adopted from an FKO periodic
+            snapshot.
+          enum:
+          - MANUAL
+          - UPGRADE
+          - SCHEDULE
+          readOnly: true
           type: string
         path:
           description: Path of the Savepoint
@@ -6641,8 +8714,9 @@ components:
           description: Whether the Savepoint is pending deletion
           type: boolean
         warning:
-          description: Warning message indicating the displayed status may be stale,
-            e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+          description: |-
+            Warning message indicating the displayed status may be stale,
+            for example, when the backing Kubernetes cluster is disconnected or decommissioned.
           type: string
       title: SavepointStatus
       type: object
@@ -6708,6 +8782,29 @@ components:
           format: int64
           type: integer
       title: C3LicenseInformationStatus
+      type: object
+    C3ConfigurationStatus:
+      example:
+        configurationProperties:
+        - originType: CONFIG_FILE
+          origin: origin
+          sensitive: true
+          value: value
+          key: key
+        - originType: CONFIG_FILE
+          origin: origin
+          sensitive: true
+          value: value
+          key: key
+      properties:
+        configurationProperties:
+          description: |
+            The curated view of CMF's own settings (the `cmf.*` and
+            `encryption.*` configuration). Sorted by key.
+          items:
+            $ref: '#/components/schemas/C3ConfigurationProperty'
+          type: array
+      title: C3ConfigurationStatus
       type: object
     Resources:
       description: Count of various resource types managed by CMF

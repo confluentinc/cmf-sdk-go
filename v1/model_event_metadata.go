@@ -12,6 +12,7 @@ package v1
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // EventMetadata Metadata about the event
@@ -22,6 +23,8 @@ type EventMetadata struct {
 	Uid *string `json:"uid,omitempty"`
 	// Timestamp when the Event was created
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
+	// Timestamp of the most recent occurrence of this event
+	UpdateTimestamp *time.Time `json:"updateTimestamp,omitempty"`
 	// Name of the FlinkApplicationInstance which this event is related to
 	FlinkApplicationInstance *string `json:"flinkApplicationInstance,omitempty"`
 	// Labels of the Event
@@ -143,6 +146,38 @@ func (o *EventMetadata) SetCreationTimestamp(v string) {
 	o.CreationTimestamp = &v
 }
 
+// GetUpdateTimestamp returns the UpdateTimestamp field value if set, zero value otherwise.
+func (o *EventMetadata) GetUpdateTimestamp() time.Time {
+	if o == nil || o.UpdateTimestamp == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.UpdateTimestamp
+}
+
+// GetUpdateTimestampOk returns a tuple with the UpdateTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EventMetadata) GetUpdateTimestampOk() (*time.Time, bool) {
+	if o == nil || o.UpdateTimestamp == nil {
+		return nil, false
+	}
+	return o.UpdateTimestamp, true
+}
+
+// HasUpdateTimestamp returns a boolean if a field has been set.
+func (o *EventMetadata) HasUpdateTimestamp() bool {
+	if o != nil && o.UpdateTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUpdateTimestamp gets a reference to the given time.Time and assigns it to the UpdateTimestamp field.
+func (o *EventMetadata) SetUpdateTimestamp(v time.Time) {
+	o.UpdateTimestamp = &v
+}
+
 // GetFlinkApplicationInstance returns the FlinkApplicationInstance field value if set, zero value otherwise.
 func (o *EventMetadata) GetFlinkApplicationInstance() string {
 	if o == nil || o.FlinkApplicationInstance == nil {
@@ -249,6 +284,9 @@ func (o EventMetadata) MarshalJSON() ([]byte, error) {
 	}
 	if o.CreationTimestamp != nil {
 		toSerialize["creationTimestamp"] = o.CreationTimestamp
+	}
+	if o.UpdateTimestamp != nil {
+		toSerialize["updateTimestamp"] = o.UpdateTimestamp
 	}
 	if o.FlinkApplicationInstance != nil {
 		toSerialize["flinkApplicationInstance"] = o.FlinkApplicationInstance
