@@ -26,6 +26,36 @@ var (
 type C3Api interface {
 
 	/*
+	GetAuthConfig Discover the CMF authentication/authorization configuration.
+
+	Returns the auth configuration the cmf-ui single-page app needs to decide
+whether and how to log in. This endpoint is intentionally unauthenticated so
+the SPA can read it before it holds a token.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @return ApiGetAuthConfigRequest
+	*/
+	GetAuthConfig(ctx _context.Context) ApiGetAuthConfigRequest
+
+	// GetAuthConfigExecute executes the request
+	//  @return AuthConfig
+	GetAuthConfigExecute(r ApiGetAuthConfigRequest) (AuthConfig, *_nethttp.Response, error)
+
+	/*
+	GetC3Configuration Retrieve the effective CMF runtime configuration.
+
+	Returns the effective configuration of the running CMF instance.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @return ApiGetC3ConfigurationRequest
+	*/
+	GetC3Configuration(ctx _context.Context) ApiGetC3ConfigurationRequest
+
+	// GetC3ConfigurationExecute executes the request
+	//  @return C3Configuration
+	GetC3ConfigurationExecute(r ApiGetC3ConfigurationRequest) (C3Configuration, *_nethttp.Response, error)
+
+	/*
 	GetC3LicenseInformation Retrieve license information for C3 integration.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -36,10 +66,263 @@ type C3Api interface {
 	// GetC3LicenseInformationExecute executes the request
 	//  @return C3LicenseInformation
 	GetC3LicenseInformationExecute(r ApiGetC3LicenseInformationRequest) (C3LicenseInformation, *_nethttp.Response, error)
+
+	/*
+	GetWhoami Return the authenticated principal's identity.
+
+	Returns the principal CMF authenticated the current request as -- the JWT/OIDC/Basic
+subject or, for mTLS, the client-certificate subject mapped to a principal. Lets the
+cmf-ui SPA label the signed-in user even when there is no token to decode (mTLS), where
+the principal exists only server-side. Requires authentication when authentication is
+enabled; when authentication is disabled the endpoint is still reachable and returns a
+null principal.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @return ApiGetWhoamiRequest
+	*/
+	GetWhoami(ctx _context.Context) ApiGetWhoamiRequest
+
+	// GetWhoamiExecute executes the request
+	//  @return WhoAmi
+	GetWhoamiExecute(r ApiGetWhoamiRequest) (WhoAmi, *_nethttp.Response, error)
 }
 
 // C3ApiService C3Api service
 type C3ApiService service
+
+type ApiGetAuthConfigRequest struct {
+	ctx _context.Context
+	ApiService C3Api
+}
+
+
+func (r ApiGetAuthConfigRequest) Execute() (AuthConfig, *_nethttp.Response, error) {
+	return r.ApiService.GetAuthConfigExecute(r)
+}
+
+/*
+GetAuthConfig Discover the CMF authentication/authorization configuration.
+
+Returns the auth configuration the cmf-ui single-page app needs to decide
+whether and how to log in. This endpoint is intentionally unauthenticated so
+the SPA can read it before it holds a token.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetAuthConfigRequest
+*/
+func (a *C3ApiService) GetAuthConfig(ctx _context.Context) ApiGetAuthConfigRequest {
+	return ApiGetAuthConfigRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return AuthConfig
+func (a *C3ApiService) GetAuthConfigExecute(r ApiGetAuthConfigRequest) (AuthConfig, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  AuthConfig
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "C3ApiService.GetAuthConfig")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/c3/auth-config"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetC3ConfigurationRequest struct {
+	ctx _context.Context
+	ApiService C3Api
+}
+
+
+func (r ApiGetC3ConfigurationRequest) Execute() (C3Configuration, *_nethttp.Response, error) {
+	return r.ApiService.GetC3ConfigurationExecute(r)
+}
+
+/*
+GetC3Configuration Retrieve the effective CMF runtime configuration.
+
+Returns the effective configuration of the running CMF instance.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetC3ConfigurationRequest
+*/
+func (a *C3ApiService) GetC3Configuration(ctx _context.Context) ApiGetC3ConfigurationRequest {
+	return ApiGetC3ConfigurationRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return C3Configuration
+func (a *C3ApiService) GetC3ConfigurationExecute(r ApiGetC3ConfigurationRequest) (C3Configuration, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  C3Configuration
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "C3ApiService.GetC3Configuration")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/c3/configuration"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
 
 type ApiGetC3LicenseInformationRequest struct {
 	ctx _context.Context
@@ -82,6 +365,122 @@ func (a *C3ApiService) GetC3LicenseInformationExecute(r ApiGetC3LicenseInformati
 	}
 
 	localVarPath := localBasePath + "/cmf/api/v1/c3/license"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetWhoamiRequest struct {
+	ctx _context.Context
+	ApiService C3Api
+}
+
+
+func (r ApiGetWhoamiRequest) Execute() (WhoAmi, *_nethttp.Response, error) {
+	return r.ApiService.GetWhoamiExecute(r)
+}
+
+/*
+GetWhoami Return the authenticated principal's identity.
+
+Returns the principal CMF authenticated the current request as -- the JWT/OIDC/Basic
+subject or, for mTLS, the client-certificate subject mapped to a principal. Lets the
+cmf-ui SPA label the signed-in user even when there is no token to decode (mTLS), where
+the principal exists only server-side. Requires authentication when authentication is
+enabled; when authentication is disabled the endpoint is still reachable and returns a
+null principal.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetWhoamiRequest
+*/
+func (a *C3ApiService) GetWhoami(ctx _context.Context) ApiGetWhoamiRequest {
+	return ApiGetWhoamiRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return WhoAmi
+func (a *C3ApiService) GetWhoamiExecute(r ApiGetWhoamiRequest) (WhoAmi, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  WhoAmi
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "C3ApiService.GetWhoami")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/c3/whoami"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}

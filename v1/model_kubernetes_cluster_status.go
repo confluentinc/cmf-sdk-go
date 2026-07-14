@@ -25,6 +25,8 @@ type KubernetesClusterStatus struct {
 	LastHeartbeatTimestamp *time.Time `json:"lastHeartbeatTimestamp,omitempty"`
 	// The Kubernetes server version reported by the cluster (e.g., \"v1.28.3\"). Only available when the cluster is CONNECTED.
 	KubernetesVersion *string `json:"kubernetesVersion,omitempty"`
+	// Names of environments that reference this cluster via spec.kubernetesClusterName. Always empty in Environment.status.kubernetesCluster.
+	Environments *[]string `json:"environments,omitempty"`
 }
 
 // NewKubernetesClusterStatus instantiates a new KubernetesClusterStatus object
@@ -172,6 +174,38 @@ func (o *KubernetesClusterStatus) SetKubernetesVersion(v string) {
 	o.KubernetesVersion = &v
 }
 
+// GetEnvironments returns the Environments field value if set, zero value otherwise.
+func (o *KubernetesClusterStatus) GetEnvironments() []string {
+	if o == nil || o.Environments == nil {
+		var ret []string
+		return ret
+	}
+	return *o.Environments
+}
+
+// GetEnvironmentsOk returns a tuple with the Environments field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *KubernetesClusterStatus) GetEnvironmentsOk() (*[]string, bool) {
+	if o == nil || o.Environments == nil {
+		return nil, false
+	}
+	return o.Environments, true
+}
+
+// HasEnvironments returns a boolean if a field has been set.
+func (o *KubernetesClusterStatus) HasEnvironments() bool {
+	if o != nil && o.Environments != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetEnvironments gets a reference to the given []string and assigns it to the Environments field.
+func (o *KubernetesClusterStatus) SetEnvironments(v []string) {
+	o.Environments = &v
+}
+
 func (o KubernetesClusterStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.State != nil {
@@ -185,6 +219,9 @@ func (o KubernetesClusterStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.KubernetesVersion != nil {
 		toSerialize["kubernetesVersion"] = o.KubernetesVersion
+	}
+	if o.Environments != nil {
+		toSerialize["environments"] = o.Environments
 	}
 	return json.Marshal(toSerialize)
 }

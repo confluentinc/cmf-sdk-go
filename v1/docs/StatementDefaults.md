@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **FlinkConfiguration** | Pointer to **map[string]string** | default Flink configuration for Statements | [optional] 
+**SavepointSchedule** | Pointer to [**SavepointScheduleConfig**](SavepointScheduleConfig.md) |  | [optional] 
 
 ## Methods
 
@@ -49,6 +50,31 @@ SetFlinkConfiguration sets FlinkConfiguration field to given value.
 `func (o *StatementDefaults) HasFlinkConfiguration() bool`
 
 HasFlinkConfiguration returns a boolean if a field has been set.
+
+### GetSavepointSchedule
+
+`func (o *StatementDefaults) GetSavepointSchedule() SavepointScheduleConfig`
+
+GetSavepointSchedule returns the SavepointSchedule field if non-nil, zero value otherwise.
+
+### GetSavepointScheduleOk
+
+`func (o *StatementDefaults) GetSavepointScheduleOk() (*SavepointScheduleConfig, bool)`
+
+GetSavepointScheduleOk returns a tuple with the SavepointSchedule field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSavepointSchedule
+
+`func (o *StatementDefaults) SetSavepointSchedule(v SavepointScheduleConfig)`
+
+SetSavepointSchedule sets SavepointSchedule field to given value.
+
+### HasSavepointSchedule
+
+`func (o *StatementDefaults) HasSavepointSchedule() bool`
+
+HasSavepointSchedule returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

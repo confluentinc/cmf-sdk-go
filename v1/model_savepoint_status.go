@@ -18,6 +18,8 @@ import (
 type SavepointStatus struct {
 	// State of the Savepoint
 	State *string `json:"state,omitempty"`
+	// How this Savepoint was created. MANUAL means user-initiated; UPGRADE means adopted from a Flink Kubernetes Operator upgrade snapshot; SCHEDULE means created by the CMF periodic scheduling engine or adopted from an FKO periodic snapshot. 
+	Source *string `json:"source,omitempty"`
 	// Path of the Savepoint
 	Path *string `json:"path,omitempty"`
 	// Timestamp when the Savepoint was triggered
@@ -30,7 +32,7 @@ type SavepointStatus struct {
 	Error *string `json:"error,omitempty"`
 	// Whether the Savepoint is pending deletion
 	PendingDeletion *bool `json:"pendingDeletion,omitempty"`
-	// Warning message indicating the displayed status may be stale, e.g. when the backing Kubernetes cluster is disconnected or decommissioned.
+	// Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned.
 	Warning *string `json:"warning,omitempty"`
 }
 
@@ -81,6 +83,38 @@ func (o *SavepointStatus) HasState() bool {
 // SetState gets a reference to the given string and assigns it to the State field.
 func (o *SavepointStatus) SetState(v string) {
 	o.State = &v
+}
+
+// GetSource returns the Source field value if set, zero value otherwise.
+func (o *SavepointStatus) GetSource() string {
+	if o == nil || o.Source == nil {
+		var ret string
+		return ret
+	}
+	return *o.Source
+}
+
+// GetSourceOk returns a tuple with the Source field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SavepointStatus) GetSourceOk() (*string, bool) {
+	if o == nil || o.Source == nil {
+		return nil, false
+	}
+	return o.Source, true
+}
+
+// HasSource returns a boolean if a field has been set.
+func (o *SavepointStatus) HasSource() bool {
+	if o != nil && o.Source != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSource gets a reference to the given string and assigns it to the Source field.
+func (o *SavepointStatus) SetSource(v string) {
+	o.Source = &v
 }
 
 // GetPath returns the Path field value if set, zero value otherwise.
@@ -311,6 +345,9 @@ func (o SavepointStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.State != nil {
 		toSerialize["state"] = o.State
+	}
+	if o.Source != nil {
+		toSerialize["source"] = o.Source
 	}
 	if o.Path != nil {
 		toSerialize["path"] = o.Path

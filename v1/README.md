@@ -78,18 +78,29 @@ All URIs are relative to *http://localhost:8080*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ArtifactsApi* | [**CreateArtifact**](docs/ArtifactsApi.md#createartifact) | **Post** /cmf/api/v1/environments/{envName}/artifacts | Upload a new Artifact to an Environment.
+*ArtifactsApi* | [**DeleteArtifact**](docs/ArtifactsApi.md#deleteartifact) | **Delete** /cmf/api/v1/environments/{envName}/artifacts/{artifactName} | Deletes the Artifact of the given name in the given Environment.
+*ArtifactsApi* | [**DownloadArtifactContent**](docs/ArtifactsApi.md#downloadartifactcontent) | **Get** /cmf/api/v1/environments/{envName}/artifacts/{artifactName}/content | Download the binary content of an Artifact.
+*ArtifactsApi* | [**GetArtifact**](docs/ArtifactsApi.md#getartifact) | **Get** /cmf/api/v1/environments/{envName}/artifacts/{artifactName} | Retrieve an Artifact of the given name in the given Environment.
+*ArtifactsApi* | [**ListArtifactVersions**](docs/ArtifactsApi.md#listartifactversions) | **Get** /cmf/api/v1/environments/{envName}/artifacts/{artifactName}/versions | Retrieve a paginated list of all versions of an Artifact, ordered newest-first.
+*ArtifactsApi* | [**ListArtifacts**](docs/ArtifactsApi.md#listartifacts) | **Get** /cmf/api/v1/environments/{envName}/artifacts | Retrieve a paginated list of all Artifacts in the given Environment.
+*ArtifactsApi* | [**UpdateArtifact**](docs/ArtifactsApi.md#updateartifact) | **Put** /cmf/api/v1/environments/{envName}/artifacts/{artifactName} | Update an Artifact&#39;s labels and annotations, and/or upload a new version.
+*C3Api* | [**GetAuthConfig**](docs/C3Api.md#getauthconfig) | **Get** /cmf/api/v1/c3/auth-config | Discover the CMF authentication/authorization configuration.
+*C3Api* | [**GetC3Configuration**](docs/C3Api.md#getc3configuration) | **Get** /cmf/api/v1/c3/configuration | Retrieve the effective CMF runtime configuration.
 *C3Api* | [**GetC3LicenseInformation**](docs/C3Api.md#getc3licenseinformation) | **Get** /cmf/api/v1/c3/license | Retrieve license information for C3 integration.
+*C3Api* | [**GetWhoami**](docs/C3Api.md#getwhoami) | **Get** /cmf/api/v1/c3/whoami | Return the authenticated principal&#39;s identity.
 *CMFInformationApi* | [**GetResourceInformation**](docs/CMFInformationApi.md#getresourceinformation) | **Get** /cmf/api/v1/resource-information | Retrieve resource information about the CMF deployment.
 *CMFInformationApi* | [**GetSystemInformation**](docs/CMFInformationApi.md#getsysteminformation) | **Get** /cmf/api/v1/system-information | Retrieve system information about the CMF deployment.
 *DetachedSavepointsApi* | [**CreateDetachedSavepoint**](docs/DetachedSavepointsApi.md#createdetachedsavepoint) | **Post** /cmf/api/v1/detached-savepoints | Creates a new detached savepoint.
-*DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the Detached Savepoint of the given name.
-*DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the Detached Savepoint of the given name.
-*DetachedSavepointsApi* | [**ListDetachedSavepoints**](docs/DetachedSavepointsApi.md#listdetachedsavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all Detached Savepoints.
+*DetachedSavepointsApi* | [**DeleteDetachedSavepoint**](docs/DetachedSavepointsApi.md#deletedetachedsavepoint) | **Delete** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Deletes the detached savepoint of the given name.
+*DetachedSavepointsApi* | [**GetDetachedSavepoint**](docs/DetachedSavepointsApi.md#getdetachedsavepoint) | **Get** /cmf/api/v1/detached-savepoints/{detachedSavepointName} | Retrieve the detached savepoint of the given name.
+*DetachedSavepointsApi* | [**ListDetachedSavepoints**](docs/DetachedSavepointsApi.md#listdetachedsavepoints) | **Get** /cmf/api/v1/detached-savepoints | Retrieve a paginated list of all detached savepoints.
 *EnvironmentsApi* | [**CreateEnvironmentSecretMapping**](docs/EnvironmentsApi.md#createenvironmentsecretmapping) | **Post** /cmf/api/v1/environments/{envName}/secret-mappings | Creates the Environment Secret Mapping for the given Environment.
 *EnvironmentsApi* | [**CreateOrUpdateEnvironment**](docs/EnvironmentsApi.md#createorupdateenvironment) | **Post** /cmf/api/v1/environments | Create or update an Environment
 *EnvironmentsApi* | [**DeleteEnvironment**](docs/EnvironmentsApi.md#deleteenvironment) | **Delete** /cmf/api/v1/environments/{envName} | 
 *EnvironmentsApi* | [**DeleteEnvironmentSecretMapping**](docs/EnvironmentsApi.md#deleteenvironmentsecretmapping) | **Delete** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Deletes the Environment Secret Mapping for the given Environment and Secret.
 *EnvironmentsApi* | [**GetEnvironment**](docs/EnvironmentsApi.md#getenvironment) | **Get** /cmf/api/v1/environments/{envName} | Get/Describe an environment with the given name.
+*EnvironmentsApi* | [**GetEnvironmentCatalog**](docs/EnvironmentsApi.md#getenvironmentcatalog) | **Get** /cmf/api/v1/environments/{envName}/catalog | Retrieves the environment&#39;s default Flink SQL catalog and its databases.
 *EnvironmentsApi* | [**GetEnvironmentSecretMapping**](docs/EnvironmentsApi.md#getenvironmentsecretmapping) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings/{name} | Retrieve the Environment Secret Mapping for the given name in the given environment.
 *EnvironmentsApi* | [**GetEnvironmentSecretMappings**](docs/EnvironmentsApi.md#getenvironmentsecretmappings) | **Get** /cmf/api/v1/environments/{envName}/secret-mappings | Retrieve a paginated list of all Environment Secret Mappings.
 *EnvironmentsApi* | [**GetEnvironments**](docs/EnvironmentsApi.md#getenvironments) | **Get** /cmf/api/v1/environments | Retrieve a paginated list of all environments.
@@ -124,10 +135,12 @@ Class | Method | HTTP request | Description
 *SQLApi* | [**GetStatementExceptions**](docs/SQLApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatementResult**](docs/SQLApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatements**](docs/SQLApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
-*SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates a Compute Pool of the given name in the given Environment.
+*SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates the compute pool specified using its name and environment.
 *SQLApi* | [**UpdateKafkaCatalog**](docs/SQLApi.md#updatekafkacatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
 *SQLApi* | [**UpdateKafkaDatabase**](docs/SQLApi.md#updatekafkadatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
 *SQLApi* | [**UpdateStatement**](docs/SQLApi.md#updatestatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Updates a Statement of the given name in the given Environment.
+*SavepointsApi* | [**BulkDeleteSavepointsForFlinkApplication**](docs/SavepointsApi.md#bulkdeletesavepointsforflinkapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Bulk-delete Savepoints for the given Application filtered by source and age.
+*SavepointsApi* | [**BulkDeleteSavepointsForFlinkStatement**](docs/SavepointsApi.md#bulkdeletesavepointsforflinkstatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Bulk-delete Savepoints for the given Statement filtered by source and age.
 *SavepointsApi* | [**CreateSavepointForFlinkApplication**](docs/SavepointsApi.md#createsavepointforflinkapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Creates a new Savepoint for the given Application in the given Environment.
 *SavepointsApi* | [**CreateSavepointForFlinkStatement**](docs/SavepointsApi.md#createsavepointforflinkstatement) | **Post** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Creates a new Savepoint for the given Statement in the given Environment.
 *SavepointsApi* | [**DeleteSavepointForFlinkApplication**](docs/SavepointsApi.md#deletesavepointforflinkapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Application in the given Environment.
@@ -137,6 +150,8 @@ Class | Method | HTTP request | Description
 *SavepointsApi* | [**GetSavepointForFlinkStatement**](docs/SavepointsApi.md#getsavepointforflinkstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Statement in the given Environment.
 *SavepointsApi* | [**GetSavepointsForFlinkApplication**](docs/SavepointsApi.md#getsavepointsforflinkapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Retrieve a paginated list of all Savepoints for the given Application in the given Environment.
 *SavepointsApi* | [**GetSavepointsForFlinkStatement**](docs/SavepointsApi.md#getsavepointsforflinkstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Retrieve a paginated list of all Savepoints for the given Statement in the given Environment.
+*SavepointsApi* | [**UpdateSavepointForFlinkApplication**](docs/SavepointsApi.md#updatesavepointforflinkapplication) | **Put** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+*SavepointsApi* | [**UpdateSavepointForFlinkStatement**](docs/SavepointsApi.md#updatesavepointforflinkstatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
 *SecretsApi* | [**CreateSecret**](docs/SecretsApi.md#createsecret) | **Post** /cmf/api/v1/secrets | Create a Secret.
 *SecretsApi* | [**DeleteSecret**](docs/SecretsApi.md#deletesecret) | **Delete** /cmf/api/v1/secrets/{secretName} | Delete the secret with the given name.
 *SecretsApi* | [**GetSecret**](docs/SecretsApi.md#getsecret) | **Get** /cmf/api/v1/secrets/{secretName} | Retrieve the Secret of the given name. Note that the secret data is not returned for security reasons.
@@ -158,6 +173,18 @@ Class | Method | HTTP request | Description
  - [ApplicationsByStatusSummary](docs/ApplicationsByStatusSummary.md)
  - [ApplicationsPage](docs/ApplicationsPage.md)
  - [ApplicationsPageAllOf](docs/ApplicationsPageAllOf.md)
+ - [Artifact](docs/Artifact.md)
+ - [ArtifactAllOf](docs/ArtifactAllOf.md)
+ - [ArtifactMetadata](docs/ArtifactMetadata.md)
+ - [ArtifactPageMetadata](docs/ArtifactPageMetadata.md)
+ - [ArtifactStatus](docs/ArtifactStatus.md)
+ - [ArtifactsPage](docs/ArtifactsPage.md)
+ - [ArtifactsPageAllOf](docs/ArtifactsPageAllOf.md)
+ - [AuthConfig](docs/AuthConfig.md)
+ - [BlackoutWindow](docs/BlackoutWindow.md)
+ - [C3Configuration](docs/C3Configuration.md)
+ - [C3ConfigurationProperty](docs/C3ConfigurationProperty.md)
+ - [C3ConfigurationStatus](docs/C3ConfigurationStatus.md)
  - [C3LicenseInformation](docs/C3LicenseInformation.md)
  - [C3LicenseInformationStatus](docs/C3LicenseInformationStatus.md)
  - [CatalogMetadata](docs/CatalogMetadata.md)
@@ -168,6 +195,7 @@ Class | Method | HTTP request | Description
  - [ComputePoolMetadata](docs/ComputePoolMetadata.md)
  - [ComputePoolPageMetadata](docs/ComputePoolPageMetadata.md)
  - [ComputePoolSpec](docs/ComputePoolSpec.md)
+ - [ComputePoolsByStatusSummary](docs/ComputePoolsByStatusSummary.md)
  - [ComputePoolsPage](docs/ComputePoolsPage.md)
  - [ComputePoolsPageAllOf](docs/ComputePoolsPageAllOf.md)
  - [DataType](docs/DataType.md)
@@ -175,6 +203,8 @@ Class | Method | HTTP request | Description
  - [DatabaseMetadata](docs/DatabaseMetadata.md)
  - [DatabasePageMetadata](docs/DatabasePageMetadata.md)
  - [Environment](docs/Environment.md)
+ - [EnvironmentCatalog](docs/EnvironmentCatalog.md)
+ - [EnvironmentCatalogDatabase](docs/EnvironmentCatalogDatabase.md)
  - [EnvironmentMetadata](docs/EnvironmentMetadata.md)
  - [EnvironmentSecretMapping](docs/EnvironmentSecretMapping.md)
  - [EnvironmentSecretMappingMetadata](docs/EnvironmentSecretMappingMetadata.md)
@@ -188,6 +218,7 @@ Class | Method | HTTP request | Description
  - [EventData](docs/EventData.md)
  - [EventDataJobException](docs/EventDataJobException.md)
  - [EventDataNewStatus](docs/EventDataNewStatus.md)
+ - [EventDataReasonMessage](docs/EventDataReasonMessage.md)
  - [EventMetadata](docs/EventMetadata.md)
  - [EventStatus](docs/EventStatus.md)
  - [EventsPage](docs/EventsPage.md)
@@ -247,8 +278,13 @@ Class | Method | HTTP request | Description
  - [SavepointAllOf](docs/SavepointAllOf.md)
  - [SavepointMetadata](docs/SavepointMetadata.md)
  - [SavepointPageMetadata](docs/SavepointPageMetadata.md)
+ - [SavepointRetention](docs/SavepointRetention.md)
+ - [SavepointScheduleConfig](docs/SavepointScheduleConfig.md)
+ - [SavepointScheduleStatus](docs/SavepointScheduleStatus.md)
  - [SavepointSpec](docs/SavepointSpec.md)
  - [SavepointStatus](docs/SavepointStatus.md)
+ - [SavepointsBulkDeleteResult](docs/SavepointsBulkDeleteResult.md)
+ - [SavepointsBulkDeleteResultFailures](docs/SavepointsBulkDeleteResultFailures.md)
  - [SavepointsPage](docs/SavepointsPage.md)
  - [SavepointsPageAllOf](docs/SavepointsPageAllOf.md)
  - [Secret](docs/Secret.md)
@@ -283,6 +319,7 @@ Class | Method | HTTP request | Description
  - [SystemInformation](docs/SystemInformation.md)
  - [SystemInformationStatus](docs/SystemInformationStatus.md)
  - [TaskManager](docs/TaskManager.md)
+ - [WhoAmi](docs/WhoAmi.md)
 
 
 ## Documentation For Authorization

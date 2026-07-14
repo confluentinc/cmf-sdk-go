@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Applications** | Pointer to [**ApplicationsByStatusSummary**](ApplicationsByStatusSummary.md) |  | [optional] 
+**ComputePools** | Pointer to [**ComputePoolsByStatusSummary**](ComputePoolsByStatusSummary.md) |  | [optional] 
 **Statements** | Pointer to [**StatementsByStatusSummary**](StatementsByStatusSummary.md) |  | [optional] 
 
 ## Methods
@@ -50,6 +51,31 @@ SetApplications sets Applications field to given value.
 `func (o *ResourcesByStatusAndTypeSummary) HasApplications() bool`
 
 HasApplications returns a boolean if a field has been set.
+
+### GetComputePools
+
+`func (o *ResourcesByStatusAndTypeSummary) GetComputePools() ComputePoolsByStatusSummary`
+
+GetComputePools returns the ComputePools field if non-nil, zero value otherwise.
+
+### GetComputePoolsOk
+
+`func (o *ResourcesByStatusAndTypeSummary) GetComputePoolsOk() (*ComputePoolsByStatusSummary, bool)`
+
+GetComputePoolsOk returns a tuple with the ComputePools field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetComputePools
+
+`func (o *ResourcesByStatusAndTypeSummary) SetComputePools(v ComputePoolsByStatusSummary)`
+
+SetComputePools sets ComputePools field to given value.
+
+### HasComputePools
+
+`func (o *ResourcesByStatusAndTypeSummary) HasComputePools() bool`
+
+HasComputePools returns a boolean if a field has been set.
 
 ### GetStatements
 

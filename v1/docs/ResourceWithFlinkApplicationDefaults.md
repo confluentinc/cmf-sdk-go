@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FlinkApplicationDefaults** | Pointer to **map[string]interface{}** |  | [optional] 
+**FlinkApplicationDefaults** | Pointer to **map[string]interface{}** | Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \&quot;spec\&quot; object here whose fields are merged into every application spec at deploy time. May include a \&quot;savepointSchedule\&quot; inside \&quot;spec\&quot; (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself.  | [optional] 
 
 ## Methods
 

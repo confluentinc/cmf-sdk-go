@@ -25,6 +25,10 @@ type StatementTraits struct {
 	// The column indexes that are updated by the statement
 	UpsertColumns *[]int32 `json:"upsertColumns,omitempty"`
 	Schema *ResultSchema `json:"schema,omitempty"`
+	// UDF JAR URIs (pre-resolution, e.g. `cmf://`, `s3://`) that this statement references via the environment catalog. Empty or absent when the statement uses no env-catalog UDFs. Surfaced so callers can see which JARs the statement loads at runtime.
+	UdfJarUris *[]string `json:"udfJarUris,omitempty"`
+	// Connector and format artifact JAR URIs (e.g. `s3://`) that this statement's referenced tables require, one entry per connector or format actually used. Empty or absent when the statement uses only built-in connectors and formats. Surfaced so callers can see which artifact JARs the statement loads at runtime.
+	ConnectorJarUris *[]string `json:"connectorJarUris,omitempty"`
 }
 
 // NewStatementTraits instantiates a new StatementTraits object
@@ -204,6 +208,70 @@ func (o *StatementTraits) SetSchema(v ResultSchema) {
 	o.Schema = &v
 }
 
+// GetUdfJarUris returns the UdfJarUris field value if set, zero value otherwise.
+func (o *StatementTraits) GetUdfJarUris() []string {
+	if o == nil || o.UdfJarUris == nil {
+		var ret []string
+		return ret
+	}
+	return *o.UdfJarUris
+}
+
+// GetUdfJarUrisOk returns a tuple with the UdfJarUris field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetUdfJarUrisOk() (*[]string, bool) {
+	if o == nil || o.UdfJarUris == nil {
+		return nil, false
+	}
+	return o.UdfJarUris, true
+}
+
+// HasUdfJarUris returns a boolean if a field has been set.
+func (o *StatementTraits) HasUdfJarUris() bool {
+	if o != nil && o.UdfJarUris != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUdfJarUris gets a reference to the given []string and assigns it to the UdfJarUris field.
+func (o *StatementTraits) SetUdfJarUris(v []string) {
+	o.UdfJarUris = &v
+}
+
+// GetConnectorJarUris returns the ConnectorJarUris field value if set, zero value otherwise.
+func (o *StatementTraits) GetConnectorJarUris() []string {
+	if o == nil || o.ConnectorJarUris == nil {
+		var ret []string
+		return ret
+	}
+	return *o.ConnectorJarUris
+}
+
+// GetConnectorJarUrisOk returns a tuple with the ConnectorJarUris field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetConnectorJarUrisOk() (*[]string, bool) {
+	if o == nil || o.ConnectorJarUris == nil {
+		return nil, false
+	}
+	return o.ConnectorJarUris, true
+}
+
+// HasConnectorJarUris returns a boolean if a field has been set.
+func (o *StatementTraits) HasConnectorJarUris() bool {
+	if o != nil && o.ConnectorJarUris != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetConnectorJarUris gets a reference to the given []string and assigns it to the ConnectorJarUris field.
+func (o *StatementTraits) SetConnectorJarUris(v []string) {
+	o.ConnectorJarUris = &v
+}
+
 func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.SqlKind != nil {
@@ -220,6 +288,12 @@ func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	}
 	if o.Schema != nil {
 		toSerialize["schema"] = o.Schema
+	}
+	if o.UdfJarUris != nil {
+		toSerialize["udfJarUris"] = o.UdfJarUris
+	}
+	if o.ConnectorJarUris != nil {
+		toSerialize["connectorJarUris"] = o.ConnectorJarUris
 	}
 	return json.Marshal(toSerialize)
 }

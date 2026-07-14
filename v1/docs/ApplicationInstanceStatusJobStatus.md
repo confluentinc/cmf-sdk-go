@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **JobId** | Pointer to **string** | Flink job id inside the Flink cluster | [optional] 
-**State** | Pointer to **string** | Tracks the final Flink JobStatus of the instance | [optional] 
+**State** | Pointer to **string** | The most recently observed state of the Flink job for this instance, such as RUNNING, FINISHED, FAILED, CANCELED, or RECONCILING. For instances that are no longer deployed this is the last state observed before the instance was superseded; for the currently deployed instance it continues to update, and it may be UNKNOWN when the job state cannot be determined. | [optional] 
 
 ## Methods
 

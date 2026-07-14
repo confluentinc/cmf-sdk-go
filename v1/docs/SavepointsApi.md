@@ -4,6 +4,8 @@ All URIs are relative to *http://localhost:8080*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**BulkDeleteSavepointsForFlinkApplication**](SavepointsApi.md#BulkDeleteSavepointsForFlinkApplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Bulk-delete Savepoints for the given Application filtered by source and age.
+[**BulkDeleteSavepointsForFlinkStatement**](SavepointsApi.md#BulkDeleteSavepointsForFlinkStatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Bulk-delete Savepoints for the given Statement filtered by source and age.
 [**CreateSavepointForFlinkApplication**](SavepointsApi.md#CreateSavepointForFlinkApplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Creates a new Savepoint for the given Application in the given Environment.
 [**CreateSavepointForFlinkStatement**](SavepointsApi.md#CreateSavepointForFlinkStatement) | **Post** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Creates a new Savepoint for the given Statement in the given Environment.
 [**DeleteSavepointForFlinkApplication**](SavepointsApi.md#DeleteSavepointForFlinkApplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Application in the given Environment.
@@ -13,7 +15,167 @@ Method | HTTP request | Description
 [**GetSavepointForFlinkStatement**](SavepointsApi.md#GetSavepointForFlinkStatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Statement in the given Environment.
 [**GetSavepointsForFlinkApplication**](SavepointsApi.md#GetSavepointsForFlinkApplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Retrieve a paginated list of all Savepoints for the given Application in the given Environment.
 [**GetSavepointsForFlinkStatement**](SavepointsApi.md#GetSavepointsForFlinkStatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Retrieve a paginated list of all Savepoints for the given Statement in the given Environment.
+[**UpdateSavepointForFlinkApplication**](SavepointsApi.md#UpdateSavepointForFlinkApplication) | **Put** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+[**UpdateSavepointForFlinkStatement**](SavepointsApi.md#UpdateSavepointForFlinkStatement) | **Put** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
 
+
+
+## BulkDeleteSavepointsForFlinkApplication
+
+> SavepointsBulkDeleteResult BulkDeleteSavepointsForFlinkApplication(ctx, envName, appName).Source(source).OlderThanDays(olderThanDays).OlderThanHours(olderThanHours).Force(force).Execute()
+
+Bulk-delete Savepoints for the given Application filtered by source and age.
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    envName := "envName_example" // string | 
+    appName := "appName_example" // string | 
+    source := "source_example" // string | Required. Only Savepoints with this source are deleted.
+    olderThanDays := int32(56) // int32 | Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours. (optional)
+    olderThanHours := int32(56) // int32 | Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays. (optional)
+    force := true // bool | Force-delete even if the backing Kubernetes cluster is unavailable. (optional) (default to false)
+
+    configuration := openapiclient.NewConfiguration()
+    api_client := openapiclient.NewAPIClient(configuration)
+    resp, r, err := api_client.SavepointsApi.BulkDeleteSavepointsForFlinkApplication(context.Background(), envName, appName).Source(source).OlderThanDays(olderThanDays).OlderThanHours(olderThanHours).Force(force).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `SavepointsApi.BulkDeleteSavepointsForFlinkApplication``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `BulkDeleteSavepointsForFlinkApplication`: SavepointsBulkDeleteResult
+    fmt.Fprintf(os.Stdout, "Response from `SavepointsApi.BulkDeleteSavepointsForFlinkApplication`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**envName** | **string** |  | 
+**appName** | **string** |  | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiBulkDeleteSavepointsForFlinkApplicationRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **source** | **string** | Required. Only Savepoints with this source are deleted. | 
+ **olderThanDays** | **int32** | Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours. | 
+ **olderThanHours** | **int32** | Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays. | 
+ **force** | **bool** | Force-delete even if the backing Kubernetes cluster is unavailable. | [default to false]
+
+### Return type
+
+[**SavepointsBulkDeleteResult**](SavepointsBulkDeleteResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json, application/yaml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## BulkDeleteSavepointsForFlinkStatement
+
+> SavepointsBulkDeleteResult BulkDeleteSavepointsForFlinkStatement(ctx, envName, stmtName).Source(source).OlderThanDays(olderThanDays).OlderThanHours(olderThanHours).Force(force).Execute()
+
+Bulk-delete Savepoints for the given Statement filtered by source and age.
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    envName := "envName_example" // string | 
+    stmtName := "stmtName_example" // string | 
+    source := "source_example" // string | Required. Only Savepoints with this source are deleted.
+    olderThanDays := int32(56) // int32 | Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours. (optional)
+    olderThanHours := int32(56) // int32 | Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays. (optional)
+    force := true // bool | Force-delete even if the backing Kubernetes cluster is unavailable. (optional) (default to false)
+
+    configuration := openapiclient.NewConfiguration()
+    api_client := openapiclient.NewAPIClient(configuration)
+    resp, r, err := api_client.SavepointsApi.BulkDeleteSavepointsForFlinkStatement(context.Background(), envName, stmtName).Source(source).OlderThanDays(olderThanDays).OlderThanHours(olderThanHours).Force(force).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `SavepointsApi.BulkDeleteSavepointsForFlinkStatement``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `BulkDeleteSavepointsForFlinkStatement`: SavepointsBulkDeleteResult
+    fmt.Fprintf(os.Stdout, "Response from `SavepointsApi.BulkDeleteSavepointsForFlinkStatement`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**envName** | **string** |  | 
+**stmtName** | **string** |  | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiBulkDeleteSavepointsForFlinkStatementRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **source** | **string** | Required. Only Savepoints with this source are deleted. | 
+ **olderThanDays** | **int32** | Only delete Savepoints older than this many days. Mutually exclusive with olderThanHours. | 
+ **olderThanHours** | **int32** | Only delete Savepoints older than this many hours. Mutually exclusive with olderThanDays. | 
+ **force** | **bool** | Force-delete even if the backing Kubernetes cluster is unavailable. | [default to false]
+
+### Return type
+
+[**SavepointsBulkDeleteResult**](SavepointsBulkDeleteResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json, application/yaml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## CreateSavepointForFlinkApplication
@@ -556,7 +718,7 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
-    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) (optional)
+    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter=state=COMPLETED,source=SCHEDULE (optional)
     fields := "fields_example" // string | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -592,7 +754,7 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
- **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) | 
+ **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE | 
  **fields** | **string** | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase | 
 
 ### Return type
@@ -637,7 +799,7 @@ func main() {
     page := int32(56) // int32 | Zero-based page index (0..N) (optional)
     size := int32(56) // int32 | The size of the page to be returned (optional)
     sort := []string{"Inner_example"} // []string | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. (optional)
-    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) (optional)
+    filter := "filter_example" // string | Filter query string with comma-separated expressions. Supports: - Name filtering: name=foo*bar (wildcards allowed) - Label equality: labels.key = value or labels.key != value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED) Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter=state=COMPLETED,source=SCHEDULE (optional)
     fields := "fields_example" // string | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -673,7 +835,7 @@ Name | Type | Description  | Notes
  **page** | **int32** | Zero-based page index (0..N) | 
  **size** | **int32** | The size of the page to be returned | 
  **sort** | **[]string** | Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. | 
- **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) | 
+ **filter** | **string** | Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE | 
  **fields** | **string** | Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase | 
 
 ### Return type
@@ -687,6 +849,158 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json, application/yaml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateSavepointForFlinkApplication
+
+> Savepoint UpdateSavepointForFlinkApplication(ctx, envName, appName, savepointName).Savepoint(savepoint).Execute()
+
+Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    envName := "envName_example" // string | 
+    appName := "appName_example" // string | 
+    savepointName := "savepointName_example" // string | 
+    savepoint := *openapiclient.NewSavepoint("ApiVersion_example", "Kind_example", *openapiclient.NewSavepointMetadata(), *openapiclient.NewSavepointSpec()) // Savepoint |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    api_client := openapiclient.NewAPIClient(configuration)
+    resp, r, err := api_client.SavepointsApi.UpdateSavepointForFlinkApplication(context.Background(), envName, appName, savepointName).Savepoint(savepoint).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `SavepointsApi.UpdateSavepointForFlinkApplication``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `UpdateSavepointForFlinkApplication`: Savepoint
+    fmt.Fprintf(os.Stdout, "Response from `SavepointsApi.UpdateSavepointForFlinkApplication`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**envName** | **string** |  | 
+**appName** | **string** |  | 
+**savepointName** | **string** |  | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiUpdateSavepointForFlinkApplicationRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+
+ **savepoint** | [**Savepoint**](Savepoint.md) |  | 
+
+### Return type
+
+[**Savepoint**](Savepoint.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json, application/yaml
+- **Accept**: application/json, application/yaml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateSavepointForFlinkStatement
+
+> Savepoint UpdateSavepointForFlinkStatement(ctx, envName, stmtName, savepointName).Savepoint(savepoint).Execute()
+
+Update mutable fields on a Savepoint. Currently only spec.pinned is honored; all other fields in the request body are ignored. metadata.name in the request body, when present, must match the resource name in the URL path. 
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    envName := "envName_example" // string | 
+    stmtName := "stmtName_example" // string | 
+    savepointName := "savepointName_example" // string | 
+    savepoint := *openapiclient.NewSavepoint("ApiVersion_example", "Kind_example", *openapiclient.NewSavepointMetadata(), *openapiclient.NewSavepointSpec()) // Savepoint |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    api_client := openapiclient.NewAPIClient(configuration)
+    resp, r, err := api_client.SavepointsApi.UpdateSavepointForFlinkStatement(context.Background(), envName, stmtName, savepointName).Savepoint(savepoint).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `SavepointsApi.UpdateSavepointForFlinkStatement``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `UpdateSavepointForFlinkStatement`: Savepoint
+    fmt.Fprintf(os.Stdout, "Response from `SavepointsApi.UpdateSavepointForFlinkStatement`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**envName** | **string** |  | 
+**stmtName** | **string** |  | 
+**savepointName** | **string** |  | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiUpdateSavepointForFlinkStatementRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+
+ **savepoint** | [**Savepoint**](Savepoint.md) |  | 
+
+### Return type
+
+[**Savepoint**](Savepoint.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json, application/yaml
 - **Accept**: application/json, application/yaml
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

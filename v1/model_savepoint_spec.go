@@ -22,6 +22,8 @@ type SavepointSpec struct {
 	BackoffLimit *int32 `json:"backoffLimit,omitempty"`
 	// Format type of the Savepoint
 	FormatType *string `json:"formatType,omitempty"`
+	// When true, this Savepoint is exempt from automatic retention cleanup and must be deleted explicitly. 
+	Pinned *bool `json:"pinned,omitempty"`
 }
 
 // NewSavepointSpec instantiates a new SavepointSpec object
@@ -34,6 +36,8 @@ func NewSavepointSpec() *SavepointSpec {
 	this.BackoffLimit = &backoffLimit
 	var formatType string = "CANONICAL"
 	this.FormatType = &formatType
+	var pinned bool = false
+	this.Pinned = &pinned
 	return &this
 }
 
@@ -46,6 +50,8 @@ func NewSavepointSpecWithDefaults() *SavepointSpec {
 	this.BackoffLimit = &backoffLimit
 	var formatType string = "CANONICAL"
 	this.FormatType = &formatType
+	var pinned bool = false
+	this.Pinned = &pinned
 	return &this
 }
 
@@ -145,6 +151,38 @@ func (o *SavepointSpec) SetFormatType(v string) {
 	o.FormatType = &v
 }
 
+// GetPinned returns the Pinned field value if set, zero value otherwise.
+func (o *SavepointSpec) GetPinned() bool {
+	if o == nil || o.Pinned == nil {
+		var ret bool
+		return ret
+	}
+	return *o.Pinned
+}
+
+// GetPinnedOk returns a tuple with the Pinned field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SavepointSpec) GetPinnedOk() (*bool, bool) {
+	if o == nil || o.Pinned == nil {
+		return nil, false
+	}
+	return o.Pinned, true
+}
+
+// HasPinned returns a boolean if a field has been set.
+func (o *SavepointSpec) HasPinned() bool {
+	if o != nil && o.Pinned != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPinned gets a reference to the given bool and assigns it to the Pinned field.
+func (o *SavepointSpec) SetPinned(v bool) {
+	o.Pinned = &v
+}
+
 func (o SavepointSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Path != nil {
@@ -155,6 +193,9 @@ func (o SavepointSpec) MarshalJSON() ([]byte, error) {
 	}
 	if o.FormatType != nil {
 		toSerialize["formatType"] = o.FormatType
+	}
+	if o.Pinned != nil {
+		toSerialize["pinned"] = o.Pinned
 	}
 	return json.Marshal(toSerialize)
 }

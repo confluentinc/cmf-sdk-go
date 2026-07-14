@@ -5,9 +5,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Name** | Pointer to **string** | A unique name for the resource. | [optional] 
-**FlinkApplicationDefaults** | Pointer to **map[string]interface{}** |  | [optional] 
-**KubernetesNamespace** | Pointer to **string** |  | [optional] 
-**KubernetesClusterName** | Pointer to **string** |  | [optional] 
+**FlinkApplicationDefaults** | Pointer to **map[string]interface{}** | Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \&quot;spec\&quot; object here whose fields are merged into every application spec at deploy time. May include a \&quot;savepointSchedule\&quot; inside \&quot;spec\&quot; (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself.  | [optional] 
+**KubernetesNamespace** | Pointer to **string** | Immutable after creation. Cannot be changed via update. | [optional] 
+**KubernetesClusterName** | Pointer to **string** | Immutable after creation. Cannot be changed via update. Defaults to \&quot;default-k8s-cluster\&quot; if not provided on creation. | [optional] 
 **ComputePoolDefaults** | Pointer to **map[string]interface{}** | the defaults as YAML or JSON for ComputePools | [optional] 
 **StatementDefaults** | Pointer to [**AllStatementDefaults1**](AllStatementDefaults1.md) |  | [optional] 
 **Metadata** | Pointer to [**EnvironmentMetadata**](EnvironmentMetadata.md) |  | [optional] 

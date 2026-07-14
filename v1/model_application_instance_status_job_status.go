@@ -18,7 +18,7 @@ import (
 type ApplicationInstanceStatusJobStatus struct {
 	// Flink job id inside the Flink cluster
 	JobId *string `json:"jobId,omitempty"`
-	// Tracks the final Flink JobStatus of the instance
+	// The most recently observed state of the Flink job for this instance, such as RUNNING, FINISHED, FAILED, CANCELED, or RECONCILING. For instances that are no longer deployed this is the last state observed before the instance was superseded; for the currently deployed instance it continues to update, and it may be UNKNOWN when the job state cannot be determined.
 	State *string `json:"state,omitempty"`
 }
 

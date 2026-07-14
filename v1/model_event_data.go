@@ -19,6 +19,7 @@ import (
 type EventData struct {
 	EventDataJobException *EventDataJobException
 	EventDataNewStatus *EventDataNewStatus
+	EventDataReasonMessage *EventDataReasonMessage
 }
 
 // EventDataJobExceptionAsEventData is a convenience function that returns EventDataJobException wrapped in EventData
@@ -29,6 +30,11 @@ func EventDataJobExceptionAsEventData(v *EventDataJobException) EventData {
 // EventDataNewStatusAsEventData is a convenience function that returns EventDataNewStatus wrapped in EventData
 func EventDataNewStatusAsEventData(v *EventDataNewStatus) EventData {
 	return EventData{ EventDataNewStatus: v}
+}
+
+// EventDataReasonMessageAsEventData is a convenience function that returns EventDataReasonMessage wrapped in EventData
+func EventDataReasonMessageAsEventData(v *EventDataReasonMessage) EventData {
+	return EventData{ EventDataReasonMessage: v}
 }
 
 
@@ -62,10 +68,24 @@ func (dst *EventData) UnmarshalJSON(data []byte) error {
 		dst.EventDataNewStatus = nil
 	}
 
+	// try to unmarshal data into EventDataReasonMessage
+	err = json.Unmarshal(data, &dst.EventDataReasonMessage)
+	if err == nil {
+		jsonEventDataReasonMessage, _ := json.Marshal(dst.EventDataReasonMessage)
+		if string(jsonEventDataReasonMessage) == "{}" { // empty struct
+			dst.EventDataReasonMessage = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.EventDataReasonMessage = nil
+	}
+
 	if match > 1 { // more than 1 match
 		// reset to nil
 		dst.EventDataJobException = nil
 		dst.EventDataNewStatus = nil
+		dst.EventDataReasonMessage = nil
 
 		return fmt.Errorf("Data matches more than one schema in oneOf(EventData)")
 	} else if match == 1 {
@@ -85,6 +105,10 @@ func (src EventData) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.EventDataNewStatus)
 	}
 
+	if src.EventDataReasonMessage != nil {
+		return json.Marshal(&src.EventDataReasonMessage)
+	}
+
 	return nil, nil // no data in oneOf schemas
 }
 
@@ -96,6 +120,10 @@ func (obj *EventData) GetActualInstance() (interface{}) {
 
 	if obj.EventDataNewStatus != nil {
 		return obj.EventDataNewStatus
+	}
+
+	if obj.EventDataReasonMessage != nil {
+		return obj.EventDataReasonMessage
 	}
 
 	// all schemas are nil
