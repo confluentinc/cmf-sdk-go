@@ -667,6 +667,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Bad request.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: |-
+            A resource with the same name already exists and would conflict with this
+            Application. This can happen if another Application, Statement, Savepoint, or shared
+            Compute Pool with the same name already exists in a different Environment that maps
+            to the same Kubernetes namespace and cluster, or if a Flink resource with the same
+            name already exists in the namespace independently of this Application (for example,
+            created outside of CMF, or left over from a previous Application with the same name
+            that was not fully cleaned up).
         "422":
           content:
             application/json:
@@ -8083,6 +8099,45 @@ components:
           $ref: '#/components/schemas/StatementStartFromSavepoint'
         savepointSchedule:
           $ref: '#/components/schemas/SavepointScheduleConfig'
+        upgradeMode:
+          description: |
+            Controls whether the statement's execution state is preserved across a
+            stop and resume, or when the statement's job has to be resubmitted (for
+            example, after the compute pool loses track of a running job and has to
+            recreate it).
+
+            This is separate from Flink's own recovery from task failures while the
+            job keeps running: that recovery is governed by the job's checkpointing
+            and restart-strategy settings and happens regardless of this field.
+
+            * `savepoint`: CMF takes a savepoint when the statement is stopped or
+              resubmitted, and restores from it on resume. Requires both
+              `state.checkpoints.dir` and `state.savepoints.dir` to be configured on
+              the compute pool the statement runs on (directly or via the
+              environment's `computePoolDefaults`); setting these directories on the
+              statement itself has no effect on this field.
+            * `stateless`: no state is preserved across a stop and resume, or a
+              resubmission. The statement comes back up with empty state even if a
+              checkpoint or savepoint is available.
+            * `last-state`: on resubmission, the statement resumes from its most
+              recent checkpoint without CMF taking a new savepoint. Requires
+              `state.checkpoints.dir` to be configured on the compute pool the
+              statement runs on (directly or via the environment's
+              `computePoolDefaults`). Not supported for statements that run on a
+              shared compute pool.
+
+            Optional. When omitted, CMF selects `savepoint` if both a checkpoint
+            directory and a savepoint directory are configured on the compute pool,
+            and `stateless` otherwise.
+
+            Changing this field alone does not restart a running statement. The new
+            value takes effect on the next stop and resume, or the next time the
+            statement's job is resubmitted.
+          enum:
+          - stateless
+          - savepoint
+          - last-state
+          type: string
       required:
       - computePoolName
       - statement
@@ -8127,6 +8182,19 @@ components:
           items:
             type: string
           type: array
+        upgradeMode:
+          description: |-
+            The upgrade mode that has been applied to the statement's deployment,
+            shown so callers can see the value that took effect without inspecting
+            the underlying Flink resources. When `spec.upgradeMode` is set, this
+            matches it; otherwise it is the value selected by the default rules
+            described on `spec.upgradeMode`. Populated once the statement has been
+            deployed at least once; absent before the first deployment attempt.
+          enum:
+          - stateless
+          - savepoint
+          - last-state
+          type: string
       title: StatementTraits
       type: object
     StatementStatus:

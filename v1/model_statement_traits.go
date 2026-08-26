@@ -29,6 +29,8 @@ type StatementTraits struct {
 	UdfJarUris *[]string `json:"udfJarUris,omitempty"`
 	// Connector and format artifact JAR URIs (e.g. `s3://`) that this statement's referenced tables require, one entry per connector or format actually used. Empty or absent when the statement uses only built-in connectors and formats. Surfaced so callers can see which artifact JARs the statement loads at runtime.
 	ConnectorJarUris *[]string `json:"connectorJarUris,omitempty"`
+	// The upgrade mode that has been applied to the statement's deployment, shown so callers can see the value that took effect without inspecting the underlying Flink resources. When `spec.upgradeMode` is set, this matches it; otherwise it is the value selected by the default rules described on `spec.upgradeMode`. Populated once the statement has been deployed at least once; absent before the first deployment attempt.
+	UpgradeMode *string `json:"upgradeMode,omitempty"`
 }
 
 // NewStatementTraits instantiates a new StatementTraits object
@@ -272,6 +274,38 @@ func (o *StatementTraits) SetConnectorJarUris(v []string) {
 	o.ConnectorJarUris = &v
 }
 
+// GetUpgradeMode returns the UpgradeMode field value if set, zero value otherwise.
+func (o *StatementTraits) GetUpgradeMode() string {
+	if o == nil || o.UpgradeMode == nil {
+		var ret string
+		return ret
+	}
+	return *o.UpgradeMode
+}
+
+// GetUpgradeModeOk returns a tuple with the UpgradeMode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetUpgradeModeOk() (*string, bool) {
+	if o == nil || o.UpgradeMode == nil {
+		return nil, false
+	}
+	return o.UpgradeMode, true
+}
+
+// HasUpgradeMode returns a boolean if a field has been set.
+func (o *StatementTraits) HasUpgradeMode() bool {
+	if o != nil && o.UpgradeMode != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUpgradeMode gets a reference to the given string and assigns it to the UpgradeMode field.
+func (o *StatementTraits) SetUpgradeMode(v string) {
+	o.UpgradeMode = &v
+}
+
 func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.SqlKind != nil {
@@ -294,6 +328,9 @@ func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	}
 	if o.ConnectorJarUris != nil {
 		toSerialize["connectorJarUris"] = o.ConnectorJarUris
+	}
+	if o.UpgradeMode != nil {
+		toSerialize["upgradeMode"] = o.UpgradeMode
 	}
 	return json.Marshal(toSerialize)
 }

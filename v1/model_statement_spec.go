@@ -30,6 +30,8 @@ type StatementSpec struct {
 	Stopped *bool `json:"stopped,omitempty"`
 	StartFromSavepoint *StatementStartFromSavepoint `json:"startFromSavepoint,omitempty"`
 	SavepointSchedule *SavepointScheduleConfig `json:"savepointSchedule,omitempty"`
+	// Controls whether the statement's execution state is preserved across a stop and resume, or when the statement's job has to be resubmitted (for example, after the compute pool loses track of a running job and has to recreate it).  This is separate from Flink's own recovery from task failures while the job keeps running: that recovery is governed by the job's checkpointing and restart-strategy settings and happens regardless of this field.  * `savepoint`: CMF takes a savepoint when the statement is stopped or   resubmitted, and restores from it on resume. Requires both   `state.checkpoints.dir` and `state.savepoints.dir` to be configured on   the compute pool the statement runs on (directly or via the   environment's `computePoolDefaults`); setting these directories on the   statement itself has no effect on this field. * `stateless`: no state is preserved across a stop and resume, or a   resubmission. The statement comes back up with empty state even if a   checkpoint or savepoint is available. * `last-state`: on resubmission, the statement resumes from its most   recent checkpoint without CMF taking a new savepoint. Requires   `state.checkpoints.dir` to be configured on the compute pool the   statement runs on (directly or via the environment's   `computePoolDefaults`). Not supported for statements that run on a   shared compute pool.  Optional. When omitted, CMF selects `savepoint` if both a checkpoint directory and a savepoint directory are configured on the compute pool, and `stateless` otherwise.  Changing this field alone does not restart a running statement. The new value takes effect on the next stop and resume, or the next time the statement's job is resubmitted. 
+	UpgradeMode *string `json:"upgradeMode,omitempty"`
 }
 
 // NewStatementSpec instantiates a new StatementSpec object
@@ -291,6 +293,38 @@ func (o *StatementSpec) SetSavepointSchedule(v SavepointScheduleConfig) {
 	o.SavepointSchedule = &v
 }
 
+// GetUpgradeMode returns the UpgradeMode field value if set, zero value otherwise.
+func (o *StatementSpec) GetUpgradeMode() string {
+	if o == nil || o.UpgradeMode == nil {
+		var ret string
+		return ret
+	}
+	return *o.UpgradeMode
+}
+
+// GetUpgradeModeOk returns a tuple with the UpgradeMode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementSpec) GetUpgradeModeOk() (*string, bool) {
+	if o == nil || o.UpgradeMode == nil {
+		return nil, false
+	}
+	return o.UpgradeMode, true
+}
+
+// HasUpgradeMode returns a boolean if a field has been set.
+func (o *StatementSpec) HasUpgradeMode() bool {
+	if o != nil && o.UpgradeMode != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUpgradeMode gets a reference to the given string and assigns it to the UpgradeMode field.
+func (o *StatementSpec) SetUpgradeMode(v string) {
+	o.UpgradeMode = &v
+}
+
 func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -316,6 +350,9 @@ func (o StatementSpec) MarshalJSON() ([]byte, error) {
 	}
 	if o.SavepointSchedule != nil {
 		toSerialize["savepointSchedule"] = o.SavepointSchedule
+	}
+	if o.UpgradeMode != nil {
+		toSerialize["upgradeMode"] = o.UpgradeMode
 	}
 	return json.Marshal(toSerialize)
 }
