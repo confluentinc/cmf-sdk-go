@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **Schema** | Pointer to [**ResultSchema**](ResultSchema.md) |  | [optional] 
 **UdfJarUris** | Pointer to **[]string** | UDF JAR URIs (pre-resolution, e.g. &#x60;cmf://&#x60;, &#x60;s3://&#x60;) that this statement references via the environment catalog. Empty or absent when the statement uses no env-catalog UDFs. Surfaced so callers can see which JARs the statement loads at runtime. | [optional] 
 **ConnectorJarUris** | Pointer to **[]string** | Connector and format artifact JAR URIs (e.g. &#x60;s3://&#x60;) that this statement&#39;s referenced tables require, one entry per connector or format actually used. Empty or absent when the statement uses only built-in connectors and formats. Surfaced so callers can see which artifact JARs the statement loads at runtime. | [optional] 
+**UpgradeMode** | Pointer to **string** | The upgrade mode that has been applied to the statement&#39;s deployment, shown so callers can see the value that took effect without inspecting the underlying Flink resources. When &#x60;spec.upgradeMode&#x60; is set, this matches it; otherwise it is the value selected by the default rules described on &#x60;spec.upgradeMode&#x60;. Populated once the statement has been deployed at least once; absent before the first deployment attempt. | [optional] 
 
 ## Methods
 
@@ -205,6 +206,31 @@ SetConnectorJarUris sets ConnectorJarUris field to given value.
 `func (o *StatementTraits) HasConnectorJarUris() bool`
 
 HasConnectorJarUris returns a boolean if a field has been set.
+
+### GetUpgradeMode
+
+`func (o *StatementTraits) GetUpgradeMode() string`
+
+GetUpgradeMode returns the UpgradeMode field if non-nil, zero value otherwise.
+
+### GetUpgradeModeOk
+
+`func (o *StatementTraits) GetUpgradeModeOk() (*string, bool)`
+
+GetUpgradeModeOk returns a tuple with the UpgradeMode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpgradeMode
+
+`func (o *StatementTraits) SetUpgradeMode(v string)`
+
+SetUpgradeMode sets UpgradeMode field to given value.
+
+### HasUpgradeMode
+
+`func (o *StatementTraits) HasUpgradeMode() bool`
+
+HasUpgradeMode returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
