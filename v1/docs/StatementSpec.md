@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **Stopped** | Pointer to **bool** | Whether the statement is stopped | [optional] 
 **StartFromSavepoint** | Pointer to [**StatementStartFromSavepoint**](StatementStartFromSavepoint.md) |  | [optional] 
 **SavepointSchedule** | Pointer to [**SavepointScheduleConfig**](SavepointScheduleConfig.md) |  | [optional] 
+**UpgradeMode** | Pointer to **string** | Controls whether the statement&#39;s execution state is preserved across a stop and resume, or when the statement&#39;s job has to be resubmitted (for example, after the compute pool loses track of a running job and has to recreate it).  This is separate from Flink&#39;s own recovery from task failures while the job keeps running: that recovery is governed by the job&#39;s checkpointing and restart-strategy settings and happens regardless of this field.  * &#x60;savepoint&#x60;: CMF takes a savepoint when the statement is stopped or   resubmitted, and restores from it on resume. Requires both   &#x60;state.checkpoints.dir&#x60; and &#x60;state.savepoints.dir&#x60; to be configured on   the compute pool the statement runs on (directly or via the   environment&#39;s &#x60;computePoolDefaults&#x60;); setting these directories on the   statement itself has no effect on this field. * &#x60;stateless&#x60;: no state is preserved across a stop and resume, or a   resubmission. The statement comes back up with empty state even if a   checkpoint or savepoint is available. * &#x60;last-state&#x60;: on resubmission, the statement resumes from its most   recent checkpoint without CMF taking a new savepoint. Requires   &#x60;state.checkpoints.dir&#x60; to be configured on the compute pool the   statement runs on (directly or via the environment&#39;s   &#x60;computePoolDefaults&#x60;). Not supported for statements that run on a   shared compute pool.  Optional. When omitted, CMF selects &#x60;savepoint&#x60; if both a checkpoint directory and a savepoint directory are configured on the compute pool, and &#x60;stateless&#x60; otherwise.  Changing this field alone does not restart a running statement. The new value takes effect on the next stop and resume, or the next time the statement&#39;s job is resubmitted.  | [optional] 
 
 ## Methods
 
@@ -221,6 +222,31 @@ SetSavepointSchedule sets SavepointSchedule field to given value.
 `func (o *StatementSpec) HasSavepointSchedule() bool`
 
 HasSavepointSchedule returns a boolean if a field has been set.
+
+### GetUpgradeMode
+
+`func (o *StatementSpec) GetUpgradeMode() string`
+
+GetUpgradeMode returns the UpgradeMode field if non-nil, zero value otherwise.
+
+### GetUpgradeModeOk
+
+`func (o *StatementSpec) GetUpgradeModeOk() (*string, bool)`
+
+GetUpgradeModeOk returns a tuple with the UpgradeMode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpgradeMode
+
+`func (o *StatementSpec) SetUpgradeMode(v string)`
+
+SetUpgradeMode sets UpgradeMode field to given value.
+
+### HasUpgradeMode
+
+`func (o *StatementSpec) HasUpgradeMode() bool`
+
+HasUpgradeMode returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
