@@ -3,8 +3,6 @@ lang: unknown
 lang_version: unknown
 git:
   enable: true
-github:
-  enable: true
 make:
   enable: false
   enable_updates: true
@@ -16,12 +14,11 @@ semaphore:
   tasks:
     - name: tag-release
       branch: master
-      scheduled: false
       pipeline_file: .semaphore/tag-release.yml
       parameters:
         - name: GIT_REF
           required: true
-          default_value: 'master'
+          default_value: master
           description: |-
             What git reference to tag. This could be a branch name, or
             a commit hash, or even an existing tag.
