@@ -157,6 +157,7 @@ Class | Method | HTTP request | Description
 *SecretsApi* | [**GetSecret**](docs/SecretsApi.md#getsecret) | **Get** /cmf/api/v1/secrets/{secretName} | Retrieve the Secret of the given name. Note that the secret data is not returned for security reasons.
 *SecretsApi* | [**GetSecrets**](docs/SecretsApi.md#getsecrets) | **Get** /cmf/api/v1/secrets | Retrieve a paginated list of all secrets. Note that the actual secret data is masked for security reasons.
 *SecretsApi* | [**UpdateSecret**](docs/SecretsApi.md#updatesecret) | **Put** /cmf/api/v1/secrets/{secretName} | Update the secret.
+*ServiceAccountAllowlistApi* | [**ListServiceAccountAllowlistEntries**](docs/ServiceAccountAllowlistApi.md#listserviceaccountallowlistentries) | **Get** /cmf/api/v1/service-account-allowlist-entries | List the service accounts on the grandfathered allowlist.
 
 
 ## Documentation For Models
@@ -295,6 +296,13 @@ Class | Method | HTTP request | Description
  - [SecretsPage](docs/SecretsPage.md)
  - [SecretsPageAllOf](docs/SecretsPageAllOf.md)
  - [SecretsPageMetadata](docs/SecretsPageMetadata.md)
+ - [ServiceAccountAllowlistEntriesPage](docs/ServiceAccountAllowlistEntriesPage.md)
+ - [ServiceAccountAllowlistEntriesPageAllOf](docs/ServiceAccountAllowlistEntriesPageAllOf.md)
+ - [ServiceAccountAllowlistEntriesPageMetadata](docs/ServiceAccountAllowlistEntriesPageMetadata.md)
+ - [ServiceAccountAllowlistEntry](docs/ServiceAccountAllowlistEntry.md)
+ - [ServiceAccountAllowlistEntryAllOf](docs/ServiceAccountAllowlistEntryAllOf.md)
+ - [ServiceAccountAllowlistEntryMetadata](docs/ServiceAccountAllowlistEntryMetadata.md)
+ - [ServiceAccountAllowlistEntryStatus](docs/ServiceAccountAllowlistEntryStatus.md)
  - [Sort](docs/Sort.md)
  - [Statement](docs/Statement.md)
  - [StatementAllOf](docs/StatementAllOf.md)
