@@ -14,6 +14,7 @@ tags:
 - name: SQL
 - name: Savepoints
 - name: KubernetesClusters
+- name: ServiceAccountAllowlist
 paths:
   /cmf/api/v1/environments:
     get:
@@ -677,12 +678,13 @@ paths:
                 $ref: '#/components/schemas/RestError'
           description: |-
             A resource with the same name already exists and would conflict with this
-            Application. This can happen if another Application, Statement, Savepoint, or shared
-            Compute Pool with the same name already exists in a different Environment that maps
-            to the same Kubernetes namespace and cluster, or if a Flink resource with the same
-            name already exists in the namespace independently of this Application (for example,
-            created outside of CMF, or left over from a previous Application with the same name
-            that was not fully cleaned up).
+            Application. This can happen if a Statement, Savepoint, or shared Compute Pool with
+            the same name already exists in this Environment, if any of those or an Application
+            with the same name already exists in another Environment that maps to the same
+            Kubernetes namespace and cluster, or if a Flink resource with the same name already
+            exists in the namespace independently of this Application (for example, created
+            outside of CMF, or left over from a previous Application with the same name that was
+            not fully cleaned up).
         "422":
           content:
             application/json:
@@ -1840,7 +1842,16 @@ paths:
             application/yaml:
               schema:
                 $ref: '#/components/schemas/RestError'
-          description: Statement already exists.
+          description: |-
+            A resource with the same name already exists and would conflict with this Statement.
+            This can happen if an Application, Statement, Savepoint, or shared Compute Pool with
+            the same name already exists in this Environment, or in another Environment that maps
+            to the same Kubernetes namespace and cluster. For a Statement on a dedicated Compute
+            Pool, it can also happen if a Flink resource with the same name already exists in the
+            namespace independently of this Statement (for example, created outside of CMF, or
+            left over from a previous resource with the same name that was not fully cleaned up).
+            It is also returned if the Statement targets a shared Compute Pool that is not
+            currently running; retry once the Compute Pool is running.
         "422":
           content:
             application/json:
@@ -6010,6 +6021,150 @@ paths:
       summary: Update a Kubernetes cluster (lifecycle state, labels, annotations).
       tags:
       - KubernetesClusters
+  /cmf/api/v1/service-account-allowlist-entries:
+    get:
+      description: |-
+        Returns the persisted allowlist entries -- the service accounts CMF grandfathered from
+        resources already in use when the feature was enabled, and any entries a user has added
+        deliberately. The allowlist is global: an entry permits a service account for use by
+        resources in every environment on this CMF instance.
+
+        Entries added by configuration (via the `cmf.k8s.service-account-allowlist.allowed`
+        property) are not persisted and do not appear here; only entries stored server-side do.
+      operationId: listServiceAccountAllowlistEntries
+      parameters:
+      - description: Zero-based page index (0..N)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The size of the page to be returned
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: |-
+          Sorting criteria in the format: property,(asc|desc). Default sort order is ascending.
+          Multiple sort criteria are supported.
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: |-
+          Filter query string with comma-separated expressions. Supports:
+          - Name filtering: name=foo*bar (wildcards allowed)
+          - Label equality: labels.key = value or labels.key != value
+          - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2)
+          - Label existence: labels.key (exists) or !labels.key (does not exist)
+          - State filtering (Applications only): state=RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED)
+          - Phase filtering (Statements and ComputePools): phase=PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING)
+          - Type filtering (Events only): type=CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS)
+          - Cluster status filtering (Environments only): clusterStatus=CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED).
+          - Source filtering (Savepoints only): source=MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value).
+          Example: ?filter=name=foo*bar,labels.environment in (production, qa),!labels.development
+          Example (with state): ?filter=name=prod*,state in (RUNNING, FAILED)
+          Example (with phase): ?filter=name=my-stmt*,phase in (PENDING, RUNNING)
+          Example (with type): ?filter=type=CMF_STATUS or ?filter=type in (CMF_STATUS, JOB_STATUS)
+          Example (with clusterStatus): ?filter=clusterStatus in (CONNECTED, DISCONNECTED)
+          Example (with source): ?filter=state=COMPLETED,source=SCHEDULE
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Comma-separated list of field paths to include in the response. Supports nested fields using dot notation.
+          Always includes apiVersion and kind fields even if not explicitly requested.
+          Example: ?fields=metadata.name,metadata.createdTimestamp,status.phase
+        explode: true
+        in: query
+        name: fields
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                allowlist-entries:
+                  summary: Allowlist entries
+                  value:
+                    metadata:
+                      size: 2
+                    items:
+                    - apiVersion: cmf.confluent.io/v1
+                      kind: ServiceAccountAllowlistEntry
+                      metadata:
+                        name: flink-app-sa
+                        creationTimestamp: 2026-02-01T12:00:00Z
+                      spec: {}
+                      status:
+                        source: SEED
+                    - apiVersion: cmf.confluent.io/v1
+                      kind: ServiceAccountAllowlistEntry
+                      metadata:
+                        name: workshop-sa
+                        creationTimestamp: 2026-02-16T10:30:00Z
+                      spec: {}
+                      status:
+                        source: USER_ALLOWED
+              schema:
+                $ref: '#/components/schemas/ServiceAccountAllowlistEntriesPage'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ServiceAccountAllowlistEntriesPage'
+          description: |-
+            List of allowlist entries. Filters:
+              - `name=<pattern>` -- match by service account name (`*` wildcard).
+              - `source=<value>` or `source in (a,b)` -- filter by how the entry was added
+                (`SEED` or `USER_ALLOWED`).
+            If no entries are found, an empty list is returned.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Invalid filter argument.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: The caller is not authorized to view the allowlist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Server error.
+      summary: List the service accounts on the grandfathered allowlist.
+      tags:
+      - ServiceAccountAllowlist
+      x-spring-paginated: true
   /cmf/api/v1/c3/license:
     get:
       operationId: getC3LicenseInformation
@@ -6829,6 +6984,23 @@ components:
       allOf:
       - $ref: '#/components/schemas/PaginationResponse'
       - $ref: '#/components/schemas/KubernetesClustersPage_allOf'
+      type: object
+    ServiceAccountAllowlistEntry:
+      allOf:
+      - $ref: '#/components/schemas/ResourceBaseV2'
+      - $ref: '#/components/schemas/ServiceAccountAllowlistEntry_allOf'
+      description: |-
+        A service account permitted for use by CMF-managed resources. Entries with source
+        `SEED` were grandfathered from resources already using the account when the
+        allowlist feature was enabled; entries with source `USER_ALLOWED` were added
+        deliberately. The allowlist is global -- an entry permits its service account for
+        use in every environment on this CMF instance.
+      title: ServiceAccountAllowlistEntry
+      type: object
+    ServiceAccountAllowlistEntriesPage:
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponse'
+      - $ref: '#/components/schemas/ServiceAccountAllowlistEntriesPage_allOf'
       type: object
     EnvironmentsPage:
       allOf:
@@ -7825,6 +7997,67 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/KubernetesCluster'
+          type: array
+      type: object
+    ServiceAccountAllowlistEntryMetadata:
+      description: Metadata about the allowlist entry.
+      properties:
+        name:
+          description: The name of the permitted service account.
+          type: string
+        creationTimestamp:
+          description: Timestamp at which the entry was added to the allowlist.
+          readOnly: true
+          type: string
+      required:
+      - name
+      title: ServiceAccountAllowlistEntryMetadata
+      type: object
+    ServiceAccountAllowlistEntryStatus:
+      description: Server-computed information about the allowlist entry.
+      properties:
+        source:
+          description: |-
+            How the entry came to be on the allowlist. `SEED` for entries
+            grandfathered from resources already using the account; `USER_ALLOWED`
+            for entries added deliberately by a user.
+          enum:
+          - SEED
+          - USER_ALLOWED
+          type: string
+      readOnly: true
+      title: ServiceAccountAllowlistEntryStatus
+      type: object
+    ServiceAccountAllowlistEntry_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ServiceAccountAllowlistEntryMetadata'
+        spec:
+          description: Reserved for future write-time fields; currently empty.
+          title: ServiceAccountAllowlistEntrySpec
+          type: object
+        status:
+          $ref: '#/components/schemas/ServiceAccountAllowlistEntryStatus'
+      required:
+      - metadata
+      - spec
+      type: object
+    ServiceAccountAllowlistEntriesPageMetadata:
+      properties:
+        size:
+          default: 0
+          format: int64
+          type: integer
+      title: ServiceAccountAllowlistEntriesPageMetadata
+      type: object
+    ServiceAccountAllowlistEntriesPage_allOf:
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ServiceAccountAllowlistEntriesPageMetadata'
+        items:
+          default: []
+          items:
+            $ref: '#/components/schemas/ServiceAccountAllowlistEntry'
           type: array
       type: object
     EnvironmentsPageMetadata:
