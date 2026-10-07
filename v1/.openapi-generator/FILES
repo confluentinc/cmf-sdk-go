@@ -12,6 +12,7 @@ api_flink_applications.go
 api_kubernetes_clusters.go
 api_savepoints.go
 api_secrets.go
+api_service_account_allowlist.go
 api_sql.go
 client.go
 configuration.go
@@ -159,6 +160,14 @@ docs/SecretsApi.md
 docs/SecretsPage.md
 docs/SecretsPageAllOf.md
 docs/SecretsPageMetadata.md
+docs/ServiceAccountAllowlistApi.md
+docs/ServiceAccountAllowlistEntriesPage.md
+docs/ServiceAccountAllowlistEntriesPageAllOf.md
+docs/ServiceAccountAllowlistEntriesPageMetadata.md
+docs/ServiceAccountAllowlistEntry.md
+docs/ServiceAccountAllowlistEntryAllOf.md
+docs/ServiceAccountAllowlistEntryMetadata.md
+docs/ServiceAccountAllowlistEntryStatus.md
 docs/Sort.md
 docs/Statement.md
 docs/StatementAllOf.md
@@ -321,6 +330,13 @@ model_secret_status.go
 model_secrets_page.go
 model_secrets_page_all_of.go
 model_secrets_page_metadata.go
+model_service_account_allowlist_entries_page.go
+model_service_account_allowlist_entries_page_all_of.go
+model_service_account_allowlist_entries_page_metadata.go
+model_service_account_allowlist_entry.go
+model_service_account_allowlist_entry_all_of.go
+model_service_account_allowlist_entry_metadata.go
+model_service_account_allowlist_entry_status.go
 model_sort.go
 model_statement.go
 model_statement_all_of.go
