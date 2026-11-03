@@ -16,7 +16,7 @@ import (
 
 // StatementDefaults struct for StatementDefaults
 type StatementDefaults struct {
-	// default Flink configuration for Statements
+	// Default Flink configuration for Statements.  Some keys are reserved and cannot be set: `web.submit.jar-sources`, `pipeline.jars`, `pipeline.classpaths`, and every key beginning with `user.artifacts.` or `kubernetes.operator.cmf.`. An environment that sets one is rejected with an error naming the key.  A Statement keeps the `execution.runtime-mode` it was created with. An update that changes this key is rejected while Statements that can still be resumed or rescaled would run with the new value; the error names them. 
 	FlinkConfiguration *map[string]string `json:"flinkConfiguration,omitempty"`
 	SavepointSchedule *SavepointScheduleConfig `json:"savepointSchedule,omitempty"`
 }

@@ -14,7 +14,7 @@ import (
 	"encoding/json"
 )
 
-// C3LicenseInformation License information for C3 integration
+// C3LicenseInformation License information for Confluent Control Center integration.
 type C3LicenseInformation struct {
 	Kind *string `json:"kind,omitempty"`
 	Status *C3LicenseInformationStatus `json:"status,omitempty"`

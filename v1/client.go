@@ -70,6 +70,8 @@ type APIClient struct {
 	SecretsApi SecretsApi
 
 	ServiceAccountAllowlistApi ServiceAccountAllowlistApi
+
+	SqlAssistantApi SqlAssistantApi
 }
 
 type service struct {
@@ -99,6 +101,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.SavepointsApi = (*SavepointsApiService)(&c.common)
 	c.SecretsApi = (*SecretsApiService)(&c.common)
 	c.ServiceAccountAllowlistApi = (*ServiceAccountAllowlistApiService)(&c.common)
+	c.SqlAssistantApi = (*SqlAssistantApiService)(&c.common)
 
 	return c
 }

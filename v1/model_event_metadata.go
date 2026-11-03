@@ -25,7 +25,7 @@ type EventMetadata struct {
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
 	// Timestamp of the most recent occurrence of this event
 	UpdateTimestamp *time.Time `json:"updateTimestamp,omitempty"`
-	// Name of the FlinkApplicationInstance which this event is related to
+	// UID of the FlinkApplicationInstance which this event is related to
 	FlinkApplicationInstance *string `json:"flinkApplicationInstance,omitempty"`
 	// Labels of the Event
 	Labels *map[string]string `json:"labels,omitempty"`

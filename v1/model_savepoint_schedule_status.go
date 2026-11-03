@@ -21,11 +21,11 @@ type SavepointScheduleStatus struct {
 	State *string `json:"state,omitempty"`
 	// Time at which the trigger task last attempted to create a savepoint, i.e. the last fire that passed the blackout, resource-ready and in-flight guards. Skipped fires do not update this field, and it reflects the attempt regardless of whether the savepoint request succeeded. Use lastCompletedTime to know when a savepoint last completed. 
 	LastTriggerTime *time.Time `json:"lastTriggerTime,omitempty"`
-	// Next time at which the schedule will be evaluated for a trigger.
+	// Next time at which the schedule will be evaluated for a trigger. Null when the schedule is paused or disabled (see state), or could not be started (see lastErrorMessage). 
 	NextTriggerTime *time.Time `json:"nextTriggerTime,omitempty"`
 	// Time at which the most recent savepoint for this resource completed successfully, across all sources (scheduled, manual, or adopted), or null if none has completed yet. This is the freshness signal the schedule's SLA check is measured against. 
 	LastCompletedTime *time.Time `json:"lastCompletedTime,omitempty"`
-	// Last failure observed by the trigger task, or null if healthy.
+	// Last failure observed for the schedule, such as a failed savepoint trigger or a schedule that could not be started (e.g. a cron expression with no upcoming fire time), or null if healthy. 
 	LastErrorMessage *string `json:"lastErrorMessage,omitempty"`
 }
 
