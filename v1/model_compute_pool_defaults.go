@@ -16,7 +16,7 @@ import (
 
 // ComputePoolDefaults struct for ComputePoolDefaults
 type ComputePoolDefaults struct {
-	// the defaults as YAML or JSON for ComputePools
+	// the defaults as YAML or JSON for ComputePools  Some keys in \"clusterSpec.flinkConfiguration\" are reserved and cannot be set: `web.submit.jar-sources`, `pipeline.jars`, `pipeline.classpaths`, every key beginning with `kubernetes.operator.cmf.`, and every key beginning with `user.artifacts.` except `user.artifacts.max-concurrent-fetches`, `user.artifacts.max-size`, `user.artifacts.fetch-timeout`, `user.artifacts.base-dir`, `user.artifacts.http-headers` and `user.artifacts.raw-http-enabled`. An environment that sets one is rejected with an error naming the key.  An update that changes the Flink version of a compute pool (`clusterSpec.flinkVersion`, or the Flink line of a `cp-flink-sql` image in `clusterSpec.image`) is rejected while Statements on that pool can still be resumed or rescaled; the error names them. 
 	ComputePoolDefaults *map[string]interface{} `json:"computePoolDefaults,omitempty"`
 }
 

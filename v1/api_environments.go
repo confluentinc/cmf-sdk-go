@@ -55,6 +55,8 @@ type EnvironmentsApi interface {
 	/*
 	DeleteEnvironment Method for DeleteEnvironment
 
+	Deletes an environment that has no applications, statements or compute pools. With `cascade` set to `true`, those are deleted too: a successful response then only means the deletion was accepted, and the environment remains readable, with `deletionRequestedTimestamp` set in its metadata, until everything in it has been deleted. In the meantime its applications, statements, compute pools, savepoints, artifacts and secret mappings can't be created or updated, and neither can the environment itself; savepoints that running jobs take on their own are deleted along with the rest. With `force` set to `true` as well, everything is deleted before the response is returned.
+
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment to be deleted.
 	 @return ApiDeleteEnvironmentRequest
@@ -62,7 +64,8 @@ type EnvironmentsApi interface {
 	DeleteEnvironment(ctx _context.Context, envName string) ApiDeleteEnvironmentRequest
 
 	// DeleteEnvironmentExecute executes the request
-	DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (*_nethttp.Response, error)
+	//  @return EnvironmentDeletionResult
+	DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (EnvironmentDeletionResult, *_nethttp.Response, error)
 
 	/*
 	DeleteEnvironmentSecretMapping Deletes the Environment Secret Mapping for the given Environment and Secret.
@@ -420,6 +423,16 @@ func (a *EnvironmentsApiService) CreateOrUpdateEnvironmentExecute(r ApiCreateOrU
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -459,20 +472,34 @@ type ApiDeleteEnvironmentRequest struct {
 	ApiService EnvironmentsApi
 	envName string
 	force *bool
+	cascade *bool
+	skipCleanup *bool
 }
 
-// If set to &#x60;true&#x60;, the platform deletes the environment from CMF metadata only, without requiring Kubernetes cluster connectivity. Kubernetes resources, such as a service account or a secret, might be orphaned.
+// If set to &#x60;true&#x60;, the platform deletes the environment without requiring Kubernetes cluster connectivity. Without &#x60;cascade&#x60;, it is deleted from CMF metadata only, and its Kubernetes resources, such as a service account or a secret, might be orphaned. Together with &#x60;cascade&#x60;, everything in the environment is deleted with force too, as described for &#x60;cascade&#x60;, and the environment&#39;s Kubernetes resources are deleted on a best-effort basis; those that couldn&#39;t be are listed in &#x60;notCleanedUp&#x60;.
 func (r ApiDeleteEnvironmentRequest) Force(force bool) ApiDeleteEnvironmentRequest {
 	r.force = &force
 	return r
 }
+// If set to &#x60;true&#x60;, the platform also deletes the environment&#39;s savepoints, applications, statements and compute pools, and then the environment itself. Each is deleted once nothing that needs it is left: a savepoint before its application or statement, and a statement before its compute pool. A savepoint that failed or was abandoned is deleted whatever its job&#39;s state. A savepoint whose job is not running, including a job that failed to deploy, or whose application or statement is already gone, is removed without deleting its files, and their location is logged. A savepoint still being taken, or whose job is starting, restarting or stopping or can&#39;t be checked, is kept unless &#x60;skipCleanup&#x60; is &#x60;true&#x60;. A delete that is refused or fails is retried periodically until it succeeds; the deletion also continues after the platform restarts, and sending the request again retries what is left immediately. With &#x60;force&#x60; also set to &#x60;true&#x60;, everything is deleted before the response is returned, without requiring Kubernetes cluster connectivity: each resource is removed from CMF whether or not its Kubernetes objects can be deleted, which is tried on a best-effort basis. Savepoint files are not deleted, though a savepoint that was already being deleted may have lost them already. If a resource can&#39;t be removed, the request fails with the environment still being deleted. The platform may then go on deleting whatever is left, for example after it restarts, but without &#x60;force&#x60;: that needs the Kubernetes cluster, and deletes the files of savepoints whose job is running. Sending the request again with &#x60;force&#x60; deletes the rest with force.
+func (r ApiDeleteEnvironmentRequest) Cascade(cascade bool) ApiDeleteEnvironmentRequest {
+	r.cascade = &cascade
+	return r
+}
+// Only with &#x60;cascade&#x60; set to &#x60;true&#x60; and without &#x60;force&#x60;. If set to &#x60;true&#x60;, forcibly clears any finalizers blocking the deletion of the environment&#39;s applications, statements on shared compute pools, and shared compute pools that are already being deleted. It also removes its savepoints that are already being deleted without waiting for that deletion to finish, so their files may already be gone, and logs where those files are. If the environment was already being deleted before this request, it also removes savepoints that are still being taken, or whose job is starting, restarting or stopping or can&#39;t be checked, without deleting their files, and logs where they are. Only use this if the environment has remained in a pending-deletion state for longer than expected. This skips any cleanup those finalizers would otherwise have performed (for example, taking a final savepoint or cancelling a statement&#39;s Flink job), so it should only be used once you&#39;ve confirmed the resources are genuinely stuck rather than still in the middle of a normal, in-progress cleanup.
+func (r ApiDeleteEnvironmentRequest) SkipCleanup(skipCleanup bool) ApiDeleteEnvironmentRequest {
+	r.skipCleanup = &skipCleanup
+	return r
+}
 
-func (r ApiDeleteEnvironmentRequest) Execute() (*_nethttp.Response, error) {
+func (r ApiDeleteEnvironmentRequest) Execute() (EnvironmentDeletionResult, *_nethttp.Response, error) {
 	return r.ApiService.DeleteEnvironmentExecute(r)
 }
 
 /*
 DeleteEnvironment Method for DeleteEnvironment
+
+Deletes an environment that has no applications, statements or compute pools. With `cascade` set to `true`, those are deleted too: a successful response then only means the deletion was accepted, and the environment remains readable, with `deletionRequestedTimestamp` set in its metadata, until everything in it has been deleted. In the meantime its applications, statements, compute pools, savepoints, artifacts and secret mappings can't be created or updated, and neither can the environment itself; savepoints that running jobs take on their own are deleted along with the rest. With `force` set to `true` as well, everything is deleted before the response is returned.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment to be deleted.
@@ -487,18 +514,20 @@ func (a *EnvironmentsApiService) DeleteEnvironment(ctx _context.Context, envName
 }
 
 // Execute executes the request
-func (a *EnvironmentsApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (*_nethttp.Response, error) {
+//  @return EnvironmentDeletionResult
+func (a *EnvironmentsApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (EnvironmentDeletionResult, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
+		localVarReturnValue  EnvironmentDeletionResult
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "EnvironmentsApiService.DeleteEnvironment")
 	if err != nil {
-		return nil, GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}"
@@ -510,6 +539,12 @@ func (a *EnvironmentsApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironment
 
 	if r.force != nil {
 		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
+	}
+	if r.cascade != nil {
+		localVarQueryParams.Add("cascade", parameterToString(*r.cascade, ""))
+	}
+	if r.skipCleanup != nil {
+		localVarQueryParams.Add("skipCleanup", parameterToString(*r.skipCleanup, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -530,19 +565,19 @@ func (a *EnvironmentsApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironment
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -550,29 +585,78 @@ func (a *EnvironmentsApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironment
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
 type ApiDeleteEnvironmentSecretMappingRequest struct {
@@ -1266,7 +1350,7 @@ func (r ApiGetEnvironmentsRequest) IncludeResourceInformation(includeResourceInf
 	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetEnvironmentsRequest) Filter(filter string) ApiGetEnvironmentsRequest {
 	r.filter = &filter
 	return r
@@ -1276,7 +1360,7 @@ func (r ApiGetEnvironmentsRequest) Search(search string) ApiGetEnvironmentsReque
 	r.search = &search
 	return r
 }
-// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message; application events also support flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Application events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
 func (r ApiGetEnvironmentsRequest) SearchScope(searchScope string) ApiGetEnvironmentsRequest {
 	r.searchScope = &searchScope
 	return r
@@ -1536,6 +1620,16 @@ func (a *EnvironmentsApiService) UpdateEnvironmentSecretMappingExecute(r ApiUpda
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

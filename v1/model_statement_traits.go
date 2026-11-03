@@ -27,10 +27,18 @@ type StatementTraits struct {
 	Schema *ResultSchema `json:"schema,omitempty"`
 	// UDF JAR URIs (pre-resolution, e.g. `cmf://`, `s3://`) that this statement references via the environment catalog. Empty or absent when the statement uses no env-catalog UDFs. Surfaced so callers can see which JARs the statement loads at runtime.
 	UdfJarUris *[]string `json:"udfJarUris,omitempty"`
-	// Connector and format artifact JAR URIs (e.g. `s3://`) that this statement's referenced tables require, one entry per connector or format actually used. Empty or absent when the statement uses only built-in connectors and formats. Surfaced so callers can see which artifact JARs the statement loads at runtime.
+	// Connector and format artifact JAR URIs (e.g. `s3://`) that this statement's referenced tables require, one entry per connector or format actually used, and the JAR URI (e.g. `file://`) of the provider of each model the statement calls, for providers that ship as a separate JAR. Empty or absent when the statement needs none of these JARs. Surfaced so callers can see which JARs the statement loads at runtime.
 	ConnectorJarUris *[]string `json:"connectorJarUris,omitempty"`
-	// The upgrade mode that has been applied to the statement's deployment, shown so callers can see the value that took effect without inspecting the underlying Flink resources. When `spec.upgradeMode` is set, this matches it; otherwise it is the value selected by the default rules described on `spec.upgradeMode`. Populated once the statement has been deployed at least once; absent before the first deployment attempt.
+	// Topics whose Kafka sources this statement starts from the offsets it inherited through `sql.tables.initial-offset-from`. Empty when it inherits offsets but every source sets its own start, for example with a `scan.startup.mode` OPTIONS hint. Absent when it inherits no offsets or still waits for them, and when CMF cannot tell which topics its sources start from, for example for a statement started by an earlier CMF version; recovery then treats a statement that inherits offsets as starting its Kafka sources from them.
+	InheritedOffsetTopics []string `json:"inheritedOffsetTopics,omitempty"`
+	// The upgrade mode that has been applied to the statement's deployment, shown so callers can see the value that took effect without inspecting the underlying Flink resources. When `spec.upgradeMode` is set, this matches it, except on a stopped SELECT or a stopped batch statement, which use `stateless`; otherwise it is the value selected by the default rules described on `spec.upgradeMode`. Populated once the statement has been deployed at least once; absent before the first deployment attempt.
 	UpgradeMode *string `json:"upgradeMode,omitempty"`
+	// The ID of the Flink job most recently submitted for this statement. Absent for interactive SELECT statements, and until the statement's first job is submitted.  Use it to identify the job's checkpoints, stored under `<state.checkpoints.dir>/<jobId>/`, for example to restore the statement from its latest checkpoint after a disaster. A newly submitted job may not have completed a checkpoint yet.  The ID is kept while the statement is stopped. It changes when the statement is resumed or redeployed with any upgrade mode other than `last-state`.
+	JobId *string `json:"jobId,omitempty"`
+	// Set when CMF, recreating the statement's missing Flink resources after a restart, stopped the statement instead of starting it without the state it needs, or instead of letting it reprocess input. `status.detail` says how to recover it. Cleared when the statement is resumed, or set to FAILED because its compute pool was deleted. Values: `no-restore-point`: the statement has no savepoint to restore from; `restore-point-too-old`: the restore point CMF would use is older than `cmf.recovery.max-restore-point-age`; `start-from-savepoint-unresolved`: the savepoint set in `spec.startFromSavepoint` no longer resolves; `carry-over-replay`: the statement starts Kafka sources from the offsets it inherited from another statement (`sql.tables.initial-offset-from`, see `inheritedOffsetTopics`) and it has no savepoint CMF can restore it from (none exists, the `startFromSavepoint` it last started from no longer resolves, or each one is older than `cmf.recovery.max-restore-point-age` or was taken before that `startFromSavepoint` was applied), so starting it would reprocess all their input since the offsets it was created with. Resuming the statement starts it anyway; `batch-rerun`: the statement is an `INSERT INTO` or `STATEMENT SET` that runs in batch mode and its job already ran. A batch job cannot resume, so starting it again would run it from the start and could write its output a second time. The statement cannot be resumed; create a new statement to run it again.
+	ParkedByRecovery *string `json:"parkedByRecovery,omitempty"`
+	// The runtime mode the statement's Flink job runs in: `execution.runtime-mode` from the statement's `flinkConfiguration` merged with the Environment's statement defaults (statementDefaults.interactive for a SELECT, statementDefaults.detached for an INSERT INTO or a statement set), with the defaults' value taking precedence. STREAMING when neither sets it. Set when the statement is created and does not change. Absent for statements that do not run a Flink job (for example SHOW, DESCRIBE or CREATE TABLE), for statements that failed to compile, and for statements created by an earlier CMF version.
+	RuntimeMode *string `json:"runtimeMode,omitempty"`
 }
 
 // NewStatementTraits instantiates a new StatementTraits object
@@ -274,6 +282,39 @@ func (o *StatementTraits) SetConnectorJarUris(v []string) {
 	o.ConnectorJarUris = &v
 }
 
+// GetInheritedOffsetTopics returns the InheritedOffsetTopics field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *StatementTraits) GetInheritedOffsetTopics() []string {
+	if o == nil  {
+		var ret []string
+		return ret
+	}
+	return o.InheritedOffsetTopics
+}
+
+// GetInheritedOffsetTopicsOk returns a tuple with the InheritedOffsetTopics field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *StatementTraits) GetInheritedOffsetTopicsOk() (*[]string, bool) {
+	if o == nil || o.InheritedOffsetTopics == nil {
+		return nil, false
+	}
+	return &o.InheritedOffsetTopics, true
+}
+
+// HasInheritedOffsetTopics returns a boolean if a field has been set.
+func (o *StatementTraits) HasInheritedOffsetTopics() bool {
+	if o != nil && o.InheritedOffsetTopics != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetInheritedOffsetTopics gets a reference to the given []string and assigns it to the InheritedOffsetTopics field.
+func (o *StatementTraits) SetInheritedOffsetTopics(v []string) {
+	o.InheritedOffsetTopics = v
+}
+
 // GetUpgradeMode returns the UpgradeMode field value if set, zero value otherwise.
 func (o *StatementTraits) GetUpgradeMode() string {
 	if o == nil || o.UpgradeMode == nil {
@@ -306,6 +347,102 @@ func (o *StatementTraits) SetUpgradeMode(v string) {
 	o.UpgradeMode = &v
 }
 
+// GetJobId returns the JobId field value if set, zero value otherwise.
+func (o *StatementTraits) GetJobId() string {
+	if o == nil || o.JobId == nil {
+		var ret string
+		return ret
+	}
+	return *o.JobId
+}
+
+// GetJobIdOk returns a tuple with the JobId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetJobIdOk() (*string, bool) {
+	if o == nil || o.JobId == nil {
+		return nil, false
+	}
+	return o.JobId, true
+}
+
+// HasJobId returns a boolean if a field has been set.
+func (o *StatementTraits) HasJobId() bool {
+	if o != nil && o.JobId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetJobId gets a reference to the given string and assigns it to the JobId field.
+func (o *StatementTraits) SetJobId(v string) {
+	o.JobId = &v
+}
+
+// GetParkedByRecovery returns the ParkedByRecovery field value if set, zero value otherwise.
+func (o *StatementTraits) GetParkedByRecovery() string {
+	if o == nil || o.ParkedByRecovery == nil {
+		var ret string
+		return ret
+	}
+	return *o.ParkedByRecovery
+}
+
+// GetParkedByRecoveryOk returns a tuple with the ParkedByRecovery field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetParkedByRecoveryOk() (*string, bool) {
+	if o == nil || o.ParkedByRecovery == nil {
+		return nil, false
+	}
+	return o.ParkedByRecovery, true
+}
+
+// HasParkedByRecovery returns a boolean if a field has been set.
+func (o *StatementTraits) HasParkedByRecovery() bool {
+	if o != nil && o.ParkedByRecovery != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetParkedByRecovery gets a reference to the given string and assigns it to the ParkedByRecovery field.
+func (o *StatementTraits) SetParkedByRecovery(v string) {
+	o.ParkedByRecovery = &v
+}
+
+// GetRuntimeMode returns the RuntimeMode field value if set, zero value otherwise.
+func (o *StatementTraits) GetRuntimeMode() string {
+	if o == nil || o.RuntimeMode == nil {
+		var ret string
+		return ret
+	}
+	return *o.RuntimeMode
+}
+
+// GetRuntimeModeOk returns a tuple with the RuntimeMode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementTraits) GetRuntimeModeOk() (*string, bool) {
+	if o == nil || o.RuntimeMode == nil {
+		return nil, false
+	}
+	return o.RuntimeMode, true
+}
+
+// HasRuntimeMode returns a boolean if a field has been set.
+func (o *StatementTraits) HasRuntimeMode() bool {
+	if o != nil && o.RuntimeMode != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRuntimeMode gets a reference to the given string and assigns it to the RuntimeMode field.
+func (o *StatementTraits) SetRuntimeMode(v string) {
+	o.RuntimeMode = &v
+}
+
 func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.SqlKind != nil {
@@ -329,8 +466,20 @@ func (o StatementTraits) MarshalJSON() ([]byte, error) {
 	if o.ConnectorJarUris != nil {
 		toSerialize["connectorJarUris"] = o.ConnectorJarUris
 	}
+	if o.InheritedOffsetTopics != nil {
+		toSerialize["inheritedOffsetTopics"] = o.InheritedOffsetTopics
+	}
 	if o.UpgradeMode != nil {
 		toSerialize["upgradeMode"] = o.UpgradeMode
+	}
+	if o.JobId != nil {
+		toSerialize["jobId"] = o.JobId
+	}
+	if o.ParkedByRecovery != nil {
+		toSerialize["parkedByRecovery"] = o.ParkedByRecovery
+	}
+	if o.RuntimeMode != nil {
+		toSerialize["runtimeMode"] = o.RuntimeMode
 	}
 	return json.Marshal(toSerialize)
 }

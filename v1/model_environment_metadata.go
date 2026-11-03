@@ -22,6 +22,8 @@ type EnvironmentMetadata struct {
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
 	// Timestamp when the Environment was updated the last time
 	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
+	// Timestamp when deletion of this Environment and everything in it was requested. Set while that deletion is in progress, and null if no deletion has been requested.
+	DeletionRequestedTimestamp *string `json:"deletionRequestedTimestamp,omitempty"`
 	// Labels of the Environment
 	Labels *map[string]string `json:"labels,omitempty"`
 	// Annotations of the Environment
@@ -134,6 +136,38 @@ func (o *EnvironmentMetadata) SetUpdateTimestamp(v string) {
 	o.UpdateTimestamp = &v
 }
 
+// GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field value if set, zero value otherwise.
+func (o *EnvironmentMetadata) GetDeletionRequestedTimestamp() string {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		var ret string
+		return ret
+	}
+	return *o.DeletionRequestedTimestamp
+}
+
+// GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EnvironmentMetadata) GetDeletionRequestedTimestampOk() (*string, bool) {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		return nil, false
+	}
+	return o.DeletionRequestedTimestamp, true
+}
+
+// HasDeletionRequestedTimestamp returns a boolean if a field has been set.
+func (o *EnvironmentMetadata) HasDeletionRequestedTimestamp() bool {
+	if o != nil && o.DeletionRequestedTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDeletionRequestedTimestamp gets a reference to the given string and assigns it to the DeletionRequestedTimestamp field.
+func (o *EnvironmentMetadata) SetDeletionRequestedTimestamp(v string) {
+	o.DeletionRequestedTimestamp = &v
+}
+
 // GetLabels returns the Labels field value if set, zero value otherwise.
 func (o *EnvironmentMetadata) GetLabels() map[string]string {
 	if o == nil || o.Labels == nil {
@@ -208,6 +242,9 @@ func (o EnvironmentMetadata) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpdateTimestamp != nil {
 		toSerialize["updateTimestamp"] = o.UpdateTimestamp
+	}
+	if o.DeletionRequestedTimestamp != nil {
+		toSerialize["deletionRequestedTimestamp"] = o.DeletionRequestedTimestamp
 	}
 	if o.Labels != nil {
 		toSerialize["labels"] = o.Labels

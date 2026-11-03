@@ -18,6 +18,7 @@ import (
 	_neturl "net/url"
 	"strings"
 	"reflect"
+	"time"
 )
 
 // Linger please
@@ -79,7 +80,9 @@ type SQLApi interface {
 	CreateStatementExecute(r ApiCreateStatementRequest) (Statement, *_nethttp.Response, error)
 
 	/*
-	DeleteComputePool Deletes the ComputePool of the given name in the given Environment.
+	DeleteComputePool Requests deletion of the ComputePool of the given name in the given Environment.
+
+	For a dedicated compute pool, deletion completes immediately. For a shared compute pool, a successful response only means the deletion request was accepted: the compute pool remains readable, with `deletionRequestedTimestamp` set in its metadata, until the underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment
@@ -117,7 +120,9 @@ type SQLApi interface {
 	DeleteKafkaDatabaseExecute(r ApiDeleteKafkaDatabaseRequest) (*_nethttp.Response, error)
 
 	/*
-	DeleteStatement Deletes the Statement of the given name in the given Environment.
+	DeleteStatement Requests deletion of the Statement of the given name in the given Environment.
+
+	For a statement on a dedicated compute pool, deletion completes immediately. For a statement on a shared compute pool, a successful response only means the deletion request was accepted: the statement remains readable, reporting phase `DELETING` and with `deletionRequestedTimestamp` set in its metadata, until the underlying Kubernetes resources have actually been removed.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment
@@ -142,6 +147,44 @@ type SQLApi interface {
 	// GetComputePoolExecute executes the request
 	//  @return ComputePool
 	GetComputePoolExecute(r ApiGetComputePoolRequest) (ComputePool, *_nethttp.Response, error)
+
+	/*
+	GetComputePoolEvents Get a paginated list of events of the given Compute Pool
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param computePoolName Name of the Compute Pool
+	 @return ApiGetComputePoolEventsRequest
+	*/
+	GetComputePoolEvents(ctx _context.Context, envName string, computePoolName string) ApiGetComputePoolEventsRequest
+
+	// GetComputePoolEventsExecute executes the request
+	//  @return ResourceEventsPage
+	GetComputePoolEventsExecute(r ApiGetComputePoolEventsRequest) (ResourceEventsPage, *_nethttp.Response, error)
+
+	/*
+	GetComputePoolPodLogs Get a snapshot of the container logs of one of the compute pool's session cluster pods
+
+	Returns the most recent log output of a single JobManager or TaskManager pod of a shared compute pool's session cluster, together with the names of all pods of that component so a caller can request the logs of a specific one. This is a point-in-time snapshot, not a live stream.
+
+Only shared compute pools run a session cluster with pods of their own; a dedicated compute pool has none, so this returns 400 for one.
+
+Requires the AccessWebUI permission on the compute pool, the same permission as the compute pool's Flink web UI. Viewing the compute pool is not enough, because the session cluster's logs contain the output of every statement on the pool.
+
+For a live tail that stays open and delivers each new line as the container writes it, use `GET /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pod-logs/stream`. It takes the same `component` (required), `podName`, `container`, `tailLines`, `sinceTime` and `timestamps` parameters, requires the same permission, and returns a plain-text stream rather than a JSON snapshot.
+
+Log retrieval requires a connection to the Kubernetes cluster the compute pool runs on, and can be turned off entirely by the operator, in which case this endpoint responds with 404.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param computePoolName Name of the compute pool
+	 @return ApiGetComputePoolPodLogsRequest
+	*/
+	GetComputePoolPodLogs(ctx _context.Context, envName string, computePoolName string) ApiGetComputePoolPodLogsRequest
+
+	// GetComputePoolPodLogsExecute executes the request
+	//  @return KubernetesPodLogs
+	GetComputePoolPodLogsExecute(r ApiGetComputePoolPodLogsRequest) (KubernetesPodLogs, *_nethttp.Response, error)
 
 	/*
 	GetComputePools Retrieve a paginated list of Compute Pools in the given Environment.
@@ -223,6 +266,20 @@ type SQLApi interface {
 	GetStatementExecute(r ApiGetStatementRequest) (Statement, *_nethttp.Response, error)
 
 	/*
+	GetStatementEvents Get a paginated list of events of the given Statement
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param stmtName Name of the Statement
+	 @return ApiGetStatementEventsRequest
+	*/
+	GetStatementEvents(ctx _context.Context, envName string, stmtName string) ApiGetStatementEventsRequest
+
+	// GetStatementEventsExecute executes the request
+	//  @return ResourceEventsPage
+	GetStatementEventsExecute(r ApiGetStatementEventsRequest) (ResourceEventsPage, *_nethttp.Response, error)
+
+	/*
 	GetStatementExceptions Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -235,6 +292,28 @@ type SQLApi interface {
 	// GetStatementExceptionsExecute executes the request
 	//  @return StatementExceptionList
 	GetStatementExceptionsExecute(r ApiGetStatementExceptionsRequest) (StatementExceptionList, *_nethttp.Response, error)
+
+	/*
+	GetStatementPodLogs Get a snapshot of the container logs of one of the statement's pods
+
+	Returns the most recent log output of a single JobManager or TaskManager pod of a statement that runs on a dedicated compute pool, together with the names of all pods of that component so a caller can request the logs of a specific one. This is a point-in-time snapshot, not a live stream.
+
+Only a statement on a dedicated compute pool has a Flink cluster of its own. A statement on a shared compute pool runs inside that pool's session cluster and has no pods of its own, so this returns 400 for one — read the session cluster's logs on the compute pool instead.
+
+For a live tail that stays open and delivers each new line as the container writes it, use `GET /cmf/api/v1/environments/{envName}/statements/{stmtName}/pod-logs/stream`. It takes the same `component` (required), `podName`, `container`, `tailLines`, `sinceTime` and `timestamps` parameters, requires the same permission, and returns a plain-text stream rather than a JSON snapshot.
+
+Log retrieval requires a connection to the Kubernetes cluster the statement runs on, and can be turned off entirely by the operator, in which case this endpoint responds with 404.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param stmtName Name of the statement
+	 @return ApiGetStatementPodLogsRequest
+	*/
+	GetStatementPodLogs(ctx _context.Context, envName string, stmtName string) ApiGetStatementPodLogsRequest
+
+	// GetStatementPodLogsExecute executes the request
+	//  @return KubernetesPodLogs
+	GetStatementPodLogsExecute(r ApiGetStatementPodLogsRequest) (KubernetesPodLogs, *_nethttp.Response, error)
 
 	/*
 	GetStatementResult Retrieve the result of the interactive Statement with the given name in the given Environment.
@@ -262,6 +341,48 @@ type SQLApi interface {
 	// GetStatementsExecute executes the request
 	//  @return StatementsPage
 	GetStatementsExecute(r ApiGetStatementsRequest) (StatementsPage, *_nethttp.Response, error)
+
+	/*
+	ListComputePoolPods List the Kubernetes pods of the compute pool's session cluster
+
+	Returns one entry per JobManager and TaskManager pod of a shared compute pool's session cluster, with the state Kubernetes reports for the pod and each of its containers. Use it to pick a pod and container to read logs from, and to see restarts and readiness at a glance.
+
+Only shared compute pools run a session cluster with pods of their own; a dedicated compute pool has none, so this returns 400 for one. This also requires a connection to the Kubernetes cluster the compute pool runs on, and is turned off together with log retrieval, in which case this endpoint responds with 404.
+
+Requires the AccessWebUI permission on the compute pool, the same permission as the compute pool's Flink web UI. Viewing the compute pool is not enough, because the session cluster's logs contain the output of every statement on the pool.
+
+The result is a live read of Kubernetes, bounded to the session cluster's own pods, with the standard `sort`, pagination, `fields` and `filter` parameters applied to that set. Because the pods come straight from the cluster rather than the database, `filter` supports name matching only (for example `name=mypool-taskmanager-*`); a `filter` on labels, phase or other fields is rejected with 400.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param computePoolName Name of the compute pool
+	 @return ApiListComputePoolPodsRequest
+	*/
+	ListComputePoolPods(ctx _context.Context, envName string, computePoolName string) ApiListComputePoolPodsRequest
+
+	// ListComputePoolPodsExecute executes the request
+	//  @return FlinkClusterPodsPage
+	ListComputePoolPodsExecute(r ApiListComputePoolPodsRequest) (FlinkClusterPodsPage, *_nethttp.Response, error)
+
+	/*
+	ListStatementPods List the Kubernetes pods the statement runs on
+
+	Returns one entry per JobManager and TaskManager pod of a statement that runs on a dedicated compute pool, with the state Kubernetes reports for the pod and each of its containers. Use it to pick a pod and container to read logs from, and to see restarts and readiness at a glance.
+
+Only a statement on a dedicated compute pool has a Flink cluster of its own. A statement on a shared compute pool runs inside that pool's session cluster and has no pods of its own, so this returns 400 for one. This also requires a connection to the Kubernetes cluster the statement runs on, and is turned off together with log retrieval, in which case this endpoint responds with 404.
+
+The result is a live read of Kubernetes, bounded to the statement's own pods, with the standard `sort`, pagination, `fields` and `filter` parameters applied to that set. Because the pods come straight from the cluster rather than the database, `filter` supports name matching only (for example `name=mystatement-taskmanager-*`); a `filter` on labels, phase or other fields is rejected with 400.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param envName Name of the Environment
+	 @param stmtName Name of the statement
+	 @return ApiListStatementPodsRequest
+	*/
+	ListStatementPods(ctx _context.Context, envName string, stmtName string) ApiListStatementPodsRequest
+
+	// ListStatementPodsExecute executes the request
+	//  @return FlinkClusterPodsPage
+	ListStatementPodsExecute(r ApiListStatementPodsRequest) (FlinkClusterPodsPage, *_nethttp.Response, error)
 
 	/*
 	UpdateComputePool Updates the compute pool specified using its name and environment.
@@ -439,6 +560,16 @@ func (a *SQLApiService) CreateComputePoolExecute(r ApiCreateComputePoolRequest) 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -913,6 +1044,26 @@ func (a *SQLApiService) CreateStatementExecute(r ApiCreateStatementRequest) (Sta
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 429 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -943,11 +1094,17 @@ type ApiDeleteComputePoolRequest struct {
 	envName string
 	computePoolName string
 	force *bool
+	skipCleanup *bool
 }
 
-// If set to &#x60;true&#x60;, the platform deletes the compute pool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the session cluster FlinkDeployment might be orphaned. This configuration has no additional effect on dedicated compute pools that are always metadata-only.
+// If set to &#x60;true&#x60;, the platform deletes the compute pool from CMF metadata only, without requiring Kubernetes cluster connectivity. For shared compute pools, the underlying session cluster&#39;s Kubernetes resources might be orphaned. This configuration has no additional effect on dedicated compute pools that are always metadata-only.
 func (r ApiDeleteComputePoolRequest) Force(force bool) ApiDeleteComputePoolRequest {
 	r.force = &force
+	return r
+}
+// If set to &#x60;true&#x60;, forcibly clears any finalizers blocking the deletion of the underlying session cluster&#39;s Kubernetes resources. Only use this if a shared compute pool has remained in a pending-deletion state for longer than expected. This skips any cleanup those finalizers would otherwise have performed, so it should only be used once you&#39;ve confirmed the resource is genuinely stuck rather than still in the middle of a normal, in-progress cleanup. Has no effect on dedicated compute pools.
+func (r ApiDeleteComputePoolRequest) SkipCleanup(skipCleanup bool) ApiDeleteComputePoolRequest {
+	r.skipCleanup = &skipCleanup
 	return r
 }
 
@@ -956,7 +1113,9 @@ func (r ApiDeleteComputePoolRequest) Execute() (*_nethttp.Response, error) {
 }
 
 /*
-DeleteComputePool Deletes the ComputePool of the given name in the given Environment.
+DeleteComputePool Requests deletion of the ComputePool of the given name in the given Environment.
+
+For a dedicated compute pool, deletion completes immediately. For a shared compute pool, a successful response only means the deletion request was accepted: the compute pool remains readable, with `deletionRequestedTimestamp` set in its metadata, until the underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment
@@ -998,6 +1157,9 @@ func (a *SQLApiService) DeleteComputePoolExecute(r ApiDeleteComputePoolRequest) 
 	if r.force != nil {
 		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
 	}
+	if r.skipCleanup != nil {
+		localVarQueryParams.Add("skipCleanup", parameterToString(*r.skipCleanup, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1038,6 +1200,16 @@ func (a *SQLApiService) DeleteComputePoolExecute(r ApiDeleteComputePoolRequest) 
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -1316,11 +1488,17 @@ type ApiDeleteStatementRequest struct {
 	envName string
 	stmtName string
 	force *bool
+	skipCleanup *bool
 }
 
-// If set to &#x60;true&#x60;, the platform deletes the statement from CMF metadata only, without requiring Kubernetes cluster connectivity.
+// If set to &#x60;true&#x60;, the platform deletes the statement from CMF metadata even if its Kubernetes resources cannot be cleaned up, without requiring Kubernetes cluster connectivity. This takes priority over &#x60;skipCleanup&#x60;: when both are set, finalizers are not cleared and &#x60;skipCleanup&#x60; has no effect.
 func (r ApiDeleteStatementRequest) Force(force bool) ApiDeleteStatementRequest {
 	r.force = &force
+	return r
+}
+// If set to &#x60;true&#x60;, forcibly clears any finalizers blocking the deletion of the statement&#39;s underlying Kubernetes resources. Only use this if a statement on a shared compute pool has remained in a pending-deletion state for longer than expected. This skips any cleanup those finalizers would otherwise have performed, including cancelling the statement&#39;s Flink job on the shared compute pool, so the job may keep running after the statement is deleted. Only use it once you&#39;ve confirmed the resource is genuinely stuck rather than still in the middle of a normal, in-progress cleanup. Has no effect on statements on dedicated compute pools, when &#x60;force&#x60; is also set, or if Kubernetes is not already deleting the statement&#39;s underlying FlinkSessionJob.
+func (r ApiDeleteStatementRequest) SkipCleanup(skipCleanup bool) ApiDeleteStatementRequest {
+	r.skipCleanup = &skipCleanup
 	return r
 }
 
@@ -1329,7 +1507,9 @@ func (r ApiDeleteStatementRequest) Execute() (*_nethttp.Response, error) {
 }
 
 /*
-DeleteStatement Deletes the Statement of the given name in the given Environment.
+DeleteStatement Requests deletion of the Statement of the given name in the given Environment.
+
+For a statement on a dedicated compute pool, deletion completes immediately. For a statement on a shared compute pool, a successful response only means the deletion request was accepted: the statement remains readable, reporting phase `DELETING` and with `deletionRequestedTimestamp` set in its metadata, until the underlying Kubernetes resources have actually been removed.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment
@@ -1371,6 +1551,9 @@ func (a *SQLApiService) DeleteStatementExecute(r ApiDeleteStatementRequest) (*_n
 	if r.force != nil {
 		localVarQueryParams.Add("force", parameterToString(*r.force, ""))
 	}
+	if r.skipCleanup != nil {
+		localVarQueryParams.Add("skipCleanup", parameterToString(*r.skipCleanup, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1411,6 +1594,16 @@ func (a *SQLApiService) DeleteStatementExecute(r ApiDeleteStatementRequest) (*_n
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -1571,6 +1764,463 @@ func (a *SQLApiService) GetComputePoolExecute(r ApiGetComputePoolRequest) (Compu
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetComputePoolEventsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	computePoolName string
+	page *int32
+	size *int32
+	sort *[]string
+	filter *string
+	search *string
+	searchScope *string
+	fields *string
+}
+
+// Zero-based page index (0..N)
+func (r ApiGetComputePoolEventsRequest) Page(page int32) ApiGetComputePoolEventsRequest {
+	r.page = &page
+	return r
+}
+// The size of the page to be returned
+func (r ApiGetComputePoolEventsRequest) Size(size int32) ApiGetComputePoolEventsRequest {
+	r.size = &size
+	return r
+}
+// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+func (r ApiGetComputePoolEventsRequest) Sort(sort []string) ApiGetComputePoolEventsRequest {
+	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+func (r ApiGetComputePoolEventsRequest) Filter(filter string) ApiGetComputePoolEventsRequest {
+	r.filter = &filter
+	return r
+}
+// Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace
+func (r ApiGetComputePoolEventsRequest) Search(search string) ApiGetComputePoolEventsRequest {
+	r.search = &search
+	return r
+}
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message; application events also support flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Application events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+func (r ApiGetComputePoolEventsRequest) SearchScope(searchScope string) ApiGetComputePoolEventsRequest {
+	r.searchScope = &searchScope
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetComputePoolEventsRequest) Fields(fields string) ApiGetComputePoolEventsRequest {
+	r.fields = &fields
+	return r
+}
+
+func (r ApiGetComputePoolEventsRequest) Execute() (ResourceEventsPage, *_nethttp.Response, error) {
+	return r.ApiService.GetComputePoolEventsExecute(r)
+}
+
+/*
+GetComputePoolEvents Get a paginated list of events of the given Compute Pool
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param computePoolName Name of the Compute Pool
+ @return ApiGetComputePoolEventsRequest
+*/
+func (a *SQLApiService) GetComputePoolEvents(ctx _context.Context, envName string, computePoolName string) ApiGetComputePoolEventsRequest {
+	return ApiGetComputePoolEventsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		computePoolName: computePoolName,
+	}
+}
+
+// Execute executes the request
+//  @return ResourceEventsPage
+func (a *SQLApiService) GetComputePoolEventsExecute(r ApiGetComputePoolEventsRequest) (ResourceEventsPage, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  ResourceEventsPage
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.GetComputePoolEvents")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/events"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"computePoolName"+"}", _neturl.PathEscape(parameterToString(r.computePoolName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.page != nil {
+		localVarQueryParams.Add("page", parameterToString(*r.page, ""))
+	}
+	if r.size != nil {
+		localVarQueryParams.Add("size", parameterToString(*r.size, ""))
+	}
+	if r.sort != nil {
+		t := *r.sort
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				localVarQueryParams.Add("sort", parameterToString(s.Index(i), "multi"))
+			}
+		} else {
+			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
+		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.search != nil {
+		localVarQueryParams.Add("search", parameterToString(*r.search, ""))
+	}
+	if r.searchScope != nil {
+		localVarQueryParams.Add("searchScope", parameterToString(*r.searchScope, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetComputePoolPodLogsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	computePoolName string
+	component *string
+	podName *string
+	container *string
+	tailLines *int32
+	sinceSeconds *int32
+	sinceTime *time.Time
+	timestamps *bool
+	fromStart *bool
+	previous *bool
+}
+
+// Which component of the Flink cluster to read the logs of.
+func (r ApiGetComputePoolPodLogsRequest) Component(component string) ApiGetComputePoolPodLogsRequest {
+	r.component = &component
+	return r
+}
+// Name of the pod to read the logs of. Must be one of the pods reported in &#x60;availablePods&#x60;. When omitted, the logs of the first available pod of the requested component are returned.
+func (r ApiGetComputePoolPodLogsRequest) PodName(podName string) ApiGetComputePoolPodLogsRequest {
+	r.podName = &podName
+	return r
+}
+// Name of the container within the pod to read the logs of. Must be one of the containers of that pod. When omitted, the pod&#39;s main Flink container is used.
+func (r ApiGetComputePoolPodLogsRequest) Container(container string) ApiGetComputePoolPodLogsRequest {
+	r.container = &container
+	return r
+}
+// Number of most recent log lines to return. Ignored when &#x60;fromStart&#x60; is set.
+func (r ApiGetComputePoolPodLogsRequest) TailLines(tailLines int32) ApiGetComputePoolPodLogsRequest {
+	r.tailLines = &tailLines
+	return r
+}
+// Only return log lines written within the last N seconds. The &#x60;tailLines&#x60; cap still applies, so a wide window can still be truncated.
+func (r ApiGetComputePoolPodLogsRequest) SinceSeconds(sinceSeconds int32) ApiGetComputePoolPodLogsRequest {
+	r.sinceSeconds = &sinceSeconds
+	return r
+}
+// Only return log lines written at or after this timestamp (RFC 3339). Use it together with &#x60;timestamps&#x60; to continue reading where a previous response ended. Mutually exclusive with &#x60;sinceSeconds&#x60;.
+func (r ApiGetComputePoolPodLogsRequest) SinceTime(sinceTime time.Time) ApiGetComputePoolPodLogsRequest {
+	r.sinceTime = &sinceTime
+	return r
+}
+// Prefix every returned line with the RFC 3339 timestamp at which the container wrote it.
+func (r ApiGetComputePoolPodLogsRequest) Timestamps(timestamps bool) ApiGetComputePoolPodLogsRequest {
+	r.timestamps = &timestamps
+	return r
+}
+// Return the log from the oldest line the Kubernetes cluster still retains instead of the most recent ones. The response is capped in size; &#x60;truncated&#x60; reports whether it hit that cap.
+func (r ApiGetComputePoolPodLogsRequest) FromStart(fromStart bool) ApiGetComputePoolPodLogsRequest {
+	r.fromStart = &fromStart
+	return r
+}
+// Read the logs of the previous, terminated container instead of the running one. Use this to inspect why a container crashed.
+func (r ApiGetComputePoolPodLogsRequest) Previous(previous bool) ApiGetComputePoolPodLogsRequest {
+	r.previous = &previous
+	return r
+}
+
+func (r ApiGetComputePoolPodLogsRequest) Execute() (KubernetesPodLogs, *_nethttp.Response, error) {
+	return r.ApiService.GetComputePoolPodLogsExecute(r)
+}
+
+/*
+GetComputePoolPodLogs Get a snapshot of the container logs of one of the compute pool's session cluster pods
+
+Returns the most recent log output of a single JobManager or TaskManager pod of a shared compute pool's session cluster, together with the names of all pods of that component so a caller can request the logs of a specific one. This is a point-in-time snapshot, not a live stream.
+
+Only shared compute pools run a session cluster with pods of their own; a dedicated compute pool has none, so this returns 400 for one.
+
+Requires the AccessWebUI permission on the compute pool, the same permission as the compute pool's Flink web UI. Viewing the compute pool is not enough, because the session cluster's logs contain the output of every statement on the pool.
+
+For a live tail that stays open and delivers each new line as the container writes it, use `GET /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pod-logs/stream`. It takes the same `component` (required), `podName`, `container`, `tailLines`, `sinceTime` and `timestamps` parameters, requires the same permission, and returns a plain-text stream rather than a JSON snapshot.
+
+Log retrieval requires a connection to the Kubernetes cluster the compute pool runs on, and can be turned off entirely by the operator, in which case this endpoint responds with 404.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param computePoolName Name of the compute pool
+ @return ApiGetComputePoolPodLogsRequest
+*/
+func (a *SQLApiService) GetComputePoolPodLogs(ctx _context.Context, envName string, computePoolName string) ApiGetComputePoolPodLogsRequest {
+	return ApiGetComputePoolPodLogsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		computePoolName: computePoolName,
+	}
+}
+
+// Execute executes the request
+//  @return KubernetesPodLogs
+func (a *SQLApiService) GetComputePoolPodLogsExecute(r ApiGetComputePoolPodLogsRequest) (KubernetesPodLogs, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  KubernetesPodLogs
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.GetComputePoolPodLogs")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pod-logs"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"computePoolName"+"}", _neturl.PathEscape(parameterToString(r.computePoolName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.component == nil {
+		return localVarReturnValue, nil, reportError("component is required and must be specified")
+	}
+
+	localVarQueryParams.Add("component", parameterToString(*r.component, ""))
+	if r.podName != nil {
+		localVarQueryParams.Add("podName", parameterToString(*r.podName, ""))
+	}
+	if r.container != nil {
+		localVarQueryParams.Add("container", parameterToString(*r.container, ""))
+	}
+	if r.tailLines != nil {
+		localVarQueryParams.Add("tailLines", parameterToString(*r.tailLines, ""))
+	}
+	if r.sinceSeconds != nil {
+		localVarQueryParams.Add("sinceSeconds", parameterToString(*r.sinceSeconds, ""))
+	}
+	if r.sinceTime != nil {
+		localVarQueryParams.Add("sinceTime", parameterToString(*r.sinceTime, ""))
+	}
+	if r.timestamps != nil {
+		localVarQueryParams.Add("timestamps", parameterToString(*r.timestamps, ""))
+	}
+	if r.fromStart != nil {
+		localVarQueryParams.Add("fromStart", parameterToString(*r.fromStart, ""))
+	}
+	if r.previous != nil {
+		localVarQueryParams.Add("previous", parameterToString(*r.previous, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetComputePoolsRequest struct {
 	ctx _context.Context
 	ApiService SQLApi
@@ -1598,7 +2248,7 @@ func (r ApiGetComputePoolsRequest) Sort(sort []string) ApiGetComputePoolsRequest
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetComputePoolsRequest) Filter(filter string) ApiGetComputePoolsRequest {
 	r.filter = &filter
 	return r
@@ -1905,7 +2555,7 @@ func (r ApiGetKafkaCatalogsRequest) Sort(sort []string) ApiGetKafkaCatalogsReque
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetKafkaCatalogsRequest) Filter(filter string) ApiGetKafkaCatalogsRequest {
 	r.filter = &filter
 	return r
@@ -1915,7 +2565,7 @@ func (r ApiGetKafkaCatalogsRequest) Search(search string) ApiGetKafkaCatalogsReq
 	r.search = &search
 	return r
 }
-// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message; application events also support flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Application events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
 func (r ApiGetKafkaCatalogsRequest) SearchScope(searchScope string) ApiGetKafkaCatalogsRequest {
 	r.searchScope = &searchScope
 	return r
@@ -2212,7 +2862,7 @@ func (r ApiGetKafkaDatabasesRequest) Sort(sort []string) ApiGetKafkaDatabasesReq
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetKafkaDatabasesRequest) Filter(filter string) ApiGetKafkaDatabasesRequest {
 	r.filter = &filter
 	return r
@@ -2490,6 +3140,204 @@ func (a *SQLApiService) GetStatementExecute(r ApiGetStatementRequest) (Statement
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetStatementEventsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	stmtName string
+	page *int32
+	size *int32
+	sort *[]string
+	filter *string
+	search *string
+	searchScope *string
+	fields *string
+}
+
+// Zero-based page index (0..N)
+func (r ApiGetStatementEventsRequest) Page(page int32) ApiGetStatementEventsRequest {
+	r.page = &page
+	return r
+}
+// The size of the page to be returned
+func (r ApiGetStatementEventsRequest) Size(size int32) ApiGetStatementEventsRequest {
+	r.size = &size
+	return r
+}
+// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+func (r ApiGetStatementEventsRequest) Sort(sort []string) ApiGetStatementEventsRequest {
+	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+func (r ApiGetStatementEventsRequest) Filter(filter string) ApiGetStatementEventsRequest {
+	r.filter = &filter
+	return r
+}
+// Search term to match against fields specified in searchScope. Note: Both search and searchScope must be provided together. If only one is provided, the request will be rejected. Example: ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace
+func (r ApiGetStatementEventsRequest) Search(search string) ApiGetStatementEventsRequest {
+	r.search = &search
+	return r
+}
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message; application events also support flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Application events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+func (r ApiGetStatementEventsRequest) SearchScope(searchScope string) ApiGetStatementEventsRequest {
+	r.searchScope = &searchScope
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiGetStatementEventsRequest) Fields(fields string) ApiGetStatementEventsRequest {
+	r.fields = &fields
+	return r
+}
+
+func (r ApiGetStatementEventsRequest) Execute() (ResourceEventsPage, *_nethttp.Response, error) {
+	return r.ApiService.GetStatementEventsExecute(r)
+}
+
+/*
+GetStatementEvents Get a paginated list of events of the given Statement
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param stmtName Name of the Statement
+ @return ApiGetStatementEventsRequest
+*/
+func (a *SQLApiService) GetStatementEvents(ctx _context.Context, envName string, stmtName string) ApiGetStatementEventsRequest {
+	return ApiGetStatementEventsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		stmtName: stmtName,
+	}
+}
+
+// Execute executes the request
+//  @return ResourceEventsPage
+func (a *SQLApiService) GetStatementEventsExecute(r ApiGetStatementEventsRequest) (ResourceEventsPage, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  ResourceEventsPage
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.GetStatementEvents")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/statements/{stmtName}/events"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"stmtName"+"}", _neturl.PathEscape(parameterToString(r.stmtName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.page != nil {
+		localVarQueryParams.Add("page", parameterToString(*r.page, ""))
+	}
+	if r.size != nil {
+		localVarQueryParams.Add("size", parameterToString(*r.size, ""))
+	}
+	if r.sort != nil {
+		t := *r.sort
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				localVarQueryParams.Add("sort", parameterToString(s.Index(i), "multi"))
+			}
+		} else {
+			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
+		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.search != nil {
+		localVarQueryParams.Add("search", parameterToString(*r.search, ""))
+	}
+	if r.searchScope != nil {
+		localVarQueryParams.Add("searchScope", parameterToString(*r.searchScope, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetStatementExceptionsRequest struct {
 	ctx _context.Context
 	ApiService SQLApi
@@ -2594,6 +3442,263 @@ func (a *SQLApiService) GetStatementExceptionsExecute(r ApiGetStatementException
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetStatementPodLogsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	stmtName string
+	component *string
+	podName *string
+	container *string
+	tailLines *int32
+	sinceSeconds *int32
+	sinceTime *time.Time
+	timestamps *bool
+	fromStart *bool
+	previous *bool
+}
+
+// Which component of the Flink cluster to read the logs of.
+func (r ApiGetStatementPodLogsRequest) Component(component string) ApiGetStatementPodLogsRequest {
+	r.component = &component
+	return r
+}
+// Name of the pod to read the logs of. Must be one of the pods reported in &#x60;availablePods&#x60;. When omitted, the logs of the first available pod of the requested component are returned.
+func (r ApiGetStatementPodLogsRequest) PodName(podName string) ApiGetStatementPodLogsRequest {
+	r.podName = &podName
+	return r
+}
+// Name of the container within the pod to read the logs of. Must be one of the containers of that pod. When omitted, the pod&#39;s main Flink container is used.
+func (r ApiGetStatementPodLogsRequest) Container(container string) ApiGetStatementPodLogsRequest {
+	r.container = &container
+	return r
+}
+// Number of most recent log lines to return. Ignored when &#x60;fromStart&#x60; is set.
+func (r ApiGetStatementPodLogsRequest) TailLines(tailLines int32) ApiGetStatementPodLogsRequest {
+	r.tailLines = &tailLines
+	return r
+}
+// Only return log lines written within the last N seconds. The &#x60;tailLines&#x60; cap still applies, so a wide window can still be truncated.
+func (r ApiGetStatementPodLogsRequest) SinceSeconds(sinceSeconds int32) ApiGetStatementPodLogsRequest {
+	r.sinceSeconds = &sinceSeconds
+	return r
+}
+// Only return log lines written at or after this timestamp (RFC 3339). Use it together with &#x60;timestamps&#x60; to continue reading where a previous response ended. Mutually exclusive with &#x60;sinceSeconds&#x60;.
+func (r ApiGetStatementPodLogsRequest) SinceTime(sinceTime time.Time) ApiGetStatementPodLogsRequest {
+	r.sinceTime = &sinceTime
+	return r
+}
+// Prefix every returned line with the RFC 3339 timestamp at which the container wrote it.
+func (r ApiGetStatementPodLogsRequest) Timestamps(timestamps bool) ApiGetStatementPodLogsRequest {
+	r.timestamps = &timestamps
+	return r
+}
+// Return the log from the oldest line the Kubernetes cluster still retains instead of the most recent ones. The response is capped in size; &#x60;truncated&#x60; reports whether it hit that cap.
+func (r ApiGetStatementPodLogsRequest) FromStart(fromStart bool) ApiGetStatementPodLogsRequest {
+	r.fromStart = &fromStart
+	return r
+}
+// Read the logs of the previous, terminated container instead of the running one. Use this to inspect why a container crashed.
+func (r ApiGetStatementPodLogsRequest) Previous(previous bool) ApiGetStatementPodLogsRequest {
+	r.previous = &previous
+	return r
+}
+
+func (r ApiGetStatementPodLogsRequest) Execute() (KubernetesPodLogs, *_nethttp.Response, error) {
+	return r.ApiService.GetStatementPodLogsExecute(r)
+}
+
+/*
+GetStatementPodLogs Get a snapshot of the container logs of one of the statement's pods
+
+Returns the most recent log output of a single JobManager or TaskManager pod of a statement that runs on a dedicated compute pool, together with the names of all pods of that component so a caller can request the logs of a specific one. This is a point-in-time snapshot, not a live stream.
+
+Only a statement on a dedicated compute pool has a Flink cluster of its own. A statement on a shared compute pool runs inside that pool's session cluster and has no pods of its own, so this returns 400 for one — read the session cluster's logs on the compute pool instead.
+
+For a live tail that stays open and delivers each new line as the container writes it, use `GET /cmf/api/v1/environments/{envName}/statements/{stmtName}/pod-logs/stream`. It takes the same `component` (required), `podName`, `container`, `tailLines`, `sinceTime` and `timestamps` parameters, requires the same permission, and returns a plain-text stream rather than a JSON snapshot.
+
+Log retrieval requires a connection to the Kubernetes cluster the statement runs on, and can be turned off entirely by the operator, in which case this endpoint responds with 404.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param stmtName Name of the statement
+ @return ApiGetStatementPodLogsRequest
+*/
+func (a *SQLApiService) GetStatementPodLogs(ctx _context.Context, envName string, stmtName string) ApiGetStatementPodLogsRequest {
+	return ApiGetStatementPodLogsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		stmtName: stmtName,
+	}
+}
+
+// Execute executes the request
+//  @return KubernetesPodLogs
+func (a *SQLApiService) GetStatementPodLogsExecute(r ApiGetStatementPodLogsRequest) (KubernetesPodLogs, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  KubernetesPodLogs
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.GetStatementPodLogs")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/statements/{stmtName}/pod-logs"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"stmtName"+"}", _neturl.PathEscape(parameterToString(r.stmtName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.component == nil {
+		return localVarReturnValue, nil, reportError("component is required and must be specified")
+	}
+
+	localVarQueryParams.Add("component", parameterToString(*r.component, ""))
+	if r.podName != nil {
+		localVarQueryParams.Add("podName", parameterToString(*r.podName, ""))
+	}
+	if r.container != nil {
+		localVarQueryParams.Add("container", parameterToString(*r.container, ""))
+	}
+	if r.tailLines != nil {
+		localVarQueryParams.Add("tailLines", parameterToString(*r.tailLines, ""))
+	}
+	if r.sinceSeconds != nil {
+		localVarQueryParams.Add("sinceSeconds", parameterToString(*r.sinceSeconds, ""))
+	}
+	if r.sinceTime != nil {
+		localVarQueryParams.Add("sinceTime", parameterToString(*r.sinceTime, ""))
+	}
+	if r.timestamps != nil {
+		localVarQueryParams.Add("timestamps", parameterToString(*r.timestamps, ""))
+	}
+	if r.fromStart != nil {
+		localVarQueryParams.Add("fromStart", parameterToString(*r.fromStart, ""))
+	}
+	if r.previous != nil {
+		localVarQueryParams.Add("previous", parameterToString(*r.previous, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -2749,6 +3854,16 @@ func (a *SQLApiService) GetStatementResultExecute(r ApiGetStatementResultRequest
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -2820,7 +3935,7 @@ func (r ApiGetStatementsRequest) IncludeResourceInformation(includeResourceInfor
 	r.includeResourceInformation = &includeResourceInformation
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetStatementsRequest) Filter(filter string) ApiGetStatementsRequest {
 	r.filter = &filter
 	return r
@@ -2830,7 +3945,7 @@ func (r ApiGetStatementsRequest) Search(search string) ApiGetStatementsRequest {
 	r.search = &search
 	return r
 }
-// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message, flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
+// Comma-separated list of fields to search in. Must be provided together with the search parameter. Unsupported field names will result in a 400 Bad Request. For Environments: supported fields are name, kubernetesNamespace. For Statements: supported fields are name, statement. For Events: supported fields are message; application events also support flinkApplicationInstance. For Secrets: supported fields are name, environments. For Kafka Catalogs: supported fields are name. When multiple fields are specified, the search uses OR logic. Example (Environments): ?search&#x3D;foo&amp;searchScope&#x3D;name,kubernetesNamespace means (name contains foo OR kubernetesNamespace contains foo) Example (Statements): ?search&#x3D;SELECT&amp;searchScope&#x3D;name,statement means (name contains SELECT OR statement contains SELECT) Example (Application events): ?search&#x3D;RUNNING&amp;searchScope&#x3D;message,flinkApplicationInstance means (message contains RUNNING OR flinkApplicationInstance equals RUNNING)
 func (r ApiGetStatementsRequest) SearchScope(searchScope string) ApiGetStatementsRequest {
 	r.searchScope = &searchScope
 	return r
@@ -3004,6 +4119,460 @@ func (a *SQLApiService) GetStatementsExecute(r ApiGetStatementsRequest) (Stateme
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiListComputePoolPodsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	computePoolName string
+	page *int32
+	size *int32
+	sort *[]string
+	filter *string
+	fields *string
+}
+
+// Zero-based page index (0..N)
+func (r ApiListComputePoolPodsRequest) Page(page int32) ApiListComputePoolPodsRequest {
+	r.page = &page
+	return r
+}
+// The size of the page to be returned
+func (r ApiListComputePoolPodsRequest) Size(size int32) ApiListComputePoolPodsRequest {
+	r.size = &size
+	return r
+}
+// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+func (r ApiListComputePoolPodsRequest) Sort(sort []string) ApiListComputePoolPodsRequest {
+	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+func (r ApiListComputePoolPodsRequest) Filter(filter string) ApiListComputePoolPodsRequest {
+	r.filter = &filter
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiListComputePoolPodsRequest) Fields(fields string) ApiListComputePoolPodsRequest {
+	r.fields = &fields
+	return r
+}
+
+func (r ApiListComputePoolPodsRequest) Execute() (FlinkClusterPodsPage, *_nethttp.Response, error) {
+	return r.ApiService.ListComputePoolPodsExecute(r)
+}
+
+/*
+ListComputePoolPods List the Kubernetes pods of the compute pool's session cluster
+
+Returns one entry per JobManager and TaskManager pod of a shared compute pool's session cluster, with the state Kubernetes reports for the pod and each of its containers. Use it to pick a pod and container to read logs from, and to see restarts and readiness at a glance.
+
+Only shared compute pools run a session cluster with pods of their own; a dedicated compute pool has none, so this returns 400 for one. This also requires a connection to the Kubernetes cluster the compute pool runs on, and is turned off together with log retrieval, in which case this endpoint responds with 404.
+
+Requires the AccessWebUI permission on the compute pool, the same permission as the compute pool's Flink web UI. Viewing the compute pool is not enough, because the session cluster's logs contain the output of every statement on the pool.
+
+The result is a live read of Kubernetes, bounded to the session cluster's own pods, with the standard `sort`, pagination, `fields` and `filter` parameters applied to that set. Because the pods come straight from the cluster rather than the database, `filter` supports name matching only (for example `name=mypool-taskmanager-*`); a `filter` on labels, phase or other fields is rejected with 400.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param computePoolName Name of the compute pool
+ @return ApiListComputePoolPodsRequest
+*/
+func (a *SQLApiService) ListComputePoolPods(ctx _context.Context, envName string, computePoolName string) ApiListComputePoolPodsRequest {
+	return ApiListComputePoolPodsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		computePoolName: computePoolName,
+	}
+}
+
+// Execute executes the request
+//  @return FlinkClusterPodsPage
+func (a *SQLApiService) ListComputePoolPodsExecute(r ApiListComputePoolPodsRequest) (FlinkClusterPodsPage, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  FlinkClusterPodsPage
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.ListComputePoolPods")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pods"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"computePoolName"+"}", _neturl.PathEscape(parameterToString(r.computePoolName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.page != nil {
+		localVarQueryParams.Add("page", parameterToString(*r.page, ""))
+	}
+	if r.size != nil {
+		localVarQueryParams.Add("size", parameterToString(*r.size, ""))
+	}
+	if r.sort != nil {
+		t := *r.sort
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				localVarQueryParams.Add("sort", parameterToString(s.Index(i), "multi"))
+			}
+		} else {
+			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
+		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListStatementPodsRequest struct {
+	ctx _context.Context
+	ApiService SQLApi
+	envName string
+	stmtName string
+	page *int32
+	size *int32
+	sort *[]string
+	filter *string
+	fields *string
+}
+
+// Zero-based page index (0..N)
+func (r ApiListStatementPodsRequest) Page(page int32) ApiListStatementPodsRequest {
+	r.page = &page
+	return r
+}
+// The size of the page to be returned
+func (r ApiListStatementPodsRequest) Size(size int32) ApiListStatementPodsRequest {
+	r.size = &size
+	return r
+}
+// Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+func (r ApiListStatementPodsRequest) Sort(sort []string) ApiListStatementPodsRequest {
+	r.sort = &sort
+	return r
+}
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+func (r ApiListStatementPodsRequest) Filter(filter string) ApiListStatementPodsRequest {
+	r.filter = &filter
+	return r
+}
+// Comma-separated list of field paths to include in the response. Supports nested fields using dot notation. Always includes apiVersion and kind fields even if not explicitly requested. Example: ?fields&#x3D;metadata.name,metadata.createdTimestamp,status.phase
+func (r ApiListStatementPodsRequest) Fields(fields string) ApiListStatementPodsRequest {
+	r.fields = &fields
+	return r
+}
+
+func (r ApiListStatementPodsRequest) Execute() (FlinkClusterPodsPage, *_nethttp.Response, error) {
+	return r.ApiService.ListStatementPodsExecute(r)
+}
+
+/*
+ListStatementPods List the Kubernetes pods the statement runs on
+
+Returns one entry per JobManager and TaskManager pod of a statement that runs on a dedicated compute pool, with the state Kubernetes reports for the pod and each of its containers. Use it to pick a pod and container to read logs from, and to see restarts and readiness at a glance.
+
+Only a statement on a dedicated compute pool has a Flink cluster of its own. A statement on a shared compute pool runs inside that pool's session cluster and has no pods of its own, so this returns 400 for one. This also requires a connection to the Kubernetes cluster the statement runs on, and is turned off together with log retrieval, in which case this endpoint responds with 404.
+
+The result is a live read of Kubernetes, bounded to the statement's own pods, with the standard `sort`, pagination, `fields` and `filter` parameters applied to that set. Because the pods come straight from the cluster rather than the database, `filter` supports name matching only (for example `name=mystatement-taskmanager-*`); a `filter` on labels, phase or other fields is rejected with 400.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param envName Name of the Environment
+ @param stmtName Name of the statement
+ @return ApiListStatementPodsRequest
+*/
+func (a *SQLApiService) ListStatementPods(ctx _context.Context, envName string, stmtName string) ApiListStatementPodsRequest {
+	return ApiListStatementPodsRequest{
+		ApiService: a,
+		ctx: ctx,
+		envName: envName,
+		stmtName: stmtName,
+	}
+}
+
+// Execute executes the request
+//  @return FlinkClusterPodsPage
+func (a *SQLApiService) ListStatementPodsExecute(r ApiListStatementPodsRequest) (FlinkClusterPodsPage, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  FlinkClusterPodsPage
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SQLApiService.ListStatementPods")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/environments/{envName}/statements/{stmtName}/pods"
+	localVarPath = strings.Replace(localVarPath, "{"+"envName"+"}", _neturl.PathEscape(parameterToString(r.envName, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"stmtName"+"}", _neturl.PathEscape(parameterToString(r.stmtName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.page != nil {
+		localVarQueryParams.Add("page", parameterToString(*r.page, ""))
+	}
+	if r.size != nil {
+		localVarQueryParams.Add("size", parameterToString(*r.size, ""))
+	}
+	if r.sort != nil {
+		t := *r.sort
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				localVarQueryParams.Add("sort", parameterToString(s.Index(i), "multi"))
+			}
+		} else {
+			localVarQueryParams.Add("sort", parameterToString(t, "multi"))
+		}
+	}
+	if r.filter != nil {
+		localVarQueryParams.Add("filter", parameterToString(*r.filter, ""))
+	}
+	if r.fields != nil {
+		localVarQueryParams.Add("fields", parameterToString(*r.fields, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiUpdateComputePoolRequest struct {
 	ctx _context.Context
 	ApiService SQLApi
@@ -3138,6 +4707,16 @@ func (a *SQLApiService) UpdateComputePoolExecute(r ApiUpdateComputePoolRequest) 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -3580,7 +5159,37 @@ func (a *SQLApiService) UpdateStatementExecute(r ApiUpdateStatementRequest) (*_n
 			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

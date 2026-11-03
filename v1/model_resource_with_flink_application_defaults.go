@@ -16,7 +16,7 @@ import (
 
 // ResourceWithFlinkApplicationDefaults struct for ResourceWithFlinkApplicationDefaults
 type ResourceWithFlinkApplicationDefaults struct {
-	// Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \"spec\" object here whose fields are merged into every application spec at deploy time. May include a \"savepointSchedule\" inside \"spec\" (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself. 
+	// Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \"spec\" object here whose fields are merged into every application spec at deploy time. May include a \"savepointSchedule\" inside \"spec\" (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself.  Some keys in \"spec.flinkConfiguration\" are reserved and cannot be set: `web.submit.jar-sources`, and every key beginning with `kubernetes.operator.cmf.`. An environment that sets any of these is rejected with 400, with an error naming the key. 
 	FlinkApplicationDefaults *map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 }
 
