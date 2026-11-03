@@ -20,6 +20,8 @@ type EnvironmentCatalog struct {
 	Name string `json:"name"`
 	// Databases currently registered in the default catalog.
 	Databases []EnvironmentCatalogDatabase `json:"databases"`
+	// Models currently registered in the default catalog (Flink SQL CREATE MODEL).
+	Models *[]EnvironmentCatalogModel `json:"models,omitempty"`
 }
 
 // NewEnvironmentCatalog instantiates a new EnvironmentCatalog object
@@ -89,6 +91,38 @@ func (o *EnvironmentCatalog) SetDatabases(v []EnvironmentCatalogDatabase) {
 	o.Databases = v
 }
 
+// GetModels returns the Models field value if set, zero value otherwise.
+func (o *EnvironmentCatalog) GetModels() []EnvironmentCatalogModel {
+	if o == nil || o.Models == nil {
+		var ret []EnvironmentCatalogModel
+		return ret
+	}
+	return *o.Models
+}
+
+// GetModelsOk returns a tuple with the Models field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EnvironmentCatalog) GetModelsOk() (*[]EnvironmentCatalogModel, bool) {
+	if o == nil || o.Models == nil {
+		return nil, false
+	}
+	return o.Models, true
+}
+
+// HasModels returns a boolean if a field has been set.
+func (o *EnvironmentCatalog) HasModels() bool {
+	if o != nil && o.Models != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetModels gets a reference to the given []EnvironmentCatalogModel and assigns it to the Models field.
+func (o *EnvironmentCatalog) SetModels(v []EnvironmentCatalogModel) {
+	o.Models = &v
+}
+
 func (o EnvironmentCatalog) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -96,6 +130,9 @@ func (o EnvironmentCatalog) MarshalJSON() ([]byte, error) {
 	}
 	if true {
 		toSerialize["databases"] = o.Databases
+	}
+	if o.Models != nil {
+		toSerialize["models"] = o.Models
 	}
 	return json.Marshal(toSerialize)
 }

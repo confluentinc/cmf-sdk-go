@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Status** | Pointer to [**SystemInformationStatus**](SystemInformationStatus.md) |  | [optional] 
+**MetadataSync** | Pointer to [**MetadataSyncStatus**](MetadataSyncStatus.md) |  | [optional] 
 
 ## Methods
 
@@ -49,6 +50,31 @@ SetStatus sets Status field to given value.
 `func (o *SystemInformation) HasStatus() bool`
 
 HasStatus returns a boolean if a field has been set.
+
+### GetMetadataSync
+
+`func (o *SystemInformation) GetMetadataSync() MetadataSyncStatus`
+
+GetMetadataSync returns the MetadataSync field if non-nil, zero value otherwise.
+
+### GetMetadataSyncOk
+
+`func (o *SystemInformation) GetMetadataSyncOk() (*MetadataSyncStatus, bool)`
+
+GetMetadataSyncOk returns a tuple with the MetadataSync field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetadataSync
+
+`func (o *SystemInformation) SetMetadataSync(v MetadataSyncStatus)`
+
+SetMetadataSync sets MetadataSync field to given value.
+
+### HasMetadataSync
+
+`func (o *SystemInformation) HasMetadataSync() bool`
+
+HasMetadataSync returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

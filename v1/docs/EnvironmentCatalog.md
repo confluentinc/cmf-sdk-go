@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Name** | **string** | Name of the default catalog. | 
 **Databases** | [**[]EnvironmentCatalogDatabase**](EnvironmentCatalogDatabase.md) | Databases currently registered in the default catalog. | 
+**Models** | Pointer to [**[]EnvironmentCatalogModel**](EnvironmentCatalogModel.md) | Models currently registered in the default catalog (Flink SQL CREATE MODEL). | [optional] 
 
 ## Methods
 
@@ -65,6 +66,31 @@ and a boolean to check if the value has been set.
 
 SetDatabases sets Databases field to given value.
 
+
+### GetModels
+
+`func (o *EnvironmentCatalog) GetModels() []EnvironmentCatalogModel`
+
+GetModels returns the Models field if non-nil, zero value otherwise.
+
+### GetModelsOk
+
+`func (o *EnvironmentCatalog) GetModelsOk() (*[]EnvironmentCatalogModel, bool)`
+
+GetModelsOk returns a tuple with the Models field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetModels
+
+`func (o *EnvironmentCatalog) SetModels(v []EnvironmentCatalogModel)`
+
+SetModels sets Models field to given value.
+
+### HasModels
+
+`func (o *EnvironmentCatalog) HasModels() bool`
+
+HasModels returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -14,7 +14,7 @@ import (
 	"encoding/json"
 )
 
-// StatementStartFromSavepoint Configuration for resuming a Statement from a savepoint. Works only with update Statement.
+// StatementStartFromSavepoint Configuration for resuming a Statement from a savepoint. Works only with update Statement. When the platform recreates a Statement's missing Flink resource (for example after a disaster recovery), its job starts from this savepoint only until the Statement takes a newer one; after that it starts from the Statement's latest savepoint.
 type StatementStartFromSavepoint struct {
 	// The name of the Savepoint resource to start Statement from. The request will be rejected if savepoint that has not completed is referenced.
 	SavepointName *string `json:"savepointName,omitempty"`

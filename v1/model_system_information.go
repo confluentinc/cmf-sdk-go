@@ -17,6 +17,7 @@ import (
 // SystemInformation Represents system information about the CMF application
 type SystemInformation struct {
 	Status *SystemInformationStatus `json:"status,omitempty"`
+	MetadataSync *MetadataSyncStatus `json:"metadataSync,omitempty"`
 }
 
 // NewSystemInformation instantiates a new SystemInformation object
@@ -68,10 +69,45 @@ func (o *SystemInformation) SetStatus(v SystemInformationStatus) {
 	o.Status = &v
 }
 
+// GetMetadataSync returns the MetadataSync field value if set, zero value otherwise.
+func (o *SystemInformation) GetMetadataSync() MetadataSyncStatus {
+	if o == nil || o.MetadataSync == nil {
+		var ret MetadataSyncStatus
+		return ret
+	}
+	return *o.MetadataSync
+}
+
+// GetMetadataSyncOk returns a tuple with the MetadataSync field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SystemInformation) GetMetadataSyncOk() (*MetadataSyncStatus, bool) {
+	if o == nil || o.MetadataSync == nil {
+		return nil, false
+	}
+	return o.MetadataSync, true
+}
+
+// HasMetadataSync returns a boolean if a field has been set.
+func (o *SystemInformation) HasMetadataSync() bool {
+	if o != nil && o.MetadataSync != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetMetadataSync gets a reference to the given MetadataSyncStatus and assigns it to the MetadataSync field.
+func (o *SystemInformation) SetMetadataSync(v MetadataSyncStatus) {
+	o.MetadataSync = &v
+}
+
 func (o SystemInformation) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Status != nil {
 		toSerialize["status"] = o.Status
+	}
+	if o.MetadataSync != nil {
+		toSerialize["metadataSync"] = o.MetadataSync
 	}
 	return json.Marshal(toSerialize)
 }

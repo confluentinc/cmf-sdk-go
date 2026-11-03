@@ -22,6 +22,8 @@ type ComputePoolMetadata struct {
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
 	// Timestamp when the ComputePool was last updated
 	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
+	// Timestamp when deletion of this ComputePool was requested. Only present while a shared compute pool's session cluster is being deleted from Kubernetes; absent if no deletion has been requested.
+	DeletionRequestedTimestamp *string `json:"deletionRequestedTimestamp,omitempty"`
 	// Unique identifier of the ComputePool
 	Uid *string `json:"uid,omitempty"`
 	// Labels of the ComputePool
@@ -136,6 +138,38 @@ func (o *ComputePoolMetadata) SetUpdateTimestamp(v string) {
 	o.UpdateTimestamp = &v
 }
 
+// GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field value if set, zero value otherwise.
+func (o *ComputePoolMetadata) GetDeletionRequestedTimestamp() string {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		var ret string
+		return ret
+	}
+	return *o.DeletionRequestedTimestamp
+}
+
+// GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ComputePoolMetadata) GetDeletionRequestedTimestampOk() (*string, bool) {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		return nil, false
+	}
+	return o.DeletionRequestedTimestamp, true
+}
+
+// HasDeletionRequestedTimestamp returns a boolean if a field has been set.
+func (o *ComputePoolMetadata) HasDeletionRequestedTimestamp() bool {
+	if o != nil && o.DeletionRequestedTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDeletionRequestedTimestamp gets a reference to the given string and assigns it to the DeletionRequestedTimestamp field.
+func (o *ComputePoolMetadata) SetDeletionRequestedTimestamp(v string) {
+	o.DeletionRequestedTimestamp = &v
+}
+
 // GetUid returns the Uid field value if set, zero value otherwise.
 func (o *ComputePoolMetadata) GetUid() string {
 	if o == nil || o.Uid == nil {
@@ -242,6 +276,9 @@ func (o ComputePoolMetadata) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpdateTimestamp != nil {
 		toSerialize["updateTimestamp"] = o.UpdateTimestamp
+	}
+	if o.DeletionRequestedTimestamp != nil {
+		toSerialize["deletionRequestedTimestamp"] = o.DeletionRequestedTimestamp
 	}
 	if o.Uid != nil {
 		toSerialize["uid"] = o.Uid
