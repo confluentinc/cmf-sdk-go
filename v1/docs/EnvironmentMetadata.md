@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Name** | **string** | Name of the Environment | 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the Environment was created | [optional] [readonly] 
 **UpdateTimestamp** | Pointer to **string** | Timestamp when the Environment was updated the last time | [optional] [readonly] 
+**DeletionRequestedTimestamp** | Pointer to **string** | Timestamp when deletion of this Environment and everything in it was requested. Set while that deletion is in progress, and null if no deletion has been requested. | [optional] [readonly] 
 **Labels** | Pointer to **map[string]string** | Labels of the Environment | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the Environment | [optional] 
 
@@ -98,6 +99,31 @@ SetUpdateTimestamp sets UpdateTimestamp field to given value.
 `func (o *EnvironmentMetadata) HasUpdateTimestamp() bool`
 
 HasUpdateTimestamp returns a boolean if a field has been set.
+
+### GetDeletionRequestedTimestamp
+
+`func (o *EnvironmentMetadata) GetDeletionRequestedTimestamp() string`
+
+GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field if non-nil, zero value otherwise.
+
+### GetDeletionRequestedTimestampOk
+
+`func (o *EnvironmentMetadata) GetDeletionRequestedTimestampOk() (*string, bool)`
+
+GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeletionRequestedTimestamp
+
+`func (o *EnvironmentMetadata) SetDeletionRequestedTimestamp(v string)`
+
+SetDeletionRequestedTimestamp sets DeletionRequestedTimestamp field to given value.
+
+### HasDeletionRequestedTimestamp
+
+`func (o *EnvironmentMetadata) HasDeletionRequestedTimestamp() bool`
+
+HasDeletionRequestedTimestamp returns a boolean if a field has been set.
 
 ### GetLabels
 

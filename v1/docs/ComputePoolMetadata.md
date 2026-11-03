@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Name** | **string** | Name of the ComputePool | 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the ComputePool was created | [optional] 
 **UpdateTimestamp** | Pointer to **string** | Timestamp when the ComputePool was last updated | [optional] 
+**DeletionRequestedTimestamp** | Pointer to **string** | Timestamp when deletion of this ComputePool was requested. Only present while a shared compute pool&#39;s session cluster is being deleted from Kubernetes; absent if no deletion has been requested. | [optional] 
 **Uid** | Pointer to **string** | Unique identifier of the ComputePool | [optional] 
 **Labels** | Pointer to **map[string]string** | Labels of the ComputePool | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the ComputePool | [optional] 
@@ -99,6 +100,31 @@ SetUpdateTimestamp sets UpdateTimestamp field to given value.
 `func (o *ComputePoolMetadata) HasUpdateTimestamp() bool`
 
 HasUpdateTimestamp returns a boolean if a field has been set.
+
+### GetDeletionRequestedTimestamp
+
+`func (o *ComputePoolMetadata) GetDeletionRequestedTimestamp() string`
+
+GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field if non-nil, zero value otherwise.
+
+### GetDeletionRequestedTimestampOk
+
+`func (o *ComputePoolMetadata) GetDeletionRequestedTimestampOk() (*string, bool)`
+
+GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeletionRequestedTimestamp
+
+`func (o *ComputePoolMetadata) SetDeletionRequestedTimestamp(v string)`
+
+SetDeletionRequestedTimestamp sets DeletionRequestedTimestamp field to given value.
+
+### HasDeletionRequestedTimestamp
+
+`func (o *ComputePoolMetadata) HasDeletionRequestedTimestamp() bool`
+
+HasDeletionRequestedTimestamp returns a boolean if a field has been set.
 
 ### GetUid
 

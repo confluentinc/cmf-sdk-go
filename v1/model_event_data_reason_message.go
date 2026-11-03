@@ -16,7 +16,7 @@ import (
 
 // EventDataReasonMessage struct for EventDataReasonMessage
 type EventDataReasonMessage struct {
-	// The FKO event reason (e.g., ValidationError, CrashLoopBackOff, Missing, ScalingReport, AutoscalerError). The event category is conveyed by status.type.
+	// The FKO event reason (e.g., ValidationError, CrashLoopBackOff, Missing, JobStatusChanged, ScalingReport, AutoscalerError). The event category is conveyed by status.type.
 	Reason *string `json:"reason,omitempty"`
 	// The full raw K8s event message content
 	Message *string `json:"message,omitempty"`

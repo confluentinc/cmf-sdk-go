@@ -20,8 +20,14 @@ type ComputePoolSpec struct {
 	Type string `json:"type"`
 	// Desired state of the compute pool. Can only be specified for shared compute pools. Defaults to RUNNING if not specified.
 	State *string `json:"state,omitempty"`
-	// Cluster Spec
+	// Reserved for a future release. Do not set this field. On a shared compute pool it limits which kinds of workload the pool accepts, and its behavior may change without notice. It cannot be set on dedicated compute pools.
+	AllowedWorkloadKinds []string `json:"allowedWorkloadKinds,omitempty"`
+	// Reserved for a future release. Do not set this field. On a shared compute pool whose allowedWorkloadKinds includes APPLICATION it lists the URI prefixes that Application jars may be fetched from, and its behavior may change without notice. It cannot be set on other compute pools, and is cleared when APPLICATION is removed from allowedWorkloadKinds.
+	AllowedJarUriPrefixes []string `json:"allowedJarUriPrefixes,omitempty"`
+	// Cluster Spec  Some keys in \"flinkConfiguration\" are reserved and cannot be set. For every compute pool, these are `web.submit.jar-sources` and every key beginning with `kubernetes.operator.cmf.`. For a shared compute pool, they also include `pipeline.jars`, `pipeline.classpaths`, and every key beginning with `user.artifacts.` except `user.artifacts.max-concurrent-fetches`, `user.artifacts.max-size`, `user.artifacts.fetch-timeout`, `user.artifacts.base-dir`, `user.artifacts.http-headers` and `user.artifacts.raw-http-enabled`. A compute pool that sets one is rejected with an error naming the key. 
 	ClusterSpec map[string]interface{} `json:"clusterSpec"`
+	// CP Flink SQL version that statements on this compute pool are compiled against. Releases for CMF 2.5 and later have the format `<major>.<minor>-cmf<X.Y>-cp<build>`, for example `1.19-cmf2.5-cp1`, where `<X.Y>` is the CMF minor version and `<build>` counts from 1 within it. The earlier releases `1.19-cp1` to `1.19-cp12` are also accepted, and are older than every other 1.19 version. A release candidate, for example `1.19-rc1-cmf2.5-cp1`, is the same version as its release. No other format is accepted. A compiler compiles for the versions of its Flink line up to every build of its own CMF minor version. A version of a later CMF minor version than this one is rejected, and so is a version older than the oldest version of its Flink line that CMF supports (`1.19-cp8` for 1.19, `2.3-cmf2.5-cp1` for 2.3), and a version of another Flink major version than the compute pool's `clusterSpec.flinkVersion`. Only used when CMF is configured with shared SQL compilers or compile workers. Creating a statement fails if no configured compiler supports this version, or if this version has another Flink major version than the compute pool's Flink version. When unset, CMF uses the version in a `cp-flink-sql` image tag if a configured compiler supports it and it has the compute pool's Flink major version, and otherwise a compiler matching the compute pool's Flink version. An update that leaves this field out keeps it; an empty string clears it.
+	CpFlinkSqlVersion *string `json:"cpFlinkSqlVersion,omitempty"`
 }
 
 // NewComputePoolSpec instantiates a new ComputePoolSpec object
@@ -99,6 +105,72 @@ func (o *ComputePoolSpec) SetState(v string) {
 	o.State = &v
 }
 
+// GetAllowedWorkloadKinds returns the AllowedWorkloadKinds field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *ComputePoolSpec) GetAllowedWorkloadKinds() []string {
+	if o == nil  {
+		var ret []string
+		return ret
+	}
+	return o.AllowedWorkloadKinds
+}
+
+// GetAllowedWorkloadKindsOk returns a tuple with the AllowedWorkloadKinds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *ComputePoolSpec) GetAllowedWorkloadKindsOk() (*[]string, bool) {
+	if o == nil || o.AllowedWorkloadKinds == nil {
+		return nil, false
+	}
+	return &o.AllowedWorkloadKinds, true
+}
+
+// HasAllowedWorkloadKinds returns a boolean if a field has been set.
+func (o *ComputePoolSpec) HasAllowedWorkloadKinds() bool {
+	if o != nil && o.AllowedWorkloadKinds != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAllowedWorkloadKinds gets a reference to the given []string and assigns it to the AllowedWorkloadKinds field.
+func (o *ComputePoolSpec) SetAllowedWorkloadKinds(v []string) {
+	o.AllowedWorkloadKinds = v
+}
+
+// GetAllowedJarUriPrefixes returns the AllowedJarUriPrefixes field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *ComputePoolSpec) GetAllowedJarUriPrefixes() []string {
+	if o == nil  {
+		var ret []string
+		return ret
+	}
+	return o.AllowedJarUriPrefixes
+}
+
+// GetAllowedJarUriPrefixesOk returns a tuple with the AllowedJarUriPrefixes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *ComputePoolSpec) GetAllowedJarUriPrefixesOk() (*[]string, bool) {
+	if o == nil || o.AllowedJarUriPrefixes == nil {
+		return nil, false
+	}
+	return &o.AllowedJarUriPrefixes, true
+}
+
+// HasAllowedJarUriPrefixes returns a boolean if a field has been set.
+func (o *ComputePoolSpec) HasAllowedJarUriPrefixes() bool {
+	if o != nil && o.AllowedJarUriPrefixes != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAllowedJarUriPrefixes gets a reference to the given []string and assigns it to the AllowedJarUriPrefixes field.
+func (o *ComputePoolSpec) SetAllowedJarUriPrefixes(v []string) {
+	o.AllowedJarUriPrefixes = v
+}
+
 // GetClusterSpec returns the ClusterSpec field value
 func (o *ComputePoolSpec) GetClusterSpec() map[string]interface{} {
 	if o == nil {
@@ -123,6 +195,38 @@ func (o *ComputePoolSpec) SetClusterSpec(v map[string]interface{}) {
 	o.ClusterSpec = v
 }
 
+// GetCpFlinkSqlVersion returns the CpFlinkSqlVersion field value if set, zero value otherwise.
+func (o *ComputePoolSpec) GetCpFlinkSqlVersion() string {
+	if o == nil || o.CpFlinkSqlVersion == nil {
+		var ret string
+		return ret
+	}
+	return *o.CpFlinkSqlVersion
+}
+
+// GetCpFlinkSqlVersionOk returns a tuple with the CpFlinkSqlVersion field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ComputePoolSpec) GetCpFlinkSqlVersionOk() (*string, bool) {
+	if o == nil || o.CpFlinkSqlVersion == nil {
+		return nil, false
+	}
+	return o.CpFlinkSqlVersion, true
+}
+
+// HasCpFlinkSqlVersion returns a boolean if a field has been set.
+func (o *ComputePoolSpec) HasCpFlinkSqlVersion() bool {
+	if o != nil && o.CpFlinkSqlVersion != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCpFlinkSqlVersion gets a reference to the given string and assigns it to the CpFlinkSqlVersion field.
+func (o *ComputePoolSpec) SetCpFlinkSqlVersion(v string) {
+	o.CpFlinkSqlVersion = &v
+}
+
 func (o ComputePoolSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -131,8 +235,17 @@ func (o ComputePoolSpec) MarshalJSON() ([]byte, error) {
 	if o.State != nil {
 		toSerialize["state"] = o.State
 	}
+	if o.AllowedWorkloadKinds != nil {
+		toSerialize["allowedWorkloadKinds"] = o.AllowedWorkloadKinds
+	}
+	if o.AllowedJarUriPrefixes != nil {
+		toSerialize["allowedJarUriPrefixes"] = o.AllowedJarUriPrefixes
+	}
 	if true {
 		toSerialize["clusterSpec"] = o.ClusterSpec
+	}
+	if o.CpFlinkSqlVersion != nil {
+		toSerialize["cpFlinkSqlVersion"] = o.CpFlinkSqlVersion
 	}
 	return json.Marshal(toSerialize)
 }

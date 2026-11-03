@@ -12,11 +12,12 @@ package v1
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // StatementStatus Status for statement
 type StatementStatus struct {
-	// The lifecycle phase of the statement
+	// The lifecycle phase of the statement. `PENDING`: the statement has been submitted, resumed or changed, and is waiting to start executing. `RECONCILING`: the statement's job is being restored, cannot be found, or its state cannot be read, for example after its JobManager restarted or when the statement is redeployed from a savepoint. `RESTARTING`: the statement is restarting. `RUNNING`: the statement is executing. `COMPLETED`: the statement finished executing successfully. `DELETING`: the statement is being deleted. `FAILING`: the statement has failed and cleanup is in progress. `FAILED`: the statement has failed. `STOPPED`: the statement has been stopped. `UNKNOWN`: the statement's phase could not be determined.
 	Phase string `json:"phase"`
 	// Details about the execution status of the statement
 	Detail *string `json:"detail,omitempty"`
@@ -25,6 +26,10 @@ type StatementStatus struct {
 	// Warning message indicating the displayed status may be stale, for example, when the backing Kubernetes cluster is disconnected or decommissioned.
 	Warning *string `json:"warning,omitempty"`
 	SavepointSchedule *SavepointScheduleStatus `json:"savepointSchedule,omitempty"`
+	// The Kafka read positions this statement had reached, as a map of topic name to an offset string in the same format as the `scan.startup.specific-offsets` table option, for example `partition:0,offset:100;partition:1,offset:200`.  Not populated when the statement stops. The positions are read from the savepoint taken when the statement was last stopped, and only once another statement names this one in its `sql.tables.initial-offset-from` property; absent until then, even when that savepoint has completed. After the statement runs and is stopped again, absent until the newer savepoint is read the same way.  Only topics the statement read appear. A partition it had not read from yet appears as `offset:-2` when it was to start from the earliest offset; one that was to start from the latest or the committed offset is left out, and a topic whose partitions are all left out does not appear. A statement inheriting these offsets starts a partition left out of a listed topic from its committed group offset if there is one, otherwise from the earliest offset.  Available only while carry-over offsets is enabled (`cmf.sql.carry-over-offsets.enabled`), for detached statements reading Kafka tables, and when the statement's compute pool is configured to take a savepoint when a statement is stopped. Absent otherwise.
+	LatestOffsets *map[string]string `json:"latestOffsets,omitempty"`
+	// When `latestOffsets` was read from the savepoint. Absent while `latestOffsets` is absent.
+	LatestOffsetsTimestamp *time.Time `json:"latestOffsetsTimestamp,omitempty"`
 }
 
 // NewStatementStatus instantiates a new StatementStatus object
@@ -229,6 +234,70 @@ func (o *StatementStatus) SetSavepointSchedule(v SavepointScheduleStatus) {
 	o.SavepointSchedule = &v
 }
 
+// GetLatestOffsets returns the LatestOffsets field value if set, zero value otherwise.
+func (o *StatementStatus) GetLatestOffsets() map[string]string {
+	if o == nil || o.LatestOffsets == nil {
+		var ret map[string]string
+		return ret
+	}
+	return *o.LatestOffsets
+}
+
+// GetLatestOffsetsOk returns a tuple with the LatestOffsets field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementStatus) GetLatestOffsetsOk() (*map[string]string, bool) {
+	if o == nil || o.LatestOffsets == nil {
+		return nil, false
+	}
+	return o.LatestOffsets, true
+}
+
+// HasLatestOffsets returns a boolean if a field has been set.
+func (o *StatementStatus) HasLatestOffsets() bool {
+	if o != nil && o.LatestOffsets != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetLatestOffsets gets a reference to the given map[string]string and assigns it to the LatestOffsets field.
+func (o *StatementStatus) SetLatestOffsets(v map[string]string) {
+	o.LatestOffsets = &v
+}
+
+// GetLatestOffsetsTimestamp returns the LatestOffsetsTimestamp field value if set, zero value otherwise.
+func (o *StatementStatus) GetLatestOffsetsTimestamp() time.Time {
+	if o == nil || o.LatestOffsetsTimestamp == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.LatestOffsetsTimestamp
+}
+
+// GetLatestOffsetsTimestampOk returns a tuple with the LatestOffsetsTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementStatus) GetLatestOffsetsTimestampOk() (*time.Time, bool) {
+	if o == nil || o.LatestOffsetsTimestamp == nil {
+		return nil, false
+	}
+	return o.LatestOffsetsTimestamp, true
+}
+
+// HasLatestOffsetsTimestamp returns a boolean if a field has been set.
+func (o *StatementStatus) HasLatestOffsetsTimestamp() bool {
+	if o != nil && o.LatestOffsetsTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetLatestOffsetsTimestamp gets a reference to the given time.Time and assigns it to the LatestOffsetsTimestamp field.
+func (o *StatementStatus) SetLatestOffsetsTimestamp(v time.Time) {
+	o.LatestOffsetsTimestamp = &v
+}
+
 func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -248,6 +317,12 @@ func (o StatementStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.SavepointSchedule != nil {
 		toSerialize["savepointSchedule"] = o.SavepointSchedule
+	}
+	if o.LatestOffsets != nil {
+		toSerialize["latestOffsets"] = o.LatestOffsets
+	}
+	if o.LatestOffsetsTimestamp != nil {
+		toSerialize["latestOffsetsTimestamp"] = o.LatestOffsetsTimestamp
 	}
 	return json.Marshal(toSerialize)
 }
