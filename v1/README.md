@@ -87,7 +87,9 @@ Class | Method | HTTP request | Description
 *ArtifactsApi* | [**UpdateArtifact**](docs/ArtifactsApi.md#updateartifact) | **Put** /cmf/api/v1/environments/{envName}/artifacts/{artifactName} | Update an Artifact&#39;s labels and annotations, and/or upload a new version.
 *C3Api* | [**GetAuthConfig**](docs/C3Api.md#getauthconfig) | **Get** /cmf/api/v1/c3/auth-config | Discover the CMF authentication/authorization configuration.
 *C3Api* | [**GetC3Configuration**](docs/C3Api.md#getc3configuration) | **Get** /cmf/api/v1/c3/configuration | Retrieve the effective CMF runtime configuration.
-*C3Api* | [**GetC3LicenseInformation**](docs/C3Api.md#getc3licenseinformation) | **Get** /cmf/api/v1/c3/license | Retrieve license information for C3 integration.
+*C3Api* | [**GetC3LicenseInformation**](docs/C3Api.md#getc3licenseinformation) | **Get** /cmf/api/v1/c3/license | Retrieve license information for Confluent Control Center integration.
+*C3Api* | [**GetFeatures**](docs/C3Api.md#getfeatures) | **Get** /cmf/api/v1/c3/features | Discover which optional CMF UI features the deployment exposes.
+*C3Api* | [**GetFlinkConfigReference**](docs/C3Api.md#getflinkconfigreference) | **Get** /cmf/api/v1/c3/flink-config-references/{flinkVersionName} | Retrieve the reference of the Flink configuration options of a Flink version.
 *C3Api* | [**GetWhoami**](docs/C3Api.md#getwhoami) | **Get** /cmf/api/v1/c3/whoami | Return the authenticated principal&#39;s identity.
 *CMFInformationApi* | [**GetResourceInformation**](docs/CMFInformationApi.md#getresourceinformation) | **Get** /cmf/api/v1/resource-information | Retrieve resource information about the CMF deployment.
 *CMFInformationApi* | [**GetSystemInformation**](docs/CMFInformationApi.md#getsysteminformation) | **Get** /cmf/api/v1/system-information | Retrieve system information about the CMF deployment.
@@ -108,10 +110,14 @@ Class | Method | HTTP request | Description
 *FlinkApplicationsApi* | [**CreateOrUpdateApplication**](docs/FlinkApplicationsApi.md#createorupdateapplication) | **Post** /cmf/api/v1/environments/{envName}/applications | Creates a new Flink Application or updates an existing one in the given Environment.
 *FlinkApplicationsApi* | [**DeleteApplication**](docs/FlinkApplicationsApi.md#deleteapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName} | Deletes an Application of the given name in the given Environment.
 *FlinkApplicationsApi* | [**GetApplication**](docs/FlinkApplicationsApi.md#getapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName} | Retrieve an Application of the given name in the given Environment.
+*FlinkApplicationsApi* | [**GetApplicationAutoscaler**](docs/FlinkApplicationsApi.md#getapplicationautoscaler) | **Get** /cmf/api/v1alpha1/environments/{envName}/applications/{appName}/autoscaler | Get the current autoscaler state of the given Application
 *FlinkApplicationsApi* | [**GetApplicationEvents**](docs/FlinkApplicationsApi.md#getapplicationevents) | **Get** /cmf/api/v1alpha1/environments/{envName}/applications/{appName}/events | Get a paginated list of events of the given Application
 *FlinkApplicationsApi* | [**GetApplicationInstance**](docs/FlinkApplicationsApi.md#getapplicationinstance) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances/{instName} | Retrieve an Instance of an Application
 *FlinkApplicationsApi* | [**GetApplicationInstances**](docs/FlinkApplicationsApi.md#getapplicationinstances) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/instances | Get a paginated list of instances of the given Application
+*FlinkApplicationsApi* | [**GetApplicationResourceEvents**](docs/FlinkApplicationsApi.md#getapplicationresourceevents) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/events | Get a paginated list of events of the given Application
 *FlinkApplicationsApi* | [**GetApplications**](docs/FlinkApplicationsApi.md#getapplications) | **Get** /cmf/api/v1/environments/{envName}/applications | Retrieve a paginated list of all applications in the given Environment.
+*FlinkApplicationsApi* | [**GetPodLogs**](docs/FlinkApplicationsApi.md#getpodlogs) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/pod-logs | Get a snapshot of the container logs of one of the Application&#39;s pods
+*FlinkApplicationsApi* | [**ListApplicationPods**](docs/FlinkApplicationsApi.md#listapplicationpods) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/pods | List the Kubernetes pods the Application currently runs on
 *FlinkApplicationsApi* | [**StartApplication**](docs/FlinkApplicationsApi.md#startapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/start | Starts an earlier submitted Flink Application
 *FlinkApplicationsApi* | [**SuspendApplication**](docs/FlinkApplicationsApi.md#suspendapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/suspend | Suspends an earlier started Flink Application
 *KubernetesClustersApi* | [**GetKubernetesCluster**](docs/KubernetesClustersApi.md#getkubernetescluster) | **Get** /cmf/api/v1/kubernetes-clusters/{kubernetesClusterName} | Retrieve a Kubernetes cluster by name.
@@ -121,20 +127,26 @@ Class | Method | HTTP request | Description
 *SQLApi* | [**CreateKafkaCatalog**](docs/SQLApi.md#createkafkacatalog) | **Post** /cmf/api/v1/catalogs/kafka | Creates a new Kafka Catalog that can be referenced by Flink Statements
 *SQLApi* | [**CreateKafkaDatabase**](docs/SQLApi.md#createkafkadatabase) | **Post** /cmf/api/v1/catalogs/kafka/{catName}/databases | Creates a new Kafka Database
 *SQLApi* | [**CreateStatement**](docs/SQLApi.md#createstatement) | **Post** /cmf/api/v1/environments/{envName}/statements | Creates a new Flink SQL Statement in the given Environment.
-*SQLApi* | [**DeleteComputePool**](docs/SQLApi.md#deletecomputepool) | **Delete** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Deletes the ComputePool of the given name in the given Environment.
+*SQLApi* | [**DeleteComputePool**](docs/SQLApi.md#deletecomputepool) | **Delete** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Requests deletion of the ComputePool of the given name in the given Environment.
 *SQLApi* | [**DeleteKafkaCatalog**](docs/SQLApi.md#deletekafkacatalog) | **Delete** /cmf/api/v1/catalogs/kafka/{catName} | Deletes the Kafka Catalog of the given name.
 *SQLApi* | [**DeleteKafkaDatabase**](docs/SQLApi.md#deletekafkadatabase) | **Delete** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Deletes the Kafka Database of the given name in the given KafkaCatalog.
-*SQLApi* | [**DeleteStatement**](docs/SQLApi.md#deletestatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Deletes the Statement of the given name in the given Environment.
+*SQLApi* | [**DeleteStatement**](docs/SQLApi.md#deletestatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Requests deletion of the Statement of the given name in the given Environment.
 *SQLApi* | [**GetComputePool**](docs/SQLApi.md#getcomputepool) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Retrieve the Compute Pool of the given name in the given Environment.
+*SQLApi* | [**GetComputePoolEvents**](docs/SQLApi.md#getcomputepoolevents) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/events | Get a paginated list of events of the given Compute Pool
+*SQLApi* | [**GetComputePoolPodLogs**](docs/SQLApi.md#getcomputepoolpodlogs) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pod-logs | Get a snapshot of the container logs of one of the compute pool&#39;s session cluster pods
 *SQLApi* | [**GetComputePools**](docs/SQLApi.md#getcomputepools) | **Get** /cmf/api/v1/environments/{envName}/compute-pools | Retrieve a paginated list of Compute Pools in the given Environment.
 *SQLApi* | [**GetKafkaCatalog**](docs/SQLApi.md#getkafkacatalog) | **Get** /cmf/api/v1/catalogs/kafka/{catName} | Retrieve the Kafka Catalog of the given name.
 *SQLApi* | [**GetKafkaCatalogs**](docs/SQLApi.md#getkafkacatalogs) | **Get** /cmf/api/v1/catalogs/kafka | Retrieve a paginated list of Kafka Catalogs
 *SQLApi* | [**GetKafkaDatabase**](docs/SQLApi.md#getkafkadatabase) | **Get** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Retrieve the Kafka Database of the given name in the given KafkaCatalog.
 *SQLApi* | [**GetKafkaDatabases**](docs/SQLApi.md#getkafkadatabases) | **Get** /cmf/api/v1/catalogs/kafka/{catName}/databases | Retrieve a paginated list of Kafka Databases
 *SQLApi* | [**GetStatement**](docs/SQLApi.md#getstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName} | Retrieve the Statement of the given name in the given Environment.
+*SQLApi* | [**GetStatementEvents**](docs/SQLApi.md#getstatementevents) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/events | Get a paginated list of events of the given Statement
 *SQLApi* | [**GetStatementExceptions**](docs/SQLApi.md#getstatementexceptions) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/exceptions | Retrieves the last 10 exceptions of the Statement with the given name in the given Environment.
+*SQLApi* | [**GetStatementPodLogs**](docs/SQLApi.md#getstatementpodlogs) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/pod-logs | Get a snapshot of the container logs of one of the statement&#39;s pods
 *SQLApi* | [**GetStatementResult**](docs/SQLApi.md#getstatementresult) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/results | Retrieve the result of the interactive Statement with the given name in the given Environment.
 *SQLApi* | [**GetStatements**](docs/SQLApi.md#getstatements) | **Get** /cmf/api/v1/environments/{envName}/statements | Retrieve a paginated list of Statements in the given Environment.
+*SQLApi* | [**ListComputePoolPods**](docs/SQLApi.md#listcomputepoolpods) | **Get** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName}/pods | List the Kubernetes pods of the compute pool&#39;s session cluster
+*SQLApi* | [**ListStatementPods**](docs/SQLApi.md#liststatementpods) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/pods | List the Kubernetes pods the statement runs on
 *SQLApi* | [**UpdateComputePool**](docs/SQLApi.md#updatecomputepool) | **Put** /cmf/api/v1/environments/{envName}/compute-pools/{computePoolName} | Updates the compute pool specified using its name and environment.
 *SQLApi* | [**UpdateKafkaCatalog**](docs/SQLApi.md#updatekafkacatalog) | **Put** /cmf/api/v1/catalogs/kafka/{catName} | Updates a KafkaCatalog of the given name.
 *SQLApi* | [**UpdateKafkaDatabase**](docs/SQLApi.md#updatekafkadatabase) | **Put** /cmf/api/v1/catalogs/kafka/{catName}/databases/{dbName} | Updates a KafkaDatabase of the given name in the given KafkaCatalog.
@@ -143,8 +155,8 @@ Class | Method | HTTP request | Description
 *SavepointsApi* | [**BulkDeleteSavepointsForFlinkStatement**](docs/SavepointsApi.md#bulkdeletesavepointsforflinkstatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Bulk-delete Savepoints for the given Statement filtered by source and age.
 *SavepointsApi* | [**CreateSavepointForFlinkApplication**](docs/SavepointsApi.md#createsavepointforflinkapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints | Creates a new Savepoint for the given Application in the given Environment.
 *SavepointsApi* | [**CreateSavepointForFlinkStatement**](docs/SavepointsApi.md#createsavepointforflinkstatement) | **Post** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints | Creates a new Savepoint for the given Statement in the given Environment.
-*SavepointsApi* | [**DeleteSavepointForFlinkApplication**](docs/SavepointsApi.md#deletesavepointforflinkapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Application in the given Environment.
-*SavepointsApi* | [**DeleteSavepointForFlinkStatement**](docs/SavepointsApi.md#deletesavepointforflinkstatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Deletes the Savepoint of the given name for the given Statement in the given Environment.
+*SavepointsApi* | [**DeleteSavepointForFlinkApplication**](docs/SavepointsApi.md#deletesavepointforflinkapplication) | **Delete** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Requests deletion of the Savepoint of the given name for the given Application in the given Environment.
+*SavepointsApi* | [**DeleteSavepointForFlinkStatement**](docs/SavepointsApi.md#deletesavepointforflinkstatement) | **Delete** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Requests deletion of the Savepoint of the given name for the given Statement in the given Environment.
 *SavepointsApi* | [**DetachSavepointFromFlinkApplication**](docs/SavepointsApi.md#detachsavepointfromflinkapplication) | **Post** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName}/detach | Detaches the Savepoint of the given name for the given Application in the given Environment.
 *SavepointsApi* | [**GetSavepointForFlinkApplication**](docs/SavepointsApi.md#getsavepointforflinkapplication) | **Get** /cmf/api/v1/environments/{envName}/applications/{appName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Application in the given Environment.
 *SavepointsApi* | [**GetSavepointForFlinkStatement**](docs/SavepointsApi.md#getsavepointforflinkstatement) | **Get** /cmf/api/v1/environments/{envName}/statements/{stmtName}/savepoints/{savepointName} | Retrieve the Savepoint of the given name for the given Statement in the given Environment.
@@ -158,6 +170,13 @@ Class | Method | HTTP request | Description
 *SecretsApi* | [**GetSecrets**](docs/SecretsApi.md#getsecrets) | **Get** /cmf/api/v1/secrets | Retrieve a paginated list of all secrets. Note that the actual secret data is masked for security reasons.
 *SecretsApi* | [**UpdateSecret**](docs/SecretsApi.md#updatesecret) | **Put** /cmf/api/v1/secrets/{secretName} | Update the secret.
 *ServiceAccountAllowlistApi* | [**ListServiceAccountAllowlistEntries**](docs/ServiceAccountAllowlistApi.md#listserviceaccountallowlistentries) | **Get** /cmf/api/v1/service-account-allowlist-entries | List the service accounts on the grandfathered allowlist.
+*SqlAssistantApi* | [**CreateSqlAssistantConversation**](docs/SqlAssistantApi.md#createsqlassistantconversation) | **Post** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations | Create a SQL assistant conversation; the server assigns its name
+*SqlAssistantApi* | [**CreateSqlAssistantTurn**](docs/SqlAssistantApi.md#createsqlassistantturn) | **Post** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations/{conversationName}/turns | Append a turn; when a model call is due the server calls the model and returns its response
+*SqlAssistantApi* | [**DeleteSqlAssistantConversation**](docs/SqlAssistantApi.md#deletesqlassistantconversation) | **Delete** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations/{conversationName} | Delete a conversation and all its turns
+*SqlAssistantApi* | [**GetSqlAssistantConversation**](docs/SqlAssistantApi.md#getsqlassistantconversation) | **Get** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations/{conversationName} | Get a SQL assistant conversation
+*SqlAssistantApi* | [**ListSqlAssistantConversations**](docs/SqlAssistantApi.md#listsqlassistantconversations) | **Get** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations | List the SQL assistant conversations in an environment
+*SqlAssistantApi* | [**ListSqlAssistantTurns**](docs/SqlAssistantApi.md#listsqlassistantturns) | **Get** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations/{conversationName}/turns | List the turns of a conversation, in order
+*SqlAssistantApi* | [**UpdateSqlAssistantConversation**](docs/SqlAssistantApi.md#updatesqlassistantconversation) | **Put** /cmf/api/v1alpha1/environments/{envName}/sql-assistant/conversations/{conversationName} | Update a conversation&#39;s compute pool, title, labels and annotations
 
 
 ## Documentation For Models
@@ -182,12 +201,23 @@ Class | Method | HTTP request | Description
  - [ArtifactsPage](docs/ArtifactsPage.md)
  - [ArtifactsPageAllOf](docs/ArtifactsPageAllOf.md)
  - [AuthConfig](docs/AuthConfig.md)
+ - [AutoscalerDelayedScaleDown](docs/AutoscalerDelayedScaleDown.md)
+ - [AutoscalerDelayedVertex](docs/AutoscalerDelayedVertex.md)
+ - [AutoscalerMetadata](docs/AutoscalerMetadata.md)
+ - [AutoscalerMetricSample](docs/AutoscalerMetricSample.md)
+ - [AutoscalerParallelismRecommendation](docs/AutoscalerParallelismRecommendation.md)
+ - [AutoscalerScalingEvent](docs/AutoscalerScalingEvent.md)
+ - [AutoscalerStatus](docs/AutoscalerStatus.md)
  - [BlackoutWindow](docs/BlackoutWindow.md)
  - [C3Configuration](docs/C3Configuration.md)
  - [C3ConfigurationProperty](docs/C3ConfigurationProperty.md)
  - [C3ConfigurationStatus](docs/C3ConfigurationStatus.md)
+ - [C3Features](docs/C3Features.md)
+ - [C3FeaturesMetadata](docs/C3FeaturesMetadata.md)
+ - [C3FeaturesStatus](docs/C3FeaturesStatus.md)
  - [C3LicenseInformation](docs/C3LicenseInformation.md)
  - [C3LicenseInformationStatus](docs/C3LicenseInformationStatus.md)
+ - [C3SqlAssistantFeature](docs/C3SqlAssistantFeature.md)
  - [CatalogMetadata](docs/CatalogMetadata.md)
  - [CatalogPageMetadata](docs/CatalogPageMetadata.md)
  - [ComputePool](docs/ComputePool.md)
@@ -206,7 +236,10 @@ Class | Method | HTTP request | Description
  - [Environment](docs/Environment.md)
  - [EnvironmentCatalog](docs/EnvironmentCatalog.md)
  - [EnvironmentCatalogDatabase](docs/EnvironmentCatalogDatabase.md)
+ - [EnvironmentCatalogModel](docs/EnvironmentCatalogModel.md)
+ - [EnvironmentDeletionResult](docs/EnvironmentDeletionResult.md)
  - [EnvironmentMetadata](docs/EnvironmentMetadata.md)
+ - [EnvironmentResourceNames](docs/EnvironmentResourceNames.md)
  - [EnvironmentSecretMapping](docs/EnvironmentSecretMapping.md)
  - [EnvironmentSecretMappingMetadata](docs/EnvironmentSecretMappingMetadata.md)
  - [EnvironmentSecretMappingSpec](docs/EnvironmentSecretMappingSpec.md)
@@ -227,9 +260,21 @@ Class | Method | HTTP request | Description
  - [EventsPageMetadata](docs/EventsPageMetadata.md)
  - [FlinkApplication](docs/FlinkApplication.md)
  - [FlinkApplicationAllOf](docs/FlinkApplicationAllOf.md)
+ - [FlinkApplicationAutoscaler](docs/FlinkApplicationAutoscaler.md)
  - [FlinkApplicationEvent](docs/FlinkApplicationEvent.md)
  - [FlinkApplicationInstance](docs/FlinkApplicationInstance.md)
  - [FlinkApplicationInstanceAllOf](docs/FlinkApplicationInstanceAllOf.md)
+ - [FlinkClusterPod](docs/FlinkClusterPod.md)
+ - [FlinkClusterPodContainer](docs/FlinkClusterPodContainer.md)
+ - [FlinkClusterPodMetadata](docs/FlinkClusterPodMetadata.md)
+ - [FlinkClusterPodStatus](docs/FlinkClusterPodStatus.md)
+ - [FlinkClusterPodsPage](docs/FlinkClusterPodsPage.md)
+ - [FlinkClusterPodsPageAllOf](docs/FlinkClusterPodsPageAllOf.md)
+ - [FlinkClusterPodsPageMetadata](docs/FlinkClusterPodsPageMetadata.md)
+ - [FlinkConfigOption](docs/FlinkConfigOption.md)
+ - [FlinkConfigReference](docs/FlinkConfigReference.md)
+ - [FlinkConfigReferenceMetadata](docs/FlinkConfigReferenceMetadata.md)
+ - [FlinkConfigReferenceStatus](docs/FlinkConfigReferenceStatus.md)
  - [GetResourceBase](docs/GetResourceBase.md)
  - [JobManager](docs/JobManager.md)
  - [KafkaCatalog](docs/KafkaCatalog.md)
@@ -247,6 +292,7 @@ Class | Method | HTTP request | Description
  - [KafkaDatabaseStatus](docs/KafkaDatabaseStatus.md)
  - [KafkaDatabasesPage](docs/KafkaDatabasesPage.md)
  - [KafkaDatabasesPageAllOf](docs/KafkaDatabasesPageAllOf.md)
+ - [KubernetesCleanupFailure](docs/KubernetesCleanupFailure.md)
  - [KubernetesCluster](docs/KubernetesCluster.md)
  - [KubernetesClusterAllOf](docs/KubernetesClusterAllOf.md)
  - [KubernetesClusterMetadata](docs/KubernetesClusterMetadata.md)
@@ -258,6 +304,10 @@ Class | Method | HTTP request | Description
  - [KubernetesClustersPageAllOf](docs/KubernetesClustersPageAllOf.md)
  - [KubernetesClustersPageMetadata](docs/KubernetesClustersPageMetadata.md)
  - [KubernetesNamespace](docs/KubernetesNamespace.md)
+ - [KubernetesPodLogs](docs/KubernetesPodLogs.md)
+ - [KubernetesPodLogsMetadata](docs/KubernetesPodLogsMetadata.md)
+ - [KubernetesPodLogsStatus](docs/KubernetesPodLogsStatus.md)
+ - [MetadataSyncStatus](docs/MetadataSyncStatus.md)
  - [ModelError](docs/ModelError.md)
  - [Pageable](docs/Pageable.md)
  - [PaginationResponse](docs/PaginationResponse.md)
@@ -265,6 +315,12 @@ Class | Method | HTTP request | Description
  - [PostEnvironmentAllOf](docs/PostEnvironmentAllOf.md)
  - [PostResourceBase](docs/PostResourceBase.md)
  - [ResourceBaseV2](docs/ResourceBaseV2.md)
+ - [ResourceEvent](docs/ResourceEvent.md)
+ - [ResourceEventMetadata](docs/ResourceEventMetadata.md)
+ - [ResourceEventStatus](docs/ResourceEventStatus.md)
+ - [ResourceEventsPage](docs/ResourceEventsPage.md)
+ - [ResourceEventsPageAllOf](docs/ResourceEventsPageAllOf.md)
+ - [ResourceEventsPageMetadata](docs/ResourceEventsPageMetadata.md)
  - [ResourceInformation](docs/ResourceInformation.md)
  - [ResourceInformationStatus](docs/ResourceInformationStatus.md)
  - [ResourceSummary](docs/ResourceSummary.md)
@@ -279,6 +335,7 @@ Class | Method | HTTP request | Description
  - [SavepointAllOf](docs/SavepointAllOf.md)
  - [SavepointMetadata](docs/SavepointMetadata.md)
  - [SavepointPageMetadata](docs/SavepointPageMetadata.md)
+ - [SavepointReference](docs/SavepointReference.md)
  - [SavepointRetention](docs/SavepointRetention.md)
  - [SavepointScheduleConfig](docs/SavepointScheduleConfig.md)
  - [SavepointScheduleStatus](docs/SavepointScheduleStatus.md)
@@ -304,6 +361,23 @@ Class | Method | HTTP request | Description
  - [ServiceAccountAllowlistEntryMetadata](docs/ServiceAccountAllowlistEntryMetadata.md)
  - [ServiceAccountAllowlistEntryStatus](docs/ServiceAccountAllowlistEntryStatus.md)
  - [Sort](docs/Sort.md)
+ - [SqlAssistantCollectBound](docs/SqlAssistantCollectBound.md)
+ - [SqlAssistantConversation](docs/SqlAssistantConversation.md)
+ - [SqlAssistantConversationMetadata](docs/SqlAssistantConversationMetadata.md)
+ - [SqlAssistantConversationSpec](docs/SqlAssistantConversationSpec.md)
+ - [SqlAssistantConversationStatus](docs/SqlAssistantConversationStatus.md)
+ - [SqlAssistantConversationsPage](docs/SqlAssistantConversationsPage.md)
+ - [SqlAssistantConversationsPageAllOf](docs/SqlAssistantConversationsPageAllOf.md)
+ - [SqlAssistantConversationsPageMetadata](docs/SqlAssistantConversationsPageMetadata.md)
+ - [SqlAssistantQuestion](docs/SqlAssistantQuestion.md)
+ - [SqlAssistantQuestionOption](docs/SqlAssistantQuestionOption.md)
+ - [SqlAssistantTurn](docs/SqlAssistantTurn.md)
+ - [SqlAssistantTurnMetadata](docs/SqlAssistantTurnMetadata.md)
+ - [SqlAssistantTurnSpec](docs/SqlAssistantTurnSpec.md)
+ - [SqlAssistantTurnStatus](docs/SqlAssistantTurnStatus.md)
+ - [SqlAssistantTurnsPage](docs/SqlAssistantTurnsPage.md)
+ - [SqlAssistantTurnsPageAllOf](docs/SqlAssistantTurnsPageAllOf.md)
+ - [SqlAssistantTurnsPageMetadata](docs/SqlAssistantTurnsPageMetadata.md)
  - [Statement](docs/Statement.md)
  - [StatementAllOf](docs/StatementAllOf.md)
  - [StatementDefaults](docs/StatementDefaults.md)

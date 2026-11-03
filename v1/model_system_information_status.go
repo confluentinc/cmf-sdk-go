@@ -20,6 +20,10 @@ type SystemInformationStatus struct {
 	Version *string `json:"version,omitempty"`
 	// Git commit hash of the CMF application
 	Revision *string `json:"revision,omitempty"`
+	// Identifier of this CMF instance in its authorization cluster scope. Pass this as the `cmf` key in the `clusters` object of any Metadata Service RBAC request addressed to this CMF instance (for example the Confluent CLI's `--cmf` flag). Null when authorizationMode is NONE.
+	CmfClusterId NullableString `json:"cmfClusterId,omitempty"`
+	// How this CMF instance resolves RBAC authorization decisions. NONE -- authorization is not configured, or is configured but not enforced (cmf.authorization.enforce: false). CMF -- CMF's own embedded Metadata Service makes authorization decisions. CP_MDS -- an external Metadata Service makes authorization decisions. MIGRATION -- an external Metadata Service still makes authorization decisions, while CMF's embedded Metadata Service is also running so role bindings can be prepared ahead of switching to CMF.
+	AuthorizationMode *string `json:"authorizationMode,omitempty"`
 }
 
 // NewSystemInformationStatus instantiates a new SystemInformationStatus object
@@ -103,6 +107,80 @@ func (o *SystemInformationStatus) SetRevision(v string) {
 	o.Revision = &v
 }
 
+// GetCmfClusterId returns the CmfClusterId field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *SystemInformationStatus) GetCmfClusterId() string {
+	if o == nil || o.CmfClusterId.Get() == nil {
+		var ret string
+		return ret
+	}
+	return *o.CmfClusterId.Get()
+}
+
+// GetCmfClusterIdOk returns a tuple with the CmfClusterId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *SystemInformationStatus) GetCmfClusterIdOk() (*string, bool) {
+	if o == nil  {
+		return nil, false
+	}
+	return o.CmfClusterId.Get(), o.CmfClusterId.IsSet()
+}
+
+// HasCmfClusterId returns a boolean if a field has been set.
+func (o *SystemInformationStatus) HasCmfClusterId() bool {
+	if o != nil && o.CmfClusterId.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetCmfClusterId gets a reference to the given NullableString and assigns it to the CmfClusterId field.
+func (o *SystemInformationStatus) SetCmfClusterId(v string) {
+	o.CmfClusterId.Set(&v)
+}
+// SetCmfClusterIdNil sets the value for CmfClusterId to be an explicit nil
+func (o *SystemInformationStatus) SetCmfClusterIdNil() {
+	o.CmfClusterId.Set(nil)
+}
+
+// UnsetCmfClusterId ensures that no value is present for CmfClusterId, not even an explicit nil
+func (o *SystemInformationStatus) UnsetCmfClusterId() {
+	o.CmfClusterId.Unset()
+}
+
+// GetAuthorizationMode returns the AuthorizationMode field value if set, zero value otherwise.
+func (o *SystemInformationStatus) GetAuthorizationMode() string {
+	if o == nil || o.AuthorizationMode == nil {
+		var ret string
+		return ret
+	}
+	return *o.AuthorizationMode
+}
+
+// GetAuthorizationModeOk returns a tuple with the AuthorizationMode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SystemInformationStatus) GetAuthorizationModeOk() (*string, bool) {
+	if o == nil || o.AuthorizationMode == nil {
+		return nil, false
+	}
+	return o.AuthorizationMode, true
+}
+
+// HasAuthorizationMode returns a boolean if a field has been set.
+func (o *SystemInformationStatus) HasAuthorizationMode() bool {
+	if o != nil && o.AuthorizationMode != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAuthorizationMode gets a reference to the given string and assigns it to the AuthorizationMode field.
+func (o *SystemInformationStatus) SetAuthorizationMode(v string) {
+	o.AuthorizationMode = &v
+}
+
 func (o SystemInformationStatus) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Version != nil {
@@ -110,6 +188,12 @@ func (o SystemInformationStatus) MarshalJSON() ([]byte, error) {
 	}
 	if o.Revision != nil {
 		toSerialize["revision"] = o.Revision
+	}
+	if o.CmfClusterId.IsSet() {
+		toSerialize["cmfClusterId"] = o.CmfClusterId.Get()
+	}
+	if o.AuthorizationMode != nil {
+		toSerialize["authorizationMode"] = o.AuthorizationMode
 	}
 	return json.Marshal(toSerialize)
 }

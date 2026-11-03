@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Reason** | Pointer to **string** | The FKO event reason (e.g., ValidationError, CrashLoopBackOff, Missing, ScalingReport, AutoscalerError). The event category is conveyed by status.type. | [optional] 
+**Reason** | Pointer to **string** | The FKO event reason (e.g., ValidationError, CrashLoopBackOff, Missing, JobStatusChanged, ScalingReport, AutoscalerError). The event category is conveyed by status.type. | [optional] 
 **Message** | Pointer to **string** | The full raw K8s event message content | [optional] 
 
 ## Methods

@@ -6,9 +6,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **State** | Pointer to **string** | Lifecycle state of the schedule. | [optional] [readonly] 
 **LastTriggerTime** | Pointer to **time.Time** | Time at which the trigger task last attempted to create a savepoint, i.e. the last fire that passed the blackout, resource-ready and in-flight guards. Skipped fires do not update this field, and it reflects the attempt regardless of whether the savepoint request succeeded. Use lastCompletedTime to know when a savepoint last completed.  | [optional] [readonly] 
-**NextTriggerTime** | Pointer to **time.Time** | Next time at which the schedule will be evaluated for a trigger. | [optional] [readonly] 
+**NextTriggerTime** | Pointer to **time.Time** | Next time at which the schedule will be evaluated for a trigger. Null when the schedule is paused or disabled (see state), or could not be started (see lastErrorMessage).  | [optional] [readonly] 
 **LastCompletedTime** | Pointer to **time.Time** | Time at which the most recent savepoint for this resource completed successfully, across all sources (scheduled, manual, or adopted), or null if none has completed yet. This is the freshness signal the schedule&#39;s SLA check is measured against.  | [optional] [readonly] 
-**LastErrorMessage** | Pointer to **string** | Last failure observed by the trigger task, or null if healthy. | [optional] [readonly] 
+**LastErrorMessage** | Pointer to **string** | Last failure observed for the schedule, such as a failed savepoint trigger or a schedule that could not be started (e.g. a cron expression with no upcoming fire time), or null if healthy.  | [optional] [readonly] 
 
 ## Methods
 

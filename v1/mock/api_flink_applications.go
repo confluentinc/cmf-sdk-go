@@ -32,6 +32,12 @@ type MockFlinkApplicationsApi struct {
 	lockGetApplicationExecute sync.Mutex
 	GetApplicationExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkApplication, *net_http.Response, error)
 
+	lockGetApplicationAutoscaler sync.Mutex
+	GetApplicationAutoscalerFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest
+
+	lockGetApplicationAutoscalerExecute sync.Mutex
+	GetApplicationAutoscalerExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkApplicationAutoscaler, *net_http.Response, error)
+
 	lockGetApplicationEvents sync.Mutex
 	GetApplicationEventsFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationEventsRequest
 
@@ -50,11 +56,29 @@ type MockFlinkApplicationsApi struct {
 	lockGetApplicationInstancesExecute sync.Mutex
 	GetApplicationInstancesExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationInstancesRequest) (github_com_confluentinc_cmf_sdk_go_v1.ApplicationInstancesPage, *net_http.Response, error)
 
+	lockGetApplicationResourceEvents sync.Mutex
+	GetApplicationResourceEventsFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest
+
+	lockGetApplicationResourceEventsExecute sync.Mutex
+	GetApplicationResourceEventsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error)
+
 	lockGetApplications sync.Mutex
 	GetApplicationsFunc func(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationsRequest
 
 	lockGetApplicationsExecute sync.Mutex
 	GetApplicationsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ApplicationsPage, *net_http.Response, error)
+
+	lockGetPodLogs sync.Mutex
+	GetPodLogsFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest
+
+	lockGetPodLogsExecute sync.Mutex
+	GetPodLogsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error)
+
+	lockListApplicationPods sync.Mutex
+	ListApplicationPodsFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest
+
+	lockListApplicationPodsExecute sync.Mutex
+	ListApplicationPodsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error)
 
 	lockStartApplication sync.Mutex
 	StartApplicationFunc func(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiStartApplicationRequest
@@ -92,6 +116,14 @@ type MockFlinkApplicationsApi struct {
 		GetApplicationExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationRequest
 		}
+		GetApplicationAutoscaler []struct {
+			Ctx     context.Context
+			EnvName string
+			AppName string
+		}
+		GetApplicationAutoscalerExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest
+		}
 		GetApplicationEvents []struct {
 			Ctx     context.Context
 			EnvName string
@@ -117,12 +149,36 @@ type MockFlinkApplicationsApi struct {
 		GetApplicationInstancesExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationInstancesRequest
 		}
+		GetApplicationResourceEvents []struct {
+			Ctx     context.Context
+			EnvName string
+			AppName string
+		}
+		GetApplicationResourceEventsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest
+		}
 		GetApplications []struct {
 			Ctx     context.Context
 			EnvName string
 		}
 		GetApplicationsExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationsRequest
+		}
+		GetPodLogs []struct {
+			Ctx     context.Context
+			EnvName string
+			AppName string
+		}
+		GetPodLogsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest
+		}
+		ListApplicationPods []struct {
+			Ctx     context.Context
+			EnvName string
+			AppName string
+		}
+		ListApplicationPodsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest
 		}
 		StartApplication []struct {
 			Ctx     context.Context
@@ -386,6 +442,88 @@ func (m *MockFlinkApplicationsApi) GetApplicationExecuteCalls() []struct {
 	return m.calls.GetApplicationExecute
 }
 
+// GetApplicationAutoscaler mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscaler(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest {
+	m.lockGetApplicationAutoscaler.Lock()
+	defer m.lockGetApplicationAutoscaler.Unlock()
+
+	if m.GetApplicationAutoscalerFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetApplicationAutoscalerFunc is nil but MockFlinkApplicationsApi.GetApplicationAutoscaler was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+		AppName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+		AppName: appName,
+	}
+
+	m.calls.GetApplicationAutoscaler = append(m.calls.GetApplicationAutoscaler, call)
+
+	return m.GetApplicationAutoscalerFunc(ctx, envName, appName)
+}
+
+// GetApplicationAutoscalerCalled returns true if GetApplicationAutoscaler was called at least once.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscalerCalled() bool {
+	m.lockGetApplicationAutoscaler.Lock()
+	defer m.lockGetApplicationAutoscaler.Unlock()
+
+	return len(m.calls.GetApplicationAutoscaler) > 0
+}
+
+// GetApplicationAutoscalerCalls returns the calls made to GetApplicationAutoscaler.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscalerCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+	AppName string
+} {
+	m.lockGetApplicationAutoscaler.Lock()
+	defer m.lockGetApplicationAutoscaler.Unlock()
+
+	return m.calls.GetApplicationAutoscaler
+}
+
+// GetApplicationAutoscalerExecute mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscalerExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkApplicationAutoscaler, *net_http.Response, error) {
+	m.lockGetApplicationAutoscalerExecute.Lock()
+	defer m.lockGetApplicationAutoscalerExecute.Unlock()
+
+	if m.GetApplicationAutoscalerExecuteFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetApplicationAutoscalerExecuteFunc is nil but MockFlinkApplicationsApi.GetApplicationAutoscalerExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetApplicationAutoscalerExecute = append(m.calls.GetApplicationAutoscalerExecute, call)
+
+	return m.GetApplicationAutoscalerExecuteFunc(r)
+}
+
+// GetApplicationAutoscalerExecuteCalled returns true if GetApplicationAutoscalerExecute was called at least once.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscalerExecuteCalled() bool {
+	m.lockGetApplicationAutoscalerExecute.Lock()
+	defer m.lockGetApplicationAutoscalerExecute.Unlock()
+
+	return len(m.calls.GetApplicationAutoscalerExecute) > 0
+}
+
+// GetApplicationAutoscalerExecuteCalls returns the calls made to GetApplicationAutoscalerExecute.
+func (m *MockFlinkApplicationsApi) GetApplicationAutoscalerExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationAutoscalerRequest
+} {
+	m.lockGetApplicationAutoscalerExecute.Lock()
+	defer m.lockGetApplicationAutoscalerExecute.Unlock()
+
+	return m.calls.GetApplicationAutoscalerExecute
+}
+
 // GetApplicationEvents mocks base method by wrapping the associated func.
 func (m *MockFlinkApplicationsApi) GetApplicationEvents(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationEventsRequest {
 	m.lockGetApplicationEvents.Lock()
@@ -635,6 +773,88 @@ func (m *MockFlinkApplicationsApi) GetApplicationInstancesExecuteCalls() []struc
 	return m.calls.GetApplicationInstancesExecute
 }
 
+// GetApplicationResourceEvents mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEvents(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest {
+	m.lockGetApplicationResourceEvents.Lock()
+	defer m.lockGetApplicationResourceEvents.Unlock()
+
+	if m.GetApplicationResourceEventsFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetApplicationResourceEventsFunc is nil but MockFlinkApplicationsApi.GetApplicationResourceEvents was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+		AppName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+		AppName: appName,
+	}
+
+	m.calls.GetApplicationResourceEvents = append(m.calls.GetApplicationResourceEvents, call)
+
+	return m.GetApplicationResourceEventsFunc(ctx, envName, appName)
+}
+
+// GetApplicationResourceEventsCalled returns true if GetApplicationResourceEvents was called at least once.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEventsCalled() bool {
+	m.lockGetApplicationResourceEvents.Lock()
+	defer m.lockGetApplicationResourceEvents.Unlock()
+
+	return len(m.calls.GetApplicationResourceEvents) > 0
+}
+
+// GetApplicationResourceEventsCalls returns the calls made to GetApplicationResourceEvents.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEventsCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+	AppName string
+} {
+	m.lockGetApplicationResourceEvents.Lock()
+	defer m.lockGetApplicationResourceEvents.Unlock()
+
+	return m.calls.GetApplicationResourceEvents
+}
+
+// GetApplicationResourceEventsExecute mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEventsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error) {
+	m.lockGetApplicationResourceEventsExecute.Lock()
+	defer m.lockGetApplicationResourceEventsExecute.Unlock()
+
+	if m.GetApplicationResourceEventsExecuteFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetApplicationResourceEventsExecuteFunc is nil but MockFlinkApplicationsApi.GetApplicationResourceEventsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetApplicationResourceEventsExecute = append(m.calls.GetApplicationResourceEventsExecute, call)
+
+	return m.GetApplicationResourceEventsExecuteFunc(r)
+}
+
+// GetApplicationResourceEventsExecuteCalled returns true if GetApplicationResourceEventsExecute was called at least once.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEventsExecuteCalled() bool {
+	m.lockGetApplicationResourceEventsExecute.Lock()
+	defer m.lockGetApplicationResourceEventsExecute.Unlock()
+
+	return len(m.calls.GetApplicationResourceEventsExecute) > 0
+}
+
+// GetApplicationResourceEventsExecuteCalls returns the calls made to GetApplicationResourceEventsExecute.
+func (m *MockFlinkApplicationsApi) GetApplicationResourceEventsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationResourceEventsRequest
+} {
+	m.lockGetApplicationResourceEventsExecute.Lock()
+	defer m.lockGetApplicationResourceEventsExecute.Unlock()
+
+	return m.calls.GetApplicationResourceEventsExecute
+}
+
 // GetApplications mocks base method by wrapping the associated func.
 func (m *MockFlinkApplicationsApi) GetApplications(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetApplicationsRequest {
 	m.lockGetApplications.Lock()
@@ -712,6 +932,170 @@ func (m *MockFlinkApplicationsApi) GetApplicationsExecuteCalls() []struct {
 	defer m.lockGetApplicationsExecute.Unlock()
 
 	return m.calls.GetApplicationsExecute
+}
+
+// GetPodLogs mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetPodLogs(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest {
+	m.lockGetPodLogs.Lock()
+	defer m.lockGetPodLogs.Unlock()
+
+	if m.GetPodLogsFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetPodLogsFunc is nil but MockFlinkApplicationsApi.GetPodLogs was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+		AppName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+		AppName: appName,
+	}
+
+	m.calls.GetPodLogs = append(m.calls.GetPodLogs, call)
+
+	return m.GetPodLogsFunc(ctx, envName, appName)
+}
+
+// GetPodLogsCalled returns true if GetPodLogs was called at least once.
+func (m *MockFlinkApplicationsApi) GetPodLogsCalled() bool {
+	m.lockGetPodLogs.Lock()
+	defer m.lockGetPodLogs.Unlock()
+
+	return len(m.calls.GetPodLogs) > 0
+}
+
+// GetPodLogsCalls returns the calls made to GetPodLogs.
+func (m *MockFlinkApplicationsApi) GetPodLogsCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+	AppName string
+} {
+	m.lockGetPodLogs.Lock()
+	defer m.lockGetPodLogs.Unlock()
+
+	return m.calls.GetPodLogs
+}
+
+// GetPodLogsExecute mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) GetPodLogsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error) {
+	m.lockGetPodLogsExecute.Lock()
+	defer m.lockGetPodLogsExecute.Unlock()
+
+	if m.GetPodLogsExecuteFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.GetPodLogsExecuteFunc is nil but MockFlinkApplicationsApi.GetPodLogsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetPodLogsExecute = append(m.calls.GetPodLogsExecute, call)
+
+	return m.GetPodLogsExecuteFunc(r)
+}
+
+// GetPodLogsExecuteCalled returns true if GetPodLogsExecute was called at least once.
+func (m *MockFlinkApplicationsApi) GetPodLogsExecuteCalled() bool {
+	m.lockGetPodLogsExecute.Lock()
+	defer m.lockGetPodLogsExecute.Unlock()
+
+	return len(m.calls.GetPodLogsExecute) > 0
+}
+
+// GetPodLogsExecuteCalls returns the calls made to GetPodLogsExecute.
+func (m *MockFlinkApplicationsApi) GetPodLogsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetPodLogsRequest
+} {
+	m.lockGetPodLogsExecute.Lock()
+	defer m.lockGetPodLogsExecute.Unlock()
+
+	return m.calls.GetPodLogsExecute
+}
+
+// ListApplicationPods mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) ListApplicationPods(ctx context.Context, envName, appName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest {
+	m.lockListApplicationPods.Lock()
+	defer m.lockListApplicationPods.Unlock()
+
+	if m.ListApplicationPodsFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.ListApplicationPodsFunc is nil but MockFlinkApplicationsApi.ListApplicationPods was called.")
+	}
+
+	call := struct {
+		Ctx     context.Context
+		EnvName string
+		AppName string
+	}{
+		Ctx:     ctx,
+		EnvName: envName,
+		AppName: appName,
+	}
+
+	m.calls.ListApplicationPods = append(m.calls.ListApplicationPods, call)
+
+	return m.ListApplicationPodsFunc(ctx, envName, appName)
+}
+
+// ListApplicationPodsCalled returns true if ListApplicationPods was called at least once.
+func (m *MockFlinkApplicationsApi) ListApplicationPodsCalled() bool {
+	m.lockListApplicationPods.Lock()
+	defer m.lockListApplicationPods.Unlock()
+
+	return len(m.calls.ListApplicationPods) > 0
+}
+
+// ListApplicationPodsCalls returns the calls made to ListApplicationPods.
+func (m *MockFlinkApplicationsApi) ListApplicationPodsCalls() []struct {
+	Ctx     context.Context
+	EnvName string
+	AppName string
+} {
+	m.lockListApplicationPods.Lock()
+	defer m.lockListApplicationPods.Unlock()
+
+	return m.calls.ListApplicationPods
+}
+
+// ListApplicationPodsExecute mocks base method by wrapping the associated func.
+func (m *MockFlinkApplicationsApi) ListApplicationPodsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error) {
+	m.lockListApplicationPodsExecute.Lock()
+	defer m.lockListApplicationPodsExecute.Unlock()
+
+	if m.ListApplicationPodsExecuteFunc == nil {
+		panic("mocker: MockFlinkApplicationsApi.ListApplicationPodsExecuteFunc is nil but MockFlinkApplicationsApi.ListApplicationPodsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.ListApplicationPodsExecute = append(m.calls.ListApplicationPodsExecute, call)
+
+	return m.ListApplicationPodsExecuteFunc(r)
+}
+
+// ListApplicationPodsExecuteCalled returns true if ListApplicationPodsExecute was called at least once.
+func (m *MockFlinkApplicationsApi) ListApplicationPodsExecuteCalled() bool {
+	m.lockListApplicationPodsExecute.Lock()
+	defer m.lockListApplicationPodsExecute.Unlock()
+
+	return len(m.calls.ListApplicationPodsExecute) > 0
+}
+
+// ListApplicationPodsExecuteCalls returns the calls made to ListApplicationPodsExecute.
+func (m *MockFlinkApplicationsApi) ListApplicationPodsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiListApplicationPodsRequest
+} {
+	m.lockListApplicationPodsExecute.Lock()
+	defer m.lockListApplicationPodsExecute.Unlock()
+
+	return m.calls.ListApplicationPodsExecute
 }
 
 // StartApplication mocks base method by wrapping the associated func.
@@ -898,6 +1282,12 @@ func (m *MockFlinkApplicationsApi) Reset() {
 	m.lockGetApplicationExecute.Lock()
 	m.calls.GetApplicationExecute = nil
 	m.lockGetApplicationExecute.Unlock()
+	m.lockGetApplicationAutoscaler.Lock()
+	m.calls.GetApplicationAutoscaler = nil
+	m.lockGetApplicationAutoscaler.Unlock()
+	m.lockGetApplicationAutoscalerExecute.Lock()
+	m.calls.GetApplicationAutoscalerExecute = nil
+	m.lockGetApplicationAutoscalerExecute.Unlock()
 	m.lockGetApplicationEvents.Lock()
 	m.calls.GetApplicationEvents = nil
 	m.lockGetApplicationEvents.Unlock()
@@ -916,12 +1306,30 @@ func (m *MockFlinkApplicationsApi) Reset() {
 	m.lockGetApplicationInstancesExecute.Lock()
 	m.calls.GetApplicationInstancesExecute = nil
 	m.lockGetApplicationInstancesExecute.Unlock()
+	m.lockGetApplicationResourceEvents.Lock()
+	m.calls.GetApplicationResourceEvents = nil
+	m.lockGetApplicationResourceEvents.Unlock()
+	m.lockGetApplicationResourceEventsExecute.Lock()
+	m.calls.GetApplicationResourceEventsExecute = nil
+	m.lockGetApplicationResourceEventsExecute.Unlock()
 	m.lockGetApplications.Lock()
 	m.calls.GetApplications = nil
 	m.lockGetApplications.Unlock()
 	m.lockGetApplicationsExecute.Lock()
 	m.calls.GetApplicationsExecute = nil
 	m.lockGetApplicationsExecute.Unlock()
+	m.lockGetPodLogs.Lock()
+	m.calls.GetPodLogs = nil
+	m.lockGetPodLogs.Unlock()
+	m.lockGetPodLogsExecute.Lock()
+	m.calls.GetPodLogsExecute = nil
+	m.lockGetPodLogsExecute.Unlock()
+	m.lockListApplicationPods.Lock()
+	m.calls.ListApplicationPods = nil
+	m.lockListApplicationPods.Unlock()
+	m.lockListApplicationPodsExecute.Lock()
+	m.calls.ListApplicationPodsExecute = nil
+	m.lockListApplicationPodsExecute.Unlock()
 	m.lockStartApplication.Lock()
 	m.calls.StartApplication = nil
 	m.lockStartApplication.Unlock()

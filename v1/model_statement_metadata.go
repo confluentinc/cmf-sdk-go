@@ -22,6 +22,8 @@ type StatementMetadata struct {
 	CreationTimestamp *string `json:"creationTimestamp,omitempty"`
 	// Timestamp when the Statement was updated last
 	UpdateTimestamp *string `json:"updateTimestamp,omitempty"`
+	// Timestamp when deletion of this Statement was requested. Only present while a shared statement's underlying Kubernetes resources are being deleted; absent if no deletion has been requested.
+	DeletionRequestedTimestamp *string `json:"deletionRequestedTimestamp,omitempty"`
 	// Unique identifier of the Statement
 	Uid *string `json:"uid,omitempty"`
 	// Labels of the Statement
@@ -136,6 +138,38 @@ func (o *StatementMetadata) SetUpdateTimestamp(v string) {
 	o.UpdateTimestamp = &v
 }
 
+// GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field value if set, zero value otherwise.
+func (o *StatementMetadata) GetDeletionRequestedTimestamp() string {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		var ret string
+		return ret
+	}
+	return *o.DeletionRequestedTimestamp
+}
+
+// GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StatementMetadata) GetDeletionRequestedTimestampOk() (*string, bool) {
+	if o == nil || o.DeletionRequestedTimestamp == nil {
+		return nil, false
+	}
+	return o.DeletionRequestedTimestamp, true
+}
+
+// HasDeletionRequestedTimestamp returns a boolean if a field has been set.
+func (o *StatementMetadata) HasDeletionRequestedTimestamp() bool {
+	if o != nil && o.DeletionRequestedTimestamp != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDeletionRequestedTimestamp gets a reference to the given string and assigns it to the DeletionRequestedTimestamp field.
+func (o *StatementMetadata) SetDeletionRequestedTimestamp(v string) {
+	o.DeletionRequestedTimestamp = &v
+}
+
 // GetUid returns the Uid field value if set, zero value otherwise.
 func (o *StatementMetadata) GetUid() string {
 	if o == nil || o.Uid == nil {
@@ -242,6 +276,9 @@ func (o StatementMetadata) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpdateTimestamp != nil {
 		toSerialize["updateTimestamp"] = o.UpdateTimestamp
+	}
+	if o.DeletionRequestedTimestamp != nil {
+		toSerialize["deletionRequestedTimestamp"] = o.DeletionRequestedTimestamp
 	}
 	if o.Uid != nil {
 		toSerialize["uid"] = o.Uid

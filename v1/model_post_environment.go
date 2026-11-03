@@ -19,13 +19,13 @@ type PostEnvironment struct {
 	// A unique name for the resource.
 	// Deprecated
 	Name *string `json:"name,omitempty"`
-	// Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \"spec\" object here whose fields are merged into every application spec at deploy time. May include a \"savepointSchedule\" inside \"spec\" (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself. 
+	// Environment-level defaults for FlinkApplication specs. The structure mirrors a FlinkApplication itself: place a \"spec\" object here whose fields are merged into every application spec at deploy time. May include a \"savepointSchedule\" inside \"spec\" (see SavepointScheduleConfig) to set the default periodic savepoint schedule for every application in the environment; env-level schedule fields take precedence over any value set on the resource itself.  Some keys in \"spec.flinkConfiguration\" are reserved and cannot be set: `web.submit.jar-sources`, and every key beginning with `kubernetes.operator.cmf.`. An environment that sets any of these is rejected with 400, with an error naming the key. 
 	FlinkApplicationDefaults *map[string]interface{} `json:"flinkApplicationDefaults,omitempty"`
 	// Immutable after creation. Cannot be changed via update.
 	KubernetesNamespace *string `json:"kubernetesNamespace,omitempty"`
 	// Immutable after creation. Cannot be changed via update. Defaults to \"default-k8s-cluster\" if not provided on creation.
 	KubernetesClusterName *string `json:"kubernetesClusterName,omitempty"`
-	// the defaults as YAML or JSON for ComputePools
+	// the defaults as YAML or JSON for ComputePools  Some keys in \"clusterSpec.flinkConfiguration\" are reserved and cannot be set: `web.submit.jar-sources`, `pipeline.jars`, `pipeline.classpaths`, every key beginning with `kubernetes.operator.cmf.`, and every key beginning with `user.artifacts.` except `user.artifacts.max-concurrent-fetches`, `user.artifacts.max-size`, `user.artifacts.fetch-timeout`, `user.artifacts.base-dir`, `user.artifacts.http-headers` and `user.artifacts.raw-http-enabled`. An environment that sets one is rejected with an error naming the key.  An update that changes the Flink version of a compute pool (`clusterSpec.flinkVersion`, or the Flink line of a `cp-flink-sql` image in `clusterSpec.image`) is rejected while Statements on that pool can still be resumed or rescaled; the error names them. 
 	ComputePoolDefaults *map[string]interface{} `json:"computePoolDefaults,omitempty"`
 	StatementDefaults *AllStatementDefaults1 `json:"statementDefaults,omitempty"`
 	Metadata *EnvironmentMetadata `json:"metadata,omitempty"`

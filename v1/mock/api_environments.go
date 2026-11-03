@@ -30,7 +30,7 @@ type MockEnvironmentsApi struct {
 	DeleteEnvironmentFunc func(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentRequest
 
 	lockDeleteEnvironmentExecute sync.Mutex
-	DeleteEnvironmentExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentRequest) (*net_http.Response, error)
+	DeleteEnvironmentExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentRequest) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentDeletionResult, *net_http.Response, error)
 
 	lockDeleteEnvironmentSecretMapping sync.Mutex
 	DeleteEnvironmentSecretMappingFunc func(ctx context.Context, envName, name string) github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentSecretMappingRequest
@@ -346,7 +346,7 @@ func (m *MockEnvironmentsApi) DeleteEnvironmentCalls() []struct {
 }
 
 // DeleteEnvironmentExecute mocks base method by wrapping the associated func.
-func (m *MockEnvironmentsApi) DeleteEnvironmentExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentRequest) (*net_http.Response, error) {
+func (m *MockEnvironmentsApi) DeleteEnvironmentExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiDeleteEnvironmentRequest) (github_com_confluentinc_cmf_sdk_go_v1.EnvironmentDeletionResult, *net_http.Response, error) {
 	m.lockDeleteEnvironmentExecute.Lock()
 	defer m.lockDeleteEnvironmentExecute.Unlock()
 

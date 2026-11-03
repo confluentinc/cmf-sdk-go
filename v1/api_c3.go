@@ -16,6 +16,7 @@ import (
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
+	"strings"
 )
 
 // Linger please
@@ -56,7 +57,7 @@ the SPA can read it before it holds a token.
 	GetC3ConfigurationExecute(r ApiGetC3ConfigurationRequest) (C3Configuration, *_nethttp.Response, error)
 
 	/*
-	GetC3LicenseInformation Retrieve license information for C3 integration.
+	GetC3LicenseInformation Retrieve license information for Confluent Control Center integration.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @return ApiGetC3LicenseInformationRequest
@@ -66,6 +67,43 @@ the SPA can read it before it holds a token.
 	// GetC3LicenseInformationExecute executes the request
 	//  @return C3LicenseInformation
 	GetC3LicenseInformationExecute(r ApiGetC3LicenseInformationRequest) (C3LicenseInformation, *_nethttp.Response, error)
+
+	/*
+	GetFeatures Discover which optional CMF UI features the deployment exposes.
+
+	Reports which optional capabilities this CMF deployment has enabled, so the cmf-ui
+single-page app can adapt what it offers before it calls a feature's endpoints -- for
+example, showing an explanatory screen for a disabled feature instead of letting its
+views fail. Each flag reflects a deployment-wide configuration switch, not the caller's
+permissions.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @return ApiGetFeaturesRequest
+	*/
+	GetFeatures(ctx _context.Context) ApiGetFeaturesRequest
+
+	// GetFeaturesExecute executes the request
+	//  @return C3Features
+	GetFeaturesExecute(r ApiGetFeaturesRequest) (C3Features, *_nethttp.Response, error)
+
+	/*
+	GetFlinkConfigReference Retrieve the reference of the Flink configuration options of a Flink version.
+
+	Lists the configuration options that Apache Flink documents for a Flink version,
+followed by the Flink Kubernetes Operator options that can be set in a resource's
+flinkConfiguration. The CMF UI uses it to suggest and explain configuration keys. The
+reference comes from the documentation of the Flink release line, not of a specific
+patch release.
+
+	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	 @param flinkVersionName The Flink version, as in the flinkVersion of a compute pool's or application's spec, for example v1_19.
+	 @return ApiGetFlinkConfigReferenceRequest
+	*/
+	GetFlinkConfigReference(ctx _context.Context, flinkVersionName string) ApiGetFlinkConfigReferenceRequest
+
+	// GetFlinkConfigReferenceExecute executes the request
+	//  @return FlinkConfigReference
+	GetFlinkConfigReferenceExecute(r ApiGetFlinkConfigReferenceRequest) (FlinkConfigReference, *_nethttp.Response, error)
 
 	/*
 	GetWhoami Return the authenticated principal's identity.
@@ -335,7 +373,7 @@ func (r ApiGetC3LicenseInformationRequest) Execute() (C3LicenseInformation, *_ne
 }
 
 /*
-GetC3LicenseInformation Retrieve license information for C3 integration.
+GetC3LicenseInformation Retrieve license information for Confluent Control Center integration.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetC3LicenseInformationRequest
@@ -408,6 +446,250 @@ func (a *C3ApiService) GetC3LicenseInformationExecute(r ApiGetC3LicenseInformati
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetFeaturesRequest struct {
+	ctx _context.Context
+	ApiService C3Api
+}
+
+
+func (r ApiGetFeaturesRequest) Execute() (C3Features, *_nethttp.Response, error) {
+	return r.ApiService.GetFeaturesExecute(r)
+}
+
+/*
+GetFeatures Discover which optional CMF UI features the deployment exposes.
+
+Reports which optional capabilities this CMF deployment has enabled, so the cmf-ui
+single-page app can adapt what it offers before it calls a feature's endpoints -- for
+example, showing an explanatory screen for a disabled feature instead of letting its
+views fail. Each flag reflects a deployment-wide configuration switch, not the caller's
+permissions.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetFeaturesRequest
+*/
+func (a *C3ApiService) GetFeatures(ctx _context.Context) ApiGetFeaturesRequest {
+	return ApiGetFeaturesRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return C3Features
+func (a *C3ApiService) GetFeaturesExecute(r ApiGetFeaturesRequest) (C3Features, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  C3Features
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "C3ApiService.GetFeatures")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/c3/features"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetFlinkConfigReferenceRequest struct {
+	ctx _context.Context
+	ApiService C3Api
+	flinkVersionName string
+}
+
+
+func (r ApiGetFlinkConfigReferenceRequest) Execute() (FlinkConfigReference, *_nethttp.Response, error) {
+	return r.ApiService.GetFlinkConfigReferenceExecute(r)
+}
+
+/*
+GetFlinkConfigReference Retrieve the reference of the Flink configuration options of a Flink version.
+
+Lists the configuration options that Apache Flink documents for a Flink version,
+followed by the Flink Kubernetes Operator options that can be set in a resource's
+flinkConfiguration. The CMF UI uses it to suggest and explain configuration keys. The
+reference comes from the documentation of the Flink release line, not of a specific
+patch release.
+
+ @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param flinkVersionName The Flink version, as in the flinkVersion of a compute pool's or application's spec, for example v1_19.
+ @return ApiGetFlinkConfigReferenceRequest
+*/
+func (a *C3ApiService) GetFlinkConfigReference(ctx _context.Context, flinkVersionName string) ApiGetFlinkConfigReferenceRequest {
+	return ApiGetFlinkConfigReferenceRequest{
+		ApiService: a,
+		ctx: ctx,
+		flinkVersionName: flinkVersionName,
+	}
+}
+
+// Execute executes the request
+//  @return FlinkConfigReference
+func (a *C3ApiService) GetFlinkConfigReferenceExecute(r ApiGetFlinkConfigReferenceRequest) (FlinkConfigReference, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  FlinkConfigReference
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "C3ApiService.GetFlinkConfigReference")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/cmf/api/v1/c3/flink-config-references/{flinkVersionName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"flinkVersionName"+"}", _neturl.PathEscape(parameterToString(r.flinkVersionName, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
