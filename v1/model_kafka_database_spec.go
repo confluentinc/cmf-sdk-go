@@ -19,6 +19,8 @@ type KafkaDatabaseSpec struct {
 	KafkaCluster KafkaDatabaseSpecKafkaCluster `json:"kafkaCluster"`
 	// List of environments that have permission to execute DDL statements on the tables of this database
 	DdlEnvironments *[]string `json:"ddlEnvironments,omitempty"`
+	// How the tables of this database find their Schema Registry subjects. TopicNameStrategy, the default, uses the <topic>-key and <topic>-value subjects. AssociatedNameStrategy uses the topic-subject associations of the Kafka cluster: CREATE TABLE has the brokers register the schemas, and tables read the subjects their topic is associated with.  AssociatedNameStrategy needs Schema Registry 8.3.1 or later, Kafka brokers with topic-subject associations enabled, and Flink 2.x. CMF accepts AssociatedNameStrategy only when it has a Flink 2.x SQL compiler (the default compilers include one). Statements on Flink 1.x compute pools fail when they use the tables of such a database, whether they name the database or run in it. A statement that sets a catalog but no database runs in the catalog's earliest-created database that its environment can connect to.  If an update leaves out this field, the database keeps its current strategy. Keep the strategy once the database has tables, since it decides where those tables find their schemas. 
+	SubjectNameStrategy *string `json:"subjectNameStrategy,omitempty"`
 }
 
 // NewKafkaDatabaseSpec instantiates a new KafkaDatabaseSpec object
@@ -95,6 +97,38 @@ func (o *KafkaDatabaseSpec) SetDdlEnvironments(v []string) {
 	o.DdlEnvironments = &v
 }
 
+// GetSubjectNameStrategy returns the SubjectNameStrategy field value if set, zero value otherwise.
+func (o *KafkaDatabaseSpec) GetSubjectNameStrategy() string {
+	if o == nil || o.SubjectNameStrategy == nil {
+		var ret string
+		return ret
+	}
+	return *o.SubjectNameStrategy
+}
+
+// GetSubjectNameStrategyOk returns a tuple with the SubjectNameStrategy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *KafkaDatabaseSpec) GetSubjectNameStrategyOk() (*string, bool) {
+	if o == nil || o.SubjectNameStrategy == nil {
+		return nil, false
+	}
+	return o.SubjectNameStrategy, true
+}
+
+// HasSubjectNameStrategy returns a boolean if a field has been set.
+func (o *KafkaDatabaseSpec) HasSubjectNameStrategy() bool {
+	if o != nil && o.SubjectNameStrategy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSubjectNameStrategy gets a reference to the given string and assigns it to the SubjectNameStrategy field.
+func (o *KafkaDatabaseSpec) SetSubjectNameStrategy(v string) {
+	o.SubjectNameStrategy = &v
+}
+
 func (o KafkaDatabaseSpec) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -102,6 +136,9 @@ func (o KafkaDatabaseSpec) MarshalJSON() ([]byte, error) {
 	}
 	if o.DdlEnvironments != nil {
 		toSerialize["ddlEnvironments"] = o.DdlEnvironments
+	}
+	if o.SubjectNameStrategy != nil {
+		toSerialize["subjectNameStrategy"] = o.SubjectNameStrategy
 	}
 	return json.Marshal(toSerialize)
 }

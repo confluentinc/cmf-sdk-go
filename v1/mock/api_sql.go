@@ -68,6 +68,18 @@ type MockSQLApi struct {
 	lockGetComputePoolExecute sync.Mutex
 	GetComputePoolExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolRequest) (github_com_confluentinc_cmf_sdk_go_v1.ComputePool, *net_http.Response, error)
 
+	lockGetComputePoolEvents sync.Mutex
+	GetComputePoolEventsFunc func(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest
+
+	lockGetComputePoolEventsExecute sync.Mutex
+	GetComputePoolEventsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error)
+
+	lockGetComputePoolPodLogs sync.Mutex
+	GetComputePoolPodLogsFunc func(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest
+
+	lockGetComputePoolPodLogsExecute sync.Mutex
+	GetComputePoolPodLogsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error)
+
 	lockGetComputePools sync.Mutex
 	GetComputePoolsFunc func(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolsRequest
 
@@ -104,11 +116,23 @@ type MockSQLApi struct {
 	lockGetStatementExecute sync.Mutex
 	GetStatementExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementRequest) (github_com_confluentinc_cmf_sdk_go_v1.Statement, *net_http.Response, error)
 
+	lockGetStatementEvents sync.Mutex
+	GetStatementEventsFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest
+
+	lockGetStatementEventsExecute sync.Mutex
+	GetStatementEventsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error)
+
 	lockGetStatementExceptions sync.Mutex
 	GetStatementExceptionsFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementExceptionsRequest
 
 	lockGetStatementExceptionsExecute sync.Mutex
 	GetStatementExceptionsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementExceptionsRequest) (github_com_confluentinc_cmf_sdk_go_v1.StatementExceptionList, *net_http.Response, error)
+
+	lockGetStatementPodLogs sync.Mutex
+	GetStatementPodLogsFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest
+
+	lockGetStatementPodLogsExecute sync.Mutex
+	GetStatementPodLogsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error)
 
 	lockGetStatementResult sync.Mutex
 	GetStatementResultFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementResultRequest
@@ -121,6 +145,18 @@ type MockSQLApi struct {
 
 	lockGetStatementsExecute sync.Mutex
 	GetStatementsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementsRequest) (github_com_confluentinc_cmf_sdk_go_v1.StatementsPage, *net_http.Response, error)
+
+	lockListComputePoolPods sync.Mutex
+	ListComputePoolPodsFunc func(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest
+
+	lockListComputePoolPodsExecute sync.Mutex
+	ListComputePoolPodsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error)
+
+	lockListStatementPods sync.Mutex
+	ListStatementPodsFunc func(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest
+
+	lockListStatementPodsExecute sync.Mutex
+	ListStatementPodsExecuteFunc func(r github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error)
 
 	lockUpdateComputePool sync.Mutex
 	UpdateComputePoolFunc func(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiUpdateComputePoolRequest
@@ -213,6 +249,22 @@ type MockSQLApi struct {
 		GetComputePoolExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolRequest
 		}
+		GetComputePoolEvents []struct {
+			Ctx             context.Context
+			EnvName         string
+			ComputePoolName string
+		}
+		GetComputePoolEventsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest
+		}
+		GetComputePoolPodLogs []struct {
+			Ctx             context.Context
+			EnvName         string
+			ComputePoolName string
+		}
+		GetComputePoolPodLogsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest
+		}
 		GetComputePools []struct {
 			Ctx     context.Context
 			EnvName string
@@ -256,6 +308,14 @@ type MockSQLApi struct {
 		GetStatementExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementRequest
 		}
+		GetStatementEvents []struct {
+			Ctx      context.Context
+			EnvName  string
+			StmtName string
+		}
+		GetStatementEventsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest
+		}
 		GetStatementExceptions []struct {
 			Ctx      context.Context
 			EnvName  string
@@ -263,6 +323,14 @@ type MockSQLApi struct {
 		}
 		GetStatementExceptionsExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementExceptionsRequest
+		}
+		GetStatementPodLogs []struct {
+			Ctx      context.Context
+			EnvName  string
+			StmtName string
+		}
+		GetStatementPodLogsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest
 		}
 		GetStatementResult []struct {
 			Ctx      context.Context
@@ -278,6 +346,22 @@ type MockSQLApi struct {
 		}
 		GetStatementsExecute []struct {
 			R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementsRequest
+		}
+		ListComputePoolPods []struct {
+			Ctx             context.Context
+			EnvName         string
+			ComputePoolName string
+		}
+		ListComputePoolPodsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest
+		}
+		ListStatementPods []struct {
+			Ctx      context.Context
+			EnvName  string
+			StmtName string
+		}
+		ListStatementPodsExecute []struct {
+			R github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest
 		}
 		UpdateComputePool []struct {
 			Ctx             context.Context
@@ -1033,6 +1117,170 @@ func (m *MockSQLApi) GetComputePoolExecuteCalls() []struct {
 	return m.calls.GetComputePoolExecute
 }
 
+// GetComputePoolEvents mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetComputePoolEvents(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest {
+	m.lockGetComputePoolEvents.Lock()
+	defer m.lockGetComputePoolEvents.Unlock()
+
+	if m.GetComputePoolEventsFunc == nil {
+		panic("mocker: MockSQLApi.GetComputePoolEventsFunc is nil but MockSQLApi.GetComputePoolEvents was called.")
+	}
+
+	call := struct {
+		Ctx             context.Context
+		EnvName         string
+		ComputePoolName string
+	}{
+		Ctx:             ctx,
+		EnvName:         envName,
+		ComputePoolName: computePoolName,
+	}
+
+	m.calls.GetComputePoolEvents = append(m.calls.GetComputePoolEvents, call)
+
+	return m.GetComputePoolEventsFunc(ctx, envName, computePoolName)
+}
+
+// GetComputePoolEventsCalled returns true if GetComputePoolEvents was called at least once.
+func (m *MockSQLApi) GetComputePoolEventsCalled() bool {
+	m.lockGetComputePoolEvents.Lock()
+	defer m.lockGetComputePoolEvents.Unlock()
+
+	return len(m.calls.GetComputePoolEvents) > 0
+}
+
+// GetComputePoolEventsCalls returns the calls made to GetComputePoolEvents.
+func (m *MockSQLApi) GetComputePoolEventsCalls() []struct {
+	Ctx             context.Context
+	EnvName         string
+	ComputePoolName string
+} {
+	m.lockGetComputePoolEvents.Lock()
+	defer m.lockGetComputePoolEvents.Unlock()
+
+	return m.calls.GetComputePoolEvents
+}
+
+// GetComputePoolEventsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetComputePoolEventsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error) {
+	m.lockGetComputePoolEventsExecute.Lock()
+	defer m.lockGetComputePoolEventsExecute.Unlock()
+
+	if m.GetComputePoolEventsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.GetComputePoolEventsExecuteFunc is nil but MockSQLApi.GetComputePoolEventsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetComputePoolEventsExecute = append(m.calls.GetComputePoolEventsExecute, call)
+
+	return m.GetComputePoolEventsExecuteFunc(r)
+}
+
+// GetComputePoolEventsExecuteCalled returns true if GetComputePoolEventsExecute was called at least once.
+func (m *MockSQLApi) GetComputePoolEventsExecuteCalled() bool {
+	m.lockGetComputePoolEventsExecute.Lock()
+	defer m.lockGetComputePoolEventsExecute.Unlock()
+
+	return len(m.calls.GetComputePoolEventsExecute) > 0
+}
+
+// GetComputePoolEventsExecuteCalls returns the calls made to GetComputePoolEventsExecute.
+func (m *MockSQLApi) GetComputePoolEventsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolEventsRequest
+} {
+	m.lockGetComputePoolEventsExecute.Lock()
+	defer m.lockGetComputePoolEventsExecute.Unlock()
+
+	return m.calls.GetComputePoolEventsExecute
+}
+
+// GetComputePoolPodLogs mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetComputePoolPodLogs(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest {
+	m.lockGetComputePoolPodLogs.Lock()
+	defer m.lockGetComputePoolPodLogs.Unlock()
+
+	if m.GetComputePoolPodLogsFunc == nil {
+		panic("mocker: MockSQLApi.GetComputePoolPodLogsFunc is nil but MockSQLApi.GetComputePoolPodLogs was called.")
+	}
+
+	call := struct {
+		Ctx             context.Context
+		EnvName         string
+		ComputePoolName string
+	}{
+		Ctx:             ctx,
+		EnvName:         envName,
+		ComputePoolName: computePoolName,
+	}
+
+	m.calls.GetComputePoolPodLogs = append(m.calls.GetComputePoolPodLogs, call)
+
+	return m.GetComputePoolPodLogsFunc(ctx, envName, computePoolName)
+}
+
+// GetComputePoolPodLogsCalled returns true if GetComputePoolPodLogs was called at least once.
+func (m *MockSQLApi) GetComputePoolPodLogsCalled() bool {
+	m.lockGetComputePoolPodLogs.Lock()
+	defer m.lockGetComputePoolPodLogs.Unlock()
+
+	return len(m.calls.GetComputePoolPodLogs) > 0
+}
+
+// GetComputePoolPodLogsCalls returns the calls made to GetComputePoolPodLogs.
+func (m *MockSQLApi) GetComputePoolPodLogsCalls() []struct {
+	Ctx             context.Context
+	EnvName         string
+	ComputePoolName string
+} {
+	m.lockGetComputePoolPodLogs.Lock()
+	defer m.lockGetComputePoolPodLogs.Unlock()
+
+	return m.calls.GetComputePoolPodLogs
+}
+
+// GetComputePoolPodLogsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetComputePoolPodLogsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error) {
+	m.lockGetComputePoolPodLogsExecute.Lock()
+	defer m.lockGetComputePoolPodLogsExecute.Unlock()
+
+	if m.GetComputePoolPodLogsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.GetComputePoolPodLogsExecuteFunc is nil but MockSQLApi.GetComputePoolPodLogsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetComputePoolPodLogsExecute = append(m.calls.GetComputePoolPodLogsExecute, call)
+
+	return m.GetComputePoolPodLogsExecuteFunc(r)
+}
+
+// GetComputePoolPodLogsExecuteCalled returns true if GetComputePoolPodLogsExecute was called at least once.
+func (m *MockSQLApi) GetComputePoolPodLogsExecuteCalled() bool {
+	m.lockGetComputePoolPodLogsExecute.Lock()
+	defer m.lockGetComputePoolPodLogsExecute.Unlock()
+
+	return len(m.calls.GetComputePoolPodLogsExecute) > 0
+}
+
+// GetComputePoolPodLogsExecuteCalls returns the calls made to GetComputePoolPodLogsExecute.
+func (m *MockSQLApi) GetComputePoolPodLogsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolPodLogsRequest
+} {
+	m.lockGetComputePoolPodLogsExecute.Lock()
+	defer m.lockGetComputePoolPodLogsExecute.Unlock()
+
+	return m.calls.GetComputePoolPodLogsExecute
+}
+
 // GetComputePools mocks base method by wrapping the associated func.
 func (m *MockSQLApi) GetComputePools(ctx context.Context, envName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetComputePoolsRequest {
 	m.lockGetComputePools.Lock()
@@ -1510,6 +1758,88 @@ func (m *MockSQLApi) GetStatementExecuteCalls() []struct {
 	return m.calls.GetStatementExecute
 }
 
+// GetStatementEvents mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetStatementEvents(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest {
+	m.lockGetStatementEvents.Lock()
+	defer m.lockGetStatementEvents.Unlock()
+
+	if m.GetStatementEventsFunc == nil {
+		panic("mocker: MockSQLApi.GetStatementEventsFunc is nil but MockSQLApi.GetStatementEvents was called.")
+	}
+
+	call := struct {
+		Ctx      context.Context
+		EnvName  string
+		StmtName string
+	}{
+		Ctx:      ctx,
+		EnvName:  envName,
+		StmtName: stmtName,
+	}
+
+	m.calls.GetStatementEvents = append(m.calls.GetStatementEvents, call)
+
+	return m.GetStatementEventsFunc(ctx, envName, stmtName)
+}
+
+// GetStatementEventsCalled returns true if GetStatementEvents was called at least once.
+func (m *MockSQLApi) GetStatementEventsCalled() bool {
+	m.lockGetStatementEvents.Lock()
+	defer m.lockGetStatementEvents.Unlock()
+
+	return len(m.calls.GetStatementEvents) > 0
+}
+
+// GetStatementEventsCalls returns the calls made to GetStatementEvents.
+func (m *MockSQLApi) GetStatementEventsCalls() []struct {
+	Ctx      context.Context
+	EnvName  string
+	StmtName string
+} {
+	m.lockGetStatementEvents.Lock()
+	defer m.lockGetStatementEvents.Unlock()
+
+	return m.calls.GetStatementEvents
+}
+
+// GetStatementEventsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetStatementEventsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest) (github_com_confluentinc_cmf_sdk_go_v1.ResourceEventsPage, *net_http.Response, error) {
+	m.lockGetStatementEventsExecute.Lock()
+	defer m.lockGetStatementEventsExecute.Unlock()
+
+	if m.GetStatementEventsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.GetStatementEventsExecuteFunc is nil but MockSQLApi.GetStatementEventsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetStatementEventsExecute = append(m.calls.GetStatementEventsExecute, call)
+
+	return m.GetStatementEventsExecuteFunc(r)
+}
+
+// GetStatementEventsExecuteCalled returns true if GetStatementEventsExecute was called at least once.
+func (m *MockSQLApi) GetStatementEventsExecuteCalled() bool {
+	m.lockGetStatementEventsExecute.Lock()
+	defer m.lockGetStatementEventsExecute.Unlock()
+
+	return len(m.calls.GetStatementEventsExecute) > 0
+}
+
+// GetStatementEventsExecuteCalls returns the calls made to GetStatementEventsExecute.
+func (m *MockSQLApi) GetStatementEventsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementEventsRequest
+} {
+	m.lockGetStatementEventsExecute.Lock()
+	defer m.lockGetStatementEventsExecute.Unlock()
+
+	return m.calls.GetStatementEventsExecute
+}
+
 // GetStatementExceptions mocks base method by wrapping the associated func.
 func (m *MockSQLApi) GetStatementExceptions(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementExceptionsRequest {
 	m.lockGetStatementExceptions.Lock()
@@ -1590,6 +1920,88 @@ func (m *MockSQLApi) GetStatementExceptionsExecuteCalls() []struct {
 	defer m.lockGetStatementExceptionsExecute.Unlock()
 
 	return m.calls.GetStatementExceptionsExecute
+}
+
+// GetStatementPodLogs mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetStatementPodLogs(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest {
+	m.lockGetStatementPodLogs.Lock()
+	defer m.lockGetStatementPodLogs.Unlock()
+
+	if m.GetStatementPodLogsFunc == nil {
+		panic("mocker: MockSQLApi.GetStatementPodLogsFunc is nil but MockSQLApi.GetStatementPodLogs was called.")
+	}
+
+	call := struct {
+		Ctx      context.Context
+		EnvName  string
+		StmtName string
+	}{
+		Ctx:      ctx,
+		EnvName:  envName,
+		StmtName: stmtName,
+	}
+
+	m.calls.GetStatementPodLogs = append(m.calls.GetStatementPodLogs, call)
+
+	return m.GetStatementPodLogsFunc(ctx, envName, stmtName)
+}
+
+// GetStatementPodLogsCalled returns true if GetStatementPodLogs was called at least once.
+func (m *MockSQLApi) GetStatementPodLogsCalled() bool {
+	m.lockGetStatementPodLogs.Lock()
+	defer m.lockGetStatementPodLogs.Unlock()
+
+	return len(m.calls.GetStatementPodLogs) > 0
+}
+
+// GetStatementPodLogsCalls returns the calls made to GetStatementPodLogs.
+func (m *MockSQLApi) GetStatementPodLogsCalls() []struct {
+	Ctx      context.Context
+	EnvName  string
+	StmtName string
+} {
+	m.lockGetStatementPodLogs.Lock()
+	defer m.lockGetStatementPodLogs.Unlock()
+
+	return m.calls.GetStatementPodLogs
+}
+
+// GetStatementPodLogsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) GetStatementPodLogsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest) (github_com_confluentinc_cmf_sdk_go_v1.KubernetesPodLogs, *net_http.Response, error) {
+	m.lockGetStatementPodLogsExecute.Lock()
+	defer m.lockGetStatementPodLogsExecute.Unlock()
+
+	if m.GetStatementPodLogsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.GetStatementPodLogsExecuteFunc is nil but MockSQLApi.GetStatementPodLogsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.GetStatementPodLogsExecute = append(m.calls.GetStatementPodLogsExecute, call)
+
+	return m.GetStatementPodLogsExecuteFunc(r)
+}
+
+// GetStatementPodLogsExecuteCalled returns true if GetStatementPodLogsExecute was called at least once.
+func (m *MockSQLApi) GetStatementPodLogsExecuteCalled() bool {
+	m.lockGetStatementPodLogsExecute.Lock()
+	defer m.lockGetStatementPodLogsExecute.Unlock()
+
+	return len(m.calls.GetStatementPodLogsExecute) > 0
+}
+
+// GetStatementPodLogsExecuteCalls returns the calls made to GetStatementPodLogsExecute.
+func (m *MockSQLApi) GetStatementPodLogsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiGetStatementPodLogsRequest
+} {
+	m.lockGetStatementPodLogsExecute.Lock()
+	defer m.lockGetStatementPodLogsExecute.Unlock()
+
+	return m.calls.GetStatementPodLogsExecute
 }
 
 // GetStatementResult mocks base method by wrapping the associated func.
@@ -1751,6 +2163,170 @@ func (m *MockSQLApi) GetStatementsExecuteCalls() []struct {
 	defer m.lockGetStatementsExecute.Unlock()
 
 	return m.calls.GetStatementsExecute
+}
+
+// ListComputePoolPods mocks base method by wrapping the associated func.
+func (m *MockSQLApi) ListComputePoolPods(ctx context.Context, envName, computePoolName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest {
+	m.lockListComputePoolPods.Lock()
+	defer m.lockListComputePoolPods.Unlock()
+
+	if m.ListComputePoolPodsFunc == nil {
+		panic("mocker: MockSQLApi.ListComputePoolPodsFunc is nil but MockSQLApi.ListComputePoolPods was called.")
+	}
+
+	call := struct {
+		Ctx             context.Context
+		EnvName         string
+		ComputePoolName string
+	}{
+		Ctx:             ctx,
+		EnvName:         envName,
+		ComputePoolName: computePoolName,
+	}
+
+	m.calls.ListComputePoolPods = append(m.calls.ListComputePoolPods, call)
+
+	return m.ListComputePoolPodsFunc(ctx, envName, computePoolName)
+}
+
+// ListComputePoolPodsCalled returns true if ListComputePoolPods was called at least once.
+func (m *MockSQLApi) ListComputePoolPodsCalled() bool {
+	m.lockListComputePoolPods.Lock()
+	defer m.lockListComputePoolPods.Unlock()
+
+	return len(m.calls.ListComputePoolPods) > 0
+}
+
+// ListComputePoolPodsCalls returns the calls made to ListComputePoolPods.
+func (m *MockSQLApi) ListComputePoolPodsCalls() []struct {
+	Ctx             context.Context
+	EnvName         string
+	ComputePoolName string
+} {
+	m.lockListComputePoolPods.Lock()
+	defer m.lockListComputePoolPods.Unlock()
+
+	return m.calls.ListComputePoolPods
+}
+
+// ListComputePoolPodsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) ListComputePoolPodsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error) {
+	m.lockListComputePoolPodsExecute.Lock()
+	defer m.lockListComputePoolPodsExecute.Unlock()
+
+	if m.ListComputePoolPodsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.ListComputePoolPodsExecuteFunc is nil but MockSQLApi.ListComputePoolPodsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.ListComputePoolPodsExecute = append(m.calls.ListComputePoolPodsExecute, call)
+
+	return m.ListComputePoolPodsExecuteFunc(r)
+}
+
+// ListComputePoolPodsExecuteCalled returns true if ListComputePoolPodsExecute was called at least once.
+func (m *MockSQLApi) ListComputePoolPodsExecuteCalled() bool {
+	m.lockListComputePoolPodsExecute.Lock()
+	defer m.lockListComputePoolPodsExecute.Unlock()
+
+	return len(m.calls.ListComputePoolPodsExecute) > 0
+}
+
+// ListComputePoolPodsExecuteCalls returns the calls made to ListComputePoolPodsExecute.
+func (m *MockSQLApi) ListComputePoolPodsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiListComputePoolPodsRequest
+} {
+	m.lockListComputePoolPodsExecute.Lock()
+	defer m.lockListComputePoolPodsExecute.Unlock()
+
+	return m.calls.ListComputePoolPodsExecute
+}
+
+// ListStatementPods mocks base method by wrapping the associated func.
+func (m *MockSQLApi) ListStatementPods(ctx context.Context, envName, stmtName string) github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest {
+	m.lockListStatementPods.Lock()
+	defer m.lockListStatementPods.Unlock()
+
+	if m.ListStatementPodsFunc == nil {
+		panic("mocker: MockSQLApi.ListStatementPodsFunc is nil but MockSQLApi.ListStatementPods was called.")
+	}
+
+	call := struct {
+		Ctx      context.Context
+		EnvName  string
+		StmtName string
+	}{
+		Ctx:      ctx,
+		EnvName:  envName,
+		StmtName: stmtName,
+	}
+
+	m.calls.ListStatementPods = append(m.calls.ListStatementPods, call)
+
+	return m.ListStatementPodsFunc(ctx, envName, stmtName)
+}
+
+// ListStatementPodsCalled returns true if ListStatementPods was called at least once.
+func (m *MockSQLApi) ListStatementPodsCalled() bool {
+	m.lockListStatementPods.Lock()
+	defer m.lockListStatementPods.Unlock()
+
+	return len(m.calls.ListStatementPods) > 0
+}
+
+// ListStatementPodsCalls returns the calls made to ListStatementPods.
+func (m *MockSQLApi) ListStatementPodsCalls() []struct {
+	Ctx      context.Context
+	EnvName  string
+	StmtName string
+} {
+	m.lockListStatementPods.Lock()
+	defer m.lockListStatementPods.Unlock()
+
+	return m.calls.ListStatementPods
+}
+
+// ListStatementPodsExecute mocks base method by wrapping the associated func.
+func (m *MockSQLApi) ListStatementPodsExecute(r github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest) (github_com_confluentinc_cmf_sdk_go_v1.FlinkClusterPodsPage, *net_http.Response, error) {
+	m.lockListStatementPodsExecute.Lock()
+	defer m.lockListStatementPodsExecute.Unlock()
+
+	if m.ListStatementPodsExecuteFunc == nil {
+		panic("mocker: MockSQLApi.ListStatementPodsExecuteFunc is nil but MockSQLApi.ListStatementPodsExecute was called.")
+	}
+
+	call := struct {
+		R github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest
+	}{
+		R: r,
+	}
+
+	m.calls.ListStatementPodsExecute = append(m.calls.ListStatementPodsExecute, call)
+
+	return m.ListStatementPodsExecuteFunc(r)
+}
+
+// ListStatementPodsExecuteCalled returns true if ListStatementPodsExecute was called at least once.
+func (m *MockSQLApi) ListStatementPodsExecuteCalled() bool {
+	m.lockListStatementPodsExecute.Lock()
+	defer m.lockListStatementPodsExecute.Unlock()
+
+	return len(m.calls.ListStatementPodsExecute) > 0
+}
+
+// ListStatementPodsExecuteCalls returns the calls made to ListStatementPodsExecute.
+func (m *MockSQLApi) ListStatementPodsExecuteCalls() []struct {
+	R github_com_confluentinc_cmf_sdk_go_v1.ApiListStatementPodsRequest
+} {
+	m.lockListStatementPodsExecute.Lock()
+	defer m.lockListStatementPodsExecute.Unlock()
+
+	return m.calls.ListStatementPodsExecute
 }
 
 // UpdateComputePool mocks base method by wrapping the associated func.
@@ -2134,6 +2710,18 @@ func (m *MockSQLApi) Reset() {
 	m.lockGetComputePoolExecute.Lock()
 	m.calls.GetComputePoolExecute = nil
 	m.lockGetComputePoolExecute.Unlock()
+	m.lockGetComputePoolEvents.Lock()
+	m.calls.GetComputePoolEvents = nil
+	m.lockGetComputePoolEvents.Unlock()
+	m.lockGetComputePoolEventsExecute.Lock()
+	m.calls.GetComputePoolEventsExecute = nil
+	m.lockGetComputePoolEventsExecute.Unlock()
+	m.lockGetComputePoolPodLogs.Lock()
+	m.calls.GetComputePoolPodLogs = nil
+	m.lockGetComputePoolPodLogs.Unlock()
+	m.lockGetComputePoolPodLogsExecute.Lock()
+	m.calls.GetComputePoolPodLogsExecute = nil
+	m.lockGetComputePoolPodLogsExecute.Unlock()
 	m.lockGetComputePools.Lock()
 	m.calls.GetComputePools = nil
 	m.lockGetComputePools.Unlock()
@@ -2170,12 +2758,24 @@ func (m *MockSQLApi) Reset() {
 	m.lockGetStatementExecute.Lock()
 	m.calls.GetStatementExecute = nil
 	m.lockGetStatementExecute.Unlock()
+	m.lockGetStatementEvents.Lock()
+	m.calls.GetStatementEvents = nil
+	m.lockGetStatementEvents.Unlock()
+	m.lockGetStatementEventsExecute.Lock()
+	m.calls.GetStatementEventsExecute = nil
+	m.lockGetStatementEventsExecute.Unlock()
 	m.lockGetStatementExceptions.Lock()
 	m.calls.GetStatementExceptions = nil
 	m.lockGetStatementExceptions.Unlock()
 	m.lockGetStatementExceptionsExecute.Lock()
 	m.calls.GetStatementExceptionsExecute = nil
 	m.lockGetStatementExceptionsExecute.Unlock()
+	m.lockGetStatementPodLogs.Lock()
+	m.calls.GetStatementPodLogs = nil
+	m.lockGetStatementPodLogs.Unlock()
+	m.lockGetStatementPodLogsExecute.Lock()
+	m.calls.GetStatementPodLogsExecute = nil
+	m.lockGetStatementPodLogsExecute.Unlock()
 	m.lockGetStatementResult.Lock()
 	m.calls.GetStatementResult = nil
 	m.lockGetStatementResult.Unlock()
@@ -2188,6 +2788,18 @@ func (m *MockSQLApi) Reset() {
 	m.lockGetStatementsExecute.Lock()
 	m.calls.GetStatementsExecute = nil
 	m.lockGetStatementsExecute.Unlock()
+	m.lockListComputePoolPods.Lock()
+	m.calls.ListComputePoolPods = nil
+	m.lockListComputePoolPods.Unlock()
+	m.lockListComputePoolPodsExecute.Lock()
+	m.calls.ListComputePoolPodsExecute = nil
+	m.lockListComputePoolPodsExecute.Unlock()
+	m.lockListStatementPods.Lock()
+	m.calls.ListStatementPods = nil
+	m.lockListStatementPods.Unlock()
+	m.lockListStatementPodsExecute.Lock()
+	m.calls.ListStatementPodsExecute = nil
+	m.lockListStatementPodsExecute.Unlock()
 	m.lockUpdateComputePool.Lock()
 	m.calls.UpdateComputePool = nil
 	m.lockUpdateComputePool.Unlock()

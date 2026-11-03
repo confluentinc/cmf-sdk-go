@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Name** | **string** | Name of the Statement | 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the Statement was created | [optional] 
 **UpdateTimestamp** | Pointer to **string** | Timestamp when the Statement was updated last | [optional] 
+**DeletionRequestedTimestamp** | Pointer to **string** | Timestamp when deletion of this Statement was requested. Only present while a shared statement&#39;s underlying Kubernetes resources are being deleted; absent if no deletion has been requested. | [optional] 
 **Uid** | Pointer to **string** | Unique identifier of the Statement | [optional] 
 **Labels** | Pointer to **map[string]string** | Labels of the Statement | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the Statement | [optional] 
@@ -99,6 +100,31 @@ SetUpdateTimestamp sets UpdateTimestamp field to given value.
 `func (o *StatementMetadata) HasUpdateTimestamp() bool`
 
 HasUpdateTimestamp returns a boolean if a field has been set.
+
+### GetDeletionRequestedTimestamp
+
+`func (o *StatementMetadata) GetDeletionRequestedTimestamp() string`
+
+GetDeletionRequestedTimestamp returns the DeletionRequestedTimestamp field if non-nil, zero value otherwise.
+
+### GetDeletionRequestedTimestampOk
+
+`func (o *StatementMetadata) GetDeletionRequestedTimestampOk() (*string, bool)`
+
+GetDeletionRequestedTimestampOk returns a tuple with the DeletionRequestedTimestamp field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeletionRequestedTimestamp
+
+`func (o *StatementMetadata) SetDeletionRequestedTimestamp(v string)`
+
+SetDeletionRequestedTimestamp sets DeletionRequestedTimestamp field to given value.
+
+### HasDeletionRequestedTimestamp
+
+`func (o *StatementMetadata) HasDeletionRequestedTimestamp() bool`
+
+HasDeletionRequestedTimestamp returns a boolean if a field has been set.
 
 ### GetUid
 
