@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FlinkConfiguration** | Pointer to **map[string]string** | default Flink configuration for Statements | [optional] 
+**FlinkConfiguration** | Pointer to **map[string]string** | Default Flink configuration for Statements.  Some keys are reserved and cannot be set: &#x60;web.submit.jar-sources&#x60;, &#x60;pipeline.jars&#x60;, &#x60;pipeline.classpaths&#x60;, and every key beginning with &#x60;user.artifacts.&#x60; or &#x60;kubernetes.operator.cmf.&#x60;. An environment that sets one is rejected with an error naming the key.  A Statement keeps the &#x60;execution.runtime-mode&#x60; it was created with. An update that changes this key is rejected while Statements that can still be resumed or rescaled would run with the new value; the error names them.  | [optional] 
 **SavepointSchedule** | Pointer to [**SavepointScheduleConfig**](SavepointScheduleConfig.md) |  | [optional] 
 
 ## Methods

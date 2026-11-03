@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **Uid** | Pointer to **string** | Unique identifier of the Event. Identical to name. | [optional] 
 **CreationTimestamp** | Pointer to **string** | Timestamp when the Event was created | [optional] 
 **UpdateTimestamp** | Pointer to **time.Time** | Timestamp of the most recent occurrence of this event | [optional] 
-**FlinkApplicationInstance** | Pointer to **string** | Name of the FlinkApplicationInstance which this event is related to | [optional] 
+**FlinkApplicationInstance** | Pointer to **string** | UID of the FlinkApplicationInstance which this event is related to | [optional] 
 **Labels** | Pointer to **map[string]string** | Labels of the Event | [optional] 
 **Annotations** | Pointer to **map[string]string** | Annotations of the Event | [optional] 
 

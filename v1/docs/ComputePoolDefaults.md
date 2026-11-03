@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ComputePoolDefaults** | Pointer to **map[string]interface{}** | the defaults as YAML or JSON for ComputePools | [optional] 
+**ComputePoolDefaults** | Pointer to **map[string]interface{}** | the defaults as YAML or JSON for ComputePools  Some keys in \&quot;clusterSpec.flinkConfiguration\&quot; are reserved and cannot be set: &#x60;web.submit.jar-sources&#x60;, &#x60;pipeline.jars&#x60;, &#x60;pipeline.classpaths&#x60;, every key beginning with &#x60;kubernetes.operator.cmf.&#x60;, and every key beginning with &#x60;user.artifacts.&#x60; except &#x60;user.artifacts.max-concurrent-fetches&#x60;, &#x60;user.artifacts.max-size&#x60;, &#x60;user.artifacts.fetch-timeout&#x60;, &#x60;user.artifacts.base-dir&#x60;, &#x60;user.artifacts.http-headers&#x60; and &#x60;user.artifacts.raw-http-enabled&#x60;. An environment that sets one is rejected with an error naming the key.  An update that changes the Flink version of a compute pool (&#x60;clusterSpec.flinkVersion&#x60;, or the Flink line of a &#x60;cp-flink-sql&#x60; image in &#x60;clusterSpec.image&#x60;) is rejected while Statements on that pool can still be resumed or rescaled; the error names them.  | [optional] 
 
 ## Methods
 

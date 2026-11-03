@@ -84,7 +84,9 @@ type SavepointsApi interface {
 	CreateSavepointForFlinkStatementExecute(r ApiCreateSavepointForFlinkStatementRequest) (Savepoint, *_nethttp.Response, error)
 
 	/*
-	DeleteSavepointForFlinkApplication Deletes the Savepoint of the given name for the given Application in the given Environment.
+	DeleteSavepointForFlinkApplication Requests deletion of the Savepoint of the given name for the given Application in the given Environment.
+
+	A successful response means the deletion request was accepted, not that the savepoint has already been fully removed. Unless `force` is set, the savepoint remains readable, reported with `state` `DELETING`, until its underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API. With `force=true`, the savepoint is removed from CMF immediately without waiting for Kubernetes to confirm removal of the underlying resources. Unless `force` is set, a savepoint that is still being taken isn't deleted, and the request fails with 409 until it has completed.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment
@@ -98,7 +100,9 @@ type SavepointsApi interface {
 	DeleteSavepointForFlinkApplicationExecute(r ApiDeleteSavepointForFlinkApplicationRequest) (*_nethttp.Response, error)
 
 	/*
-	DeleteSavepointForFlinkStatement Deletes the Savepoint of the given name for the given Statement in the given Environment.
+	DeleteSavepointForFlinkStatement Requests deletion of the Savepoint of the given name for the given Statement in the given Environment.
+
+	A successful response means the deletion request was accepted, not that the savepoint has already been fully removed. Unless `force` is set, the savepoint remains readable, reported with `state` `DELETING`, until its underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API. With `force=true`, the savepoint is removed from CMF immediately without waiting for Kubernetes to confirm removal of the underlying resources. Unless `force` is set, a savepoint that is still being taken isn't deleted, and the request fails with 409 until it has completed.
 
 	 @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 @param envName Name of the Environment
@@ -378,6 +382,16 @@ func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkApplicationExecute(r 
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -562,6 +576,16 @@ func (a *SavepointsApiService) BulkDeleteSavepointsForFlinkStatementExecute(r Ap
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -706,7 +730,27 @@ func (a *SavepointsApiService) CreateSavepointForFlinkApplicationExecute(r ApiCr
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -860,7 +904,27 @@ func (a *SavepointsApiService) CreateSavepointForFlinkStatementExecute(r ApiCrea
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -903,7 +967,7 @@ type ApiDeleteSavepointForFlinkApplicationRequest struct {
 	force *bool
 }
 
-// If a Savepoint is marked for deletion, it can be force deleted.
+// If set to &#x60;true&#x60;, the savepoint is removed from CMF metadata immediately, without waiting for Kubernetes to confirm that the underlying resources have been removed. Use this to get unstuck when a normal deletion is not completing.
 func (r ApiDeleteSavepointForFlinkApplicationRequest) Force(force bool) ApiDeleteSavepointForFlinkApplicationRequest {
 	r.force = &force
 	return r
@@ -914,7 +978,9 @@ func (r ApiDeleteSavepointForFlinkApplicationRequest) Execute() (*_nethttp.Respo
 }
 
 /*
-DeleteSavepointForFlinkApplication Deletes the Savepoint of the given name for the given Application in the given Environment.
+DeleteSavepointForFlinkApplication Requests deletion of the Savepoint of the given name for the given Application in the given Environment.
+
+A successful response means the deletion request was accepted, not that the savepoint has already been fully removed. Unless `force` is set, the savepoint remains readable, reported with `state` `DELETING`, until its underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API. With `force=true`, the savepoint is removed from CMF immediately without waiting for Kubernetes to confirm removal of the underlying resources. Unless `force` is set, a savepoint that is still being taken isn't deleted, and the request fails with 409 until it has completed.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment
@@ -1008,6 +1074,26 @@ func (a *SavepointsApiService) DeleteSavepointForFlinkApplicationExecute(r ApiDe
 			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -1032,7 +1118,7 @@ type ApiDeleteSavepointForFlinkStatementRequest struct {
 	force *bool
 }
 
-// If a Savepoint is marked for deletion, it can be force deleted.
+// If set to &#x60;true&#x60;, the savepoint is removed from CMF metadata immediately, without waiting for Kubernetes to confirm that the underlying resources have been removed. Use this to get unstuck when a normal deletion is not completing.
 func (r ApiDeleteSavepointForFlinkStatementRequest) Force(force bool) ApiDeleteSavepointForFlinkStatementRequest {
 	r.force = &force
 	return r
@@ -1043,7 +1129,9 @@ func (r ApiDeleteSavepointForFlinkStatementRequest) Execute() (*_nethttp.Respons
 }
 
 /*
-DeleteSavepointForFlinkStatement Deletes the Savepoint of the given name for the given Statement in the given Environment.
+DeleteSavepointForFlinkStatement Requests deletion of the Savepoint of the given name for the given Statement in the given Environment.
+
+A successful response means the deletion request was accepted, not that the savepoint has already been fully removed. Unless `force` is set, the savepoint remains readable, reported with `state` `DELETING`, until its underlying Kubernetes resources have actually been removed -- at which point it stops being returned by this API. With `force=true`, the savepoint is removed from CMF immediately without waiting for Kubernetes to confirm removal of the underlying resources. Unless `force` is set, a savepoint that is still being taken isn't deleted, and the request fails with 409 until it has completed.
 
  @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param envName Name of the Environment
@@ -1128,6 +1216,26 @@ func (a *SavepointsApiService) DeleteSavepointForFlinkStatementExecute(r ApiDele
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -1572,7 +1680,7 @@ func (r ApiGetSavepointsForFlinkApplicationRequest) Sort(sort []string) ApiGetSa
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetSavepointsForFlinkApplicationRequest) Filter(filter string) ApiGetSavepointsForFlinkApplicationRequest {
 	r.filter = &filter
 	return r
@@ -1752,7 +1860,7 @@ func (r ApiGetSavepointsForFlinkStatementRequest) Sort(sort []string) ApiGetSave
 	r.sort = &sort
 	return r
 }
-// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
+// Filter query string with comma-separated expressions. Supports: - Name filtering: name&#x3D;foo*bar (wildcards allowed) - Label equality: labels.key &#x3D; value or labels.key !&#x3D; value - Label set-based: labels.key in (value1, value2) or labels.key notin (value1, value2) - Label existence: labels.key (exists) or !labels.key (does not exist) - State filtering (Applications only): state&#x3D;RUNNING or state in (RUNNING, FAILED) or state notin (RUNNING, FAILED) - Status error filtering (Applications only): status.error (the Application&#39;s status reports an error, i.e. status.error is set and not blank) or !status.error (it reports none). An Application can report an error while its state is not FAILED, for example while its job keeps restarting. - Phase filtering (Statements and ComputePools): phase&#x3D;PENDING or phase in (PENDING, RUNNING) or phase notin (PENDING, RUNNING) - Type filtering (Events only): type&#x3D;CMF_STATUS or type in (CMF_STATUS, JOB_STATUS) or type notin (CMF_STATUS, JOB_STATUS) - Severity filtering (Events only): severity&#x3D;WARNING or severity in (INFO, WARNING) or severity notin (WARNING). Values: INFO, WARNING. Severity is independent of type, so the two can be combined to narrow further (e.g. type&#x3D;JOB_STATUS,severity&#x3D;WARNING). An unrecognized severity value is rejected with HTTP 400. - Cluster status filtering (Environments only): clusterStatus&#x3D;CONNECTED or clusterStatus in (CONNECTED, DISCONNECTED) or clusterStatus notin (CONNECTED, DISCONNECTED). Values match the effective state of the backing Kubernetes cluster (CONNECTED, DISCONNECTED, DECOMMISSIONED). - Source filtering (Savepoints only): source&#x3D;MANUAL or source in (MANUAL, SCHEDULE) or source notin (UPGRADE). Identifies how the savepoint was created. Values: MANUAL (triggered via API, CLI, or UI), UPGRADE (created during an application upgrade), SCHEDULE (created by a periodic savepoint schedule). An unrecognized source value is rejected with HTTP 400 (unlike state, which simply returns no matches for an unknown value). Example: ?filter&#x3D;name&#x3D;foo*bar,labels.environment in (production, qa),!labels.development Example (with state): ?filter&#x3D;name&#x3D;prod*,state in (RUNNING, FAILED) Example (with status.error): ?filter&#x3D;status.error,labels.team&#x3D;payments Example (with phase): ?filter&#x3D;name&#x3D;my-stmt*,phase in (PENDING, RUNNING) Example (with type): ?filter&#x3D;type&#x3D;CMF_STATUS or ?filter&#x3D;type in (CMF_STATUS, JOB_STATUS) Example (with severity): ?filter&#x3D;severity&#x3D;WARNING or ?filter&#x3D;type&#x3D;JOB_STATUS,severity&#x3D;WARNING Example (with clusterStatus): ?filter&#x3D;clusterStatus in (CONNECTED, DISCONNECTED) Example (with source): ?filter&#x3D;state&#x3D;COMPLETED,source&#x3D;SCHEDULE
 func (r ApiGetSavepointsForFlinkStatementRequest) Filter(filter string) ApiGetSavepointsForFlinkStatementRequest {
 	r.filter = &filter
 	return r
@@ -2029,6 +2137,26 @@ func (a *SavepointsApiService) UpdateSavepointForFlinkApplicationExecute(r ApiUp
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -2168,6 +2296,26 @@ func (a *SavepointsApiService) UpdateSavepointForFlinkStatementExecute(r ApiUpda
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v RestError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v RestError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
